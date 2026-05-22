@@ -7,7 +7,8 @@ function PageDiner({ openReserve }) {
   return (
     <main className="menu-page">
       <window.PageHero
-        placeholder
+        image="assets/diner-interieur.jpg"
+        alt="Sfeervol dinerinterieur met paarse bankjes, wijnrekken en kaarsen"
         tint="evening"
         eyebrow="Pagina 04 · Vrijdagavond & Feesten"
         number="№ 04"
@@ -18,7 +19,6 @@ function PageDiner({ openReserve }) {
           </React.Fragment>
         }
         lede="Eén avond per week schakelen we 's avonds door. Een echte dinerkaart, een 3-gangen keuze­menu, en onze High Bites om te delen."
-        tag={{ n: "PLACEHOLDER", text: "Sfeerbeeld, gedekte tafel op vrijdagavond" }}
       >
         <div className="page-hero-cta-row">
           <button className="nav-cta" onClick={openReserve} style={{ padding: "14px 22px", fontSize: 14 }}>

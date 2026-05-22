@@ -18,7 +18,6 @@ function Hero({ go, openReserve }) {
       <window.PageHero
         image="assets/interieur.jpg"
         alt="Interieur Zus & Zo met paarse luchter, houten bar en bloemen"
-        number="№ 01"
         titleNode={
           <React.Fragment>
             Genieten <span className="it">van eten,</span><br/>
@@ -26,7 +25,7 @@ function Hero({ go, openReserve }) {
             gezelligheid.
           </React.Fragment>
         }
-        lede="Een gezellige lunchgelegenheid tegenover het stadskantoor. Loop binnen voor een broodje, blijf voor de high tea, en kom op vrijdagavond terug, dan trekken we alles uit de kast."
+        lede="Lunch, high tea of vrijdagavond­diner. Welkom aan het Raadhuisplein."
         tag={{ n: "№ 01", text: "'s Ochtends, voor de eerste koffie" }}
       >
         <div className="page-hero-cta-row">
