@@ -189,12 +189,16 @@ function InstaFeed() {
         <div className="insta-scroll-wrap">
           <div className="insta-grid">
             {posts.map((p, i) => (
-              <a key={i} className={"insta-cell" + (p.aspect === "tall" ? " tall" : "")} href={window.BRAND.instagramUrl}>
-                <div className="placeholder">
-                  <span className="ph-icon">{p.icon}</span>
-                  <span className="ph-label">{p.label}</span>
-                </div>
-                <div className="overlay">♡ {p.likes}</div>
+              <a key={i} className="insta-cell" href={p.url || window.BRAND.instagramUrl} target="_blank" rel="noopener noreferrer">
+                {p.image ? (
+                  <img src={p.image} alt={p.label} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                ) : (
+                  <div className="placeholder">
+                    <span className="ph-icon">✦</span>
+                    <span className="ph-label">{p.label}</span>
+                  </div>
+                )}
+                <div className="overlay">{p.label}</div>
               </a>
             ))}
           </div>

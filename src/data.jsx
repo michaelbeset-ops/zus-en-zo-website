@@ -170,12 +170,12 @@ const OFFERINGS = [
 // Instagram-feed placeholders, distinct, not 4 identical squares
 // =============================================================
 const INSTA_POSTS = [
-  { label: "Carpaccio sandwich", icon: "·", aspect: "square", likes: "84" },
-  { label: "Vlaai van de week",  icon: "✦", aspect: "tall",   likes: "112" },
-  { label: "High tea etagère",   icon: "·", aspect: "square", likes: "203" },
-  { label: "Vrijdagavond, vol",  icon: "✦", aspect: "square", likes: "67" },
-  { label: "Wafel met aardbei",  icon: "·", aspect: "square", likes: "156" },
-  { label: "Interieur, ochtend", icon: "✦", aspect: "tall",   likes: "49" },
+  { image: "assets/insta-cocktails.jpg",        label: "Borrel & Bites op het terras",   url: "https://www.instagram.com/p/DYmrnl9Nt-e/" },
+  { image: "assets/insta-team-koningsdag.jpg",  label: "Team Koningsdag",                url: "https://www.instagram.com/p/DXoUvYPjXgz/" },
+  { image: "assets/insta-gastvrouw-bord.jpg",   label: "Kom genieten",                   url: "https://www.instagram.com/p/DWEGxU_jcrm/" },
+  { image: "assets/insta-high-bites.jpg",       label: "High Bites & cocktails",         url: "https://www.instagram.com/p/DVYbuAgDYHz/" },
+  { image: "assets/insta-kerst.jpg",            label: "Kerst bij Zus & Zo",             url: "https://www.instagram.com/p/DSpoFiuDbTD/" },
+  { image: null,                                label: "Sfeer op het terras",            url: "https://www.instagram.com/p/DKebgUOt1bo/" },
 ];
 
 Object.assign(window, {
