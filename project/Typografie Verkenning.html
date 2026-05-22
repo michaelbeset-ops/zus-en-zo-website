@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Typografie verkenning · Zus & Zo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500;1,9..144,600&family=Nunito+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,500;1,6..72,600&family=Karla:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     Palette (from the brief)
+     ========================================================= */
+  :root {
+    --bg-light: #F4EDE4;
+    --bg-dark: #3E2D3F;
+    --purple: #7A5C82;
+    --text: #3A2E28;
+    --text-mute: #7A6557;
+    --gold: #C9A86A;
+    --line: #D9CBB8;
+    --card: #F9F3EA;
+    --mono: "DM Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg-light);
+    color: var(--text);
+    font-family: "Nunito Sans", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* =========================================================
+     Page chrome
+     ========================================================= */
+  .page-head {
+    padding: 56px 32px 24px;
+    max-width: 1480px; margin: 0 auto;
+    display: grid; gap: 24px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .page-head { grid-template-columns: 1fr auto; align-items: end; padding: 72px 56px 32px; }
+  }
+  .page-head .crumb {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.24em; text-transform: uppercase;
+    color: var(--text-mute);
+    margin: 0 0 12px;
+  }
+  .page-head .crumb .a { color: var(--purple); }
+  .page-head h1 {
+    font-family: "Newsreader", Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    margin: 0;
+    color: var(--text);
+  }
+  .page-head h1 .em {
+    font-style: italic; color: var(--purple); font-weight: 500;
+  }
+  .page-head p {
+    font-size: 15px; color: var(--text-mute);
+    max-width: 44ch; line-height: 1.55; margin: 0;
+  }
+
+  hr.rule {
+    border: 0; height: 1px; background: var(--line);
+    margin: 24px 32px 0; max-width: 1480px;
+  }
+  @media (min-width: 900px) { hr.rule { margin: 24px 56px 0; } }
+
+  /* =========================================================
+     Compare grid (3 columns desktop, stacks on mobile)
+     ========================================================= */
+  .compare {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 32px;
+    display: grid; gap: 24px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .compare { grid-template-columns: 1fr 1fr 1fr; gap: 24px; padding: 32px 56px; }
+  }
+  @media (min-width: 1200px) {
+    .compare { gap: 32px; }
+  }
+
+  .variant {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 32px 28px 28px;
+    display: flex; flex-direction: column;
+    min-height: 100%;
+    position: relative;
+  }
+  .variant-head {
+    display: flex; align-items: baseline;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+  }
+  .variant-letter {
+    font-family: "Newsreader", serif;
+    font-style: italic; font-weight: 500;
+    font-size: 56px; line-height: 1;
+    color: var(--purple);
+  }
+  .variant-meta { flex: 1; }
+  .variant-name {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--text-mute);
+    margin: 0 0 4px;
+  }
+  .variant-name b { color: var(--text); font-weight: 600; }
+  .variant-sub {
+    font-family: var(--mono);
+    font-size: 11px; letter-spacing: 0.04em;
+    color: var(--purple);
+    margin: 0;
+  }
+  .variant-sub .pair { color: var(--gold); }
+
+  /* Sample blocks — each variant overrides these */
+  .sample {
+    display: flex; flex-direction: column;
+    gap: 24px;
+  }
+  .sample h2 {
+    font-size: clamp(32px, 3.4vw, 44px);
+    line-height: 1.02;
+    letter-spacing: -0.015em;
+    margin: 0;
+    color: var(--text);
+  }
+  .sample h2 .em {
+    font-style: italic;
+    color: var(--purple);
+  }
+  .sample h3 {
+    font-size: 17px;
+    letter-spacing: 0;
+    margin: 0;
+    color: var(--text);
+  }
+  .sample p {
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0;
+    max-width: 38ch;
+  }
+  .sample .body-note {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-mute);
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--line);
+    margin-bottom: -8px;
+  }
+  .sample button {
+    align-self: flex-start;
+    background: var(--purple);
+    color: #F4EDE4;
+    border: 1px solid var(--purple);
+    padding: 13px 22px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 1px;
+  }
+  .sample button:hover { background: #5e4566; }
+  .sample button .arr {
+    margin-left: 10px; display: inline-block;
+    transition: transform 0.2s;
+  }
+  .sample button:hover .arr { transform: translateX(3px); }
+
+  /* Small dark-bg preview row at bottom — same heading on dark */
+  .dark-preview {
+    margin-top: 28px;
+    padding: 18px 20px;
+    background: var(--bg-dark);
+    color: #E8DFD3;
+    display: flex; align-items: baseline; gap: 12px;
+    flex-wrap: wrap;
+  }
+  .dark-preview .label {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--gold);
+  }
+  .dark-preview .heading {
+    font-size: 22px;
+    line-height: 1.1;
+    color: #F4EDE4;
+    letter-spacing: -0.005em;
+  }
+  .dark-preview .heading .em {
+    font-style: italic; color: var(--gold);
+  }
+
+  /* =========================================================
+     VARIANT A — Speels & eigenzinnig
+     Fraunces (display, soft optical) + Nunito Sans (friendly)
+     ========================================================= */
+  .v-a .sample h2,
+  .v-a .dark-preview .heading {
+    font-family: "Fraunces", "Cormorant Garamond", serif;
+    font-weight: 500;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  }
+  .v-a .sample h2 .em,
+  .v-a .dark-preview .heading .em {
+    font-style: italic;
+    font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+  }
+  .v-a .sample h3 {
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+  }
+  .v-a .sample p,
+  .v-a .sample button {
+    font-family: "Nunito Sans", sans-serif;
+    font-weight: 500;
+  }
+  .v-a .sample button { font-weight: 700; letter-spacing: 0.01em; }
+  .v-a .dark-preview .label { font-family: var(--mono); }
+
+  /* =========================================================
+     VARIANT B — Strak & modern
+     Bricolage Grotesque (display) + Hanken Grotesk (body)
+     ========================================================= */
+  .v-b .sample h2,
+  .v-b .dark-preview .heading {
+    font-family: "Bricolage Grotesque", "Inter", sans-serif;
+    font-weight: 500;
+    font-variation-settings: "opsz" 96, "wdth" 100;
+    letter-spacing: -0.025em;
+  }
+  .v-b .sample h2 .em,
+  .v-b .dark-preview .heading .em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--purple);
+    font-variation-settings: "opsz" 96, "wdth" 100;
+  }
+  .v-b .dark-preview .heading .em { color: var(--gold); }
+  .v-b .sample h3 {
+    font-family: "Bricolage Grotesque", sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .v-b .sample p,
+  .v-b .sample button {
+    font-family: "Hanken Grotesk", sans-serif;
+    font-weight: 400;
+  }
+  .v-b .sample button { font-weight: 600; }
+
+  /* =========================================================
+     VARIANT C — Warm-klassiek met twist
+     Newsreader (transitional w/ playful italic) + Karla
+     ========================================================= */
+  .v-c .sample h2,
+  .v-c .dark-preview .heading {
+    font-family: "Newsreader", "EB Garamond", Georgia, serif;
+    font-weight: 500;
+    font-variation-settings: "opsz" 72;
+    letter-spacing: -0.012em;
+  }
+  .v-c .sample h2 .em,
+  .v-c .dark-preview .heading .em {
+    font-style: italic;
+    font-weight: 500;
+    font-variation-settings: "opsz" 24;
+  }
+  .v-c .sample h3 {
+    font-family: "Newsreader", serif;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .v-c .sample p,
+  .v-c .sample button {
+    font-family: "Karla", sans-serif;
+    font-weight: 400;
+  }
+  .v-c .sample button { font-weight: 600; letter-spacing: 0.02em; }
+
+  /* =========================================================
+     Bottom — palette swatch row for reference
+     ========================================================= */
+  .palette {
+    max-width: 1480px;
+    margin: 0 auto;
+    padding: 40px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .palette { grid-template-columns: auto 1fr; padding: 40px 56px 80px; gap: 48px; }
+  }
+  .palette-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-mute);
+  }
+  .swatches {
+    display: flex; gap: 16px; flex-wrap: wrap;
+  }
+  .swatch {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .swatch .chip {
+    width: 32px; height: 32px;
+    border: 1px solid rgba(0,0,0,0.08);
+    flex-shrink: 0;
+  }
+  .swatch .name {
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.05em; color: var(--text);
+  }
+  .swatch .hex {
+    font-family: var(--mono); font-size: 10px;
+    letter-spacing: 0.04em; color: var(--text-mute);
+    display: block;
+  }
+
+  /* Footer */
+  .foot {
+    border-top: 1px solid var(--line);
+    padding: 24px 32px;
+    max-width: 1480px;
+    margin: 0 auto;
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-mute);
+  }
+  @media (min-width: 900px) { .foot { padding: 24px 56px; } }
+</style>
+</head>
+<body>
+  <header class="page-head">
+    <div>
+      <p class="crumb"><span class="a">Verkenning</span> · Typografie · drie richtingen</p>
+      <h1>Welk lettertype past <span class="em">bij Zus &amp; Zo?</span></h1>
+    </div>
+    <p>
+      Drie varianten, dezelfde inhoud. Bekijk koppen, italic-accent, body en knop —
+      kies welke richting het beste de huiselijke, gastvrije sfeer pakt.
+    </p>
+  </header>
+  <hr class="rule" />
+
+  <section class="compare">
+    <!-- ==============================================
+         VARIANT A — Speels & eigenzinnig
+         ============================================== -->
+    <article class="variant v-a">
+      <div class="variant-head">
+        <span class="variant-letter">A</span>
+        <div class="variant-meta">
+          <p class="variant-name"><b>Speels &amp; eigenzinnig</b></p>
+          <p class="variant-sub">Fraunces <span class="pair">×</span> Nunito Sans</p>
+        </div>
+      </div>
+
+      <div class="sample">
+        <span class="body-note">— Grote kop —</span>
+        <h2>
+          Een huiselijke<br/>
+          lunchzaak <span class="em">aan het plein.</span>
+        </h2>
+
+        <span class="body-note">— Sub-kop —</span>
+        <h3>Wat we graag doen</h3>
+
+        <span class="body-note">— Bodytekst —</span>
+        <p>
+          We zitten aan het Raadhuisplein, recht tegenover het stadskantoor.
+          Bruin, warm, en met een paarse luchter waar nieuwe gasten altijd
+          even naar wijzen. Kom binnen voor een broodje, blijf hangen voor
+          de koffie.
+        </p>
+
+        <span class="body-note">— Knop —</span>
+        <button type="button">Reserveer hier <span class="arr">→</span></button>
+      </div>
+
+      <div class="dark-preview">
+        <span class="label">Op donker</span>
+        <span class="heading">Aan <span class="em">het plein.</span></span>
+      </div>
+    </article>
+
+    <!-- ==============================================
+         VARIANT B — Strak & modern
+         ============================================== -->
+    <article class="variant v-b">
+      <div class="variant-head">
+        <span class="variant-letter">B</span>
+        <div class="variant-meta">
+          <p class="variant-name"><b>Strak &amp; modern</b></p>
+          <p class="variant-sub">Bricolage Grotesque <span class="pair">×</span> Hanken Grotesk</p>
+        </div>
+      </div>
+
+      <div class="sample">
+        <span class="body-note">— Grote kop —</span>
+        <h2>
+          Een huiselijke<br/>
+          lunchzaak <span class="em">aan het plein.</span>
+        </h2>
+
+        <span class="body-note">— Sub-kop —</span>
+        <h3>Wat we graag doen</h3>
+
+        <span class="body-note">— Bodytekst —</span>
+        <p>
+          We zitten aan het Raadhuisplein, recht tegenover het stadskantoor.
+          Bruin, warm, en met een paarse luchter waar nieuwe gasten altijd
+          even naar wijzen. Kom binnen voor een broodje, blijf hangen voor
+          de koffie.
+        </p>
+
+        <span class="body-note">— Knop —</span>
+        <button type="button">Reserveer hier <span class="arr">→</span></button>
+      </div>
+
+      <div class="dark-preview">
+        <span class="label">Op donker</span>
+        <span class="heading">Aan <span class="em">het plein.</span></span>
+      </div>
+    </article>
+
+    <!-- ==============================================
+         VARIANT C — Warm-klassiek met twist
+         ============================================== -->
+    <article class="variant v-c">
+      <div class="variant-head">
+        <span class="variant-letter">C</span>
+        <div class="variant-meta">
+          <p class="variant-name"><b>Warm-klassiek met twist</b></p>
+          <p class="variant-sub">Newsreader <span class="pair">×</span> Karla</p>
+        </div>
+      </div>
+
+      <div class="sample">
+        <span class="body-note">— Grote kop —</span>
+        <h2>
+          Een huiselijke<br/>
+          lunchzaak <span class="em">aan het plein.</span>
+        </h2>
+
+        <span class="body-note">— Sub-kop —</span>
+        <h3>Wat we graag doen</h3>
+
+        <span class="body-note">— Bodytekst —</span>
+        <p>
+          We zitten aan het Raadhuisplein, recht tegenover het stadskantoor.
+          Bruin, warm, en met een paarse luchter waar nieuwe gasten altijd
+          even naar wijzen. Kom binnen voor een broodje, blijf hangen voor
+          de koffie.
+        </p>
+
+        <span class="body-note">— Knop —</span>
+        <button type="button">Reserveer hier <span class="arr">→</span></button>
+      </div>
+
+      <div class="dark-preview">
+        <span class="label">Op donker</span>
+        <span class="heading">Aan <span class="em">het plein.</span></span>
+      </div>
+    </article>
+  </section>
+
+  <div class="palette">
+    <span class="palette-label">Palet voor deze test</span>
+    <div class="swatches">
+      <div class="swatch">
+        <div class="chip" style="background:#F4EDE4"></div>
+        <div><span class="name">Licht</span><span class="hex">#F4EDE4</span></div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#3E2D3F"></div>
+        <div><span class="name">Donker</span><span class="hex">#3E2D3F</span></div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#7A5C82"></div>
+        <div><span class="name">Paars</span><span class="hex">#7A5C82</span></div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#3A2E28"></div>
+        <div><span class="name">Tekst</span><span class="hex">#3A2E28</span></div>
+      </div>
+      <div class="swatch">
+        <div class="chip" style="background:#C9A86A"></div>
+        <div><span class="name">Goud</span><span class="hex">#C9A86A</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Zus &amp; Zo — Typografie verkenning</span>
+    <span>3 richtingen · klik om te kiezen</span>
+  </div>
+</body>
+</html>
