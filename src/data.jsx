@@ -170,12 +170,12 @@ const OFFERINGS = [
 // Instagram-feed placeholders, distinct, not 4 identical squares
 // =============================================================
 const INSTA_POSTS = [
-  { image: "assets/insta-cocktails.jpg",        label: "Borrel & Bites op het terras",   url: "https://www.instagram.com/p/DYmrnl9Nt-e/" },
-  { image: "assets/insta-team-koningsdag.jpg",  label: "Team Koningsdag",                url: "https://www.instagram.com/p/DXoUvYPjXgz/" },
-  { image: "assets/insta-gastvrouw-bord.jpg",   label: "Kom genieten",                   url: "https://www.instagram.com/p/DWEGxU_jcrm/" },
-  { image: "assets/insta-high-bites.jpg",       label: "High Bites & cocktails",         url: "https://www.instagram.com/p/DVYbuAgDYHz/" },
-  { image: "assets/insta-kerst.jpg",            label: "Kerst bij Zus & Zo",             url: "https://www.instagram.com/p/DSpoFiuDbTD/" },
-  { image: null,                                label: "Sfeer op het terras",            url: "https://www.instagram.com/p/DKebgUOt1bo/" },
+  { image: "assets/Schermafbeelding 2026-05-22 162801.png", label: "Borrel & Bites op het terras", url: "https://www.instagram.com/p/DYmrnl9Nt-e/" },
+  { image: "assets/Schermafbeelding 2026-05-22 162823.png", label: "Team Koningsdag",              url: "https://www.instagram.com/p/DXoUvYPjXgz/" },
+  { image: "assets/Schermafbeelding 2026-05-22 162842.png", label: "Kom genieten",                 url: "https://www.instagram.com/p/DWEGxU_jcrm/" },
+  { image: "assets/Schermafbeelding 2026-05-22 162856.png", label: "High Bites & cocktails",       url: "https://www.instagram.com/p/DVYbuAgDYHz/" },
+  { image: "assets/Schermafbeelding 2026-05-22 162905.png", label: "Kerst bij Zus & Zo",           url: "https://www.instagram.com/p/DSpoFiuDbTD/" },
+  { image: "assets/Schermafbeelding 2026-05-22 162916.png", label: "Sfeer op het terras",          url: "https://www.instagram.com/p/DKebgUOt1bo/" },
 ];
 
 Object.assign(window, {
