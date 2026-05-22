@@ -103,14 +103,10 @@ function Offerings({ go }) {
                     <img src="assets/terras-proost.png" alt="Bediening proost op het terras met wijn en een sharing board" />
                   ) : o.id === "feesten" ? (
                     <img src="assets/feest-dansvloer.png" alt="Feestzaal met statafels, DJ-opstelling en sfeerverlichting" />
+                  ) : o.id === "diner" ? (
+                    <img src="assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png" alt="Sfeervol dinerinterieur met paarse bankjes en wijnrekken" />
                   ) : (
-                    <PagePlaceholder
-                      label={
-                        o.id === "diner" ? "Vrijdagavond, gedekte tafel" :
-                        "Buffet & feestelijke tafel"
-                      }
-                      dark={isDark}
-                    />
+                    <PagePlaceholder label="Buffet & feestelijke tafel" dark={isDark} />
                   )}
                   <span className="o-tag">{o.eyebrow}</span>
                 </div>
