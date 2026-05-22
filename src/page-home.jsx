@@ -18,7 +18,6 @@ function Hero({ go, openReserve }) {
       <window.PageHero
         image="assets/interieur.jpg"
         alt="Interieur Zus & Zo met paarse luchter, houten bar en bloemen"
-        eyebrow="Raadhuisplein 37 · Etten-Leur"
         number="№ 01"
         titleNode={
           <React.Fragment>
@@ -68,14 +67,8 @@ function Intro() {
         </div>
         <div>
           <p>
-            We zitten aan het Raadhuisplein, recht tegenover het stadskantoor. Bruin, warm,
-            en met een paarse luchter waar nieuwe gasten altijd even naar wijzen. Kom binnen
-            voor een broodje, blijf hangen voor de koffie, en als je toch zit, een vlaai
-            erbij is geen schande.
-          </p>
-          <p>
-            We koken eerlijk en met aandacht. Wat we hier opdienen, eten we zelf ook met
-            plezier. Niks ingewikkelds, gewoon goed.
+            Aan het Raadhuisplein, tegenover het stadskantoor. Kom binnen voor een broodje,
+            blijf voor de koffie. Op vrijdagavond trekken we alles uit de kast.
           </p>
           <p className="signature">Met liefs, het team van Zus &amp; Zo</p>
         </div>
@@ -151,8 +144,8 @@ function Offerings({ go }) {
 
           if (isDark) {
             return (
-              <div key={o.id} className="diner-feature" style={{ margin: "0 -56px 80px", padding: "80px 56px" }}>
-                <div className="container" style={{ padding: 0 }}>{Body}</div>
+              <div key={o.id} className="diner-feature">
+                <div className="container">{Body}</div>
               </div>
             );
           }
@@ -193,16 +186,18 @@ function InstaFeed() {
             <div className="eyebrow" style={{ marginTop: 4 }}>Volg ons mee →</div>
           </div>
         </div>
-        <div className="insta-grid">
-          {posts.map((p, i) => (
-            <a key={i} className={"insta-cell" + (p.aspect === "tall" ? " tall" : "")} href={window.BRAND.instagramUrl}>
-              <div className="placeholder">
-                <span className="ph-icon">{p.icon}</span>
-                <span className="ph-label">{p.label}</span>
-              </div>
-              <div className="overlay">♡ {p.likes}</div>
-            </a>
-          ))}
+        <div className="insta-scroll-wrap">
+          <div className="insta-grid">
+            {posts.map((p, i) => (
+              <a key={i} className={"insta-cell" + (p.aspect === "tall" ? " tall" : "")} href={window.BRAND.instagramUrl}>
+                <div className="placeholder">
+                  <span className="ph-icon">{p.icon}</span>
+                  <span className="ph-label">{p.label}</span>
+                </div>
+                <div className="overlay">♡ {p.likes}</div>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>

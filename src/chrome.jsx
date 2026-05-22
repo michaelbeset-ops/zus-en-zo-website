@@ -99,7 +99,7 @@ function Nav({ page, go, openReserve }) {
               className={"drawer-link" + (page === p.id ? " active" : "")}
               onClick={(e) => { e.preventDefault(); setOpen(false); go(p.id); }}
             >
-              <span className="idx">{p.num}</span> {p.label}
+              {p.label}
             </a>
           ))}
           <button
