@@ -7,7 +7,7 @@ function PageDiner({ openReserve }) {
   return (
     <main className="menu-page">
       <window.PageHero
-        image="assets/diner-interieur.jpg"
+        image="assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png"
         alt="Sfeervol dinerinterieur met paarse bankjes, wijnrekken en kaarsen"
         tint="evening"
         eyebrow="Pagina 04 · Vrijdagavond & Feesten"
