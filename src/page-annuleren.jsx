@@ -4,13 +4,13 @@
 // =============================================================
 const { useState: useStateX, useEffect: useEffectX } = React;
 
-function reservationIdFromHash() {
+function hashParam(name) {
   const q = (window.location.hash.split("?")[1] || "");
-  return new URLSearchParams(q).get("id") || "";
+  return new URLSearchParams(q).get(name) || "";
 }
 
 function PageAnnuleren({ openReserve }) {
-  const [id] = useStateX(reservationIdFromHash());
+  const [id] = useStateX(hashParam("id"));
   const [state, setState] = useStateX("laden"); // laden | open | bezig | klaar | fout
   const [res, setRes] = useStateX(null);
   const [error, setError] = useStateX("");
@@ -40,7 +40,7 @@ function PageAnnuleren({ openReserve }) {
     else { setState("open"); setError(window.ReserveApi.message(r.code)); }
   };
 
-  const typeLabel = res ? ((window.RESERVE_TYPES.find((t) => t.id === res.reservation_type) || {}).title || "") : "";
+  const typeLabel = res ? (res.type_name || "") : "";
 
   return (
     <main>
@@ -106,4 +106,52 @@ function PageAnnuleren({ openReserve }) {
   );
 }
 
-Object.assign(window, { PageAnnuleren });
+// Afmelden voor nieuws via de link uit de mail: #afmelden?token=<uuid>
+function PageAfmelden() {
+  const [token] = useStateX(hashParam("token"));
+  const [state, setState] = useStateX("open"); // open | bezig | klaar | fout
+  const [error, setError] = useStateX("");
+
+  const doUnsubscribe = async () => {
+    setState("bezig");
+    const r = await window.ReserveApi.call("unsubscribe", { token });
+    if (r.ok) setState("klaar");
+    else { setState("fout"); setError(window.ReserveApi.message(r.code)); }
+  };
+
+  return (
+    <main>
+      <window.PageHero
+        placeholder
+        tint="daylight"
+        eyebrow="Nieuwsbrief"
+        titleNode={state === "klaar" ? <React.Fragment>Afgemeld.<br/><span className="it">Je hoort niets meer.</span></React.Fragment>
+          : <React.Fragment>Afmelden voor<br/><span className="it">ons nieuws</span></React.Fragment>}
+      />
+      <section className="legal-section">
+        <div className="container" style={{ maxWidth: 640 }}>
+          <div className="cancel-card">
+            {!token ? (
+              <div className="callout callout-error" role="alert">Deze link is niet compleet. Mail ons gerust op <a href={`mailto:${window.BRAND.email}`}>{window.BRAND.email}</a>, dan halen we je van de lijst.</div>
+            ) : state === "klaar" ? (
+              <p className="cancel-text" style={{ marginTop: 0 }}>Je staat niet meer op onze mailinglijst. Je reserveringen blijven gewoon staan.</p>
+            ) : (
+              <React.Fragment>
+                {error && <div className="callout callout-error" role="alert">{error}</div>}
+                <p className="cancel-text" style={{ marginTop: 0 }}>Wil je geen nieuws en acties meer van ons per mail? Klik dan hieronder. Je reserveringen blijven gewoon staan.</p>
+                <div className="cancel-actions">
+                  <button className="btn btn-primary" onClick={doUnsubscribe} disabled={state === "bezig"}>
+                    {state === "bezig" ? "Bezig…" : "Ja, meld me af"}
+                  </button>
+                  <a className="btn" href="#home">Nee, laat maar</a>
+                </div>
+              </React.Fragment>
+            )}
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+Object.assign(window, { PageAnnuleren, PageAfmelden });

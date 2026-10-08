@@ -2,8 +2,9 @@
 // =============================================================
 // Koppeling met Supabase (reserveringssysteem)
 // =============================================================
-// Invullen na het aanmaken van het Supabase-project, zie RESERVERINGEN.md.
-// Supabase, Project Settings, API:
+// Wordt automatisch ingevuld door: node installeer/installeer.mjs
+// (zie RESERVERINGEN.md). Handmatig kan ook, uit Supabase, Project
+// Settings, API:
 //   supabaseUrl      "Project URL", bijv. https://abcdefgh.supabase.co
 //   supabaseAnonKey  de "anon public" (of "publishable") key
 //

@@ -6,7 +6,7 @@ const { useState: useStateA, useEffect: useEffectA } = React;
 
 function readHash() {
   const h = (window.location.hash || "").replace(/^#/, "").split("?")[0].trim();
-  const valid = [...window.NAV_PAGES.map((p) => p.id), "cookiebeleid", "privacybeleid", "annuleren"];
+  const valid = [...window.NAV_PAGES.map((p) => p.id), "cookiebeleid", "privacybeleid", "annuleren", "afmelden"];
   if (valid.includes(h)) return h;
   return "home";
 }
@@ -15,6 +15,19 @@ function App() {
   const [page, setPage] = useStateA(readHash());
   const [reserveOpen, setReserveOpen] = useStateA(false);
   const [reserveInitial, setReserveInitial] = useStateA(null);
+  const [, setConfigVersion] = useStateA(0);
+
+  // Openingstijden en reserveringsinstellingen uit het beheer laden. Tot die
+  // binnen zijn toont de site de vaste waarden uit data.jsx.
+  useEffectA(() => {
+    const apply = () => {
+      if (window.ReserveApi.configured) window.HOURS = window.ReserveApi.siteHours();
+      setConfigVersion((v) => v + 1);
+    };
+    window.addEventListener("zz-config", apply);
+    window.ReserveApi.loadConfig();
+    return () => window.removeEventListener("zz-config", apply);
+  }, []);
 
   useEffectA(() => {
     const onHash = () => setPage(readHash());
@@ -56,6 +69,7 @@ function App() {
   else if (page === "cookiebeleid") Page = <window.PageCookiebeleid />;
   else if (page === "privacybeleid") Page = <window.PagePrivacybeleid />;
   else if (page === "annuleren") Page = <window.PageAnnuleren openReserve={openReserve} />;
+  else if (page === "afmelden") Page = <window.PageAfmelden />;
   else Page = <window.PageHome go={go} openReserve={openReserve} />;
 
   return (

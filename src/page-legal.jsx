@@ -379,6 +379,11 @@ function PagePrivacybeleid() {
               je bestelling en het tijdstip waarop je komt halen.
             </li>
             <li>
+              <strong>Voor onze nieuwsbrief:</strong> je naam en e-mailadres, alleen als je
+              daar bij het reserveren zelf het vinkje voor aanzet. We leggen vast wanneer je
+              toestemming gaf en met welke tekst.
+            </li>
+            <li>
               <strong>Bij een sollicitatie:</strong> je CV, motivatiebrief en wat je daar
               verder zelf in meestuurt.
             </li>
@@ -400,6 +405,7 @@ function PagePrivacybeleid() {
           <ul className="legal-list">
             <li>Je reservering of bestelling klaarmaken en bevestigen.</li>
             <li>Contact opnemen als er iets verandert (bijv. een onverwachte sluiting).</li>
+            <li>Je af en toe nieuws en acties sturen, alleen als je daarvoor hebt gekozen.</li>
             <li>Je vraag of klacht netjes afhandelen.</li>
             <li>Een sollicitatie­procedure doorlopen.</li>
             <li>Onze website verbeteren op basis van geanonimiseerde statistieken.</li>
@@ -426,9 +432,10 @@ function PagePrivacybeleid() {
               facturen voor de Belastingdienst.
             </li>
             <li>
-              <strong>Toestemming</strong>, bijvoorbeeld voor optionele cookies of
-              voor het opslaan van een sollicitatie in onze portefeuille. Toestemming
-              kun je altijd weer intrekken.
+              <strong>Toestemming</strong>, bijvoorbeeld voor optionele cookies, onze
+              nieuwsbrief of het opslaan van een sollicitatie in onze portefeuille.
+              Toestemming kun je altijd weer intrekken. Voor de nieuwsbrief kan dat via
+              de afmeldlink in onze mails, of door ons even te mailen.
             </li>
           </ul>
         </React.Fragment>
@@ -447,6 +454,10 @@ function PagePrivacybeleid() {
             <div className="legal-row">
               <div>Reserverings­gegevens</div>
               <div>Tot 6 maanden na bezoek, voor service en eventuele vragen.</div>
+            </div>
+            <div className="legal-row">
+              <div>Nieuwsbrief (naam en e-mail)</div>
+              <div>Tot je je afmeldt. Daarna sturen we niets meer en bewaren we alleen dat je je hebt afgemeld.</div>
             </div>
             <div className="legal-row">
               <div>Contactformulier</div>
@@ -555,7 +566,7 @@ function PagePrivacybeleid() {
       number="№ 07"
       title="Ons"
       titleEm="privacybeleid."
-      updated="22 mei 2026"
+      updated="8 oktober 2026"
       intro="In gewone taal: wat we van je bewaren, waarom, hoe lang, en hoe je het weer weg kunt laten halen."
       sections={sections}
     />

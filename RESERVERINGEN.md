@@ -1,155 +1,129 @@
 # Reserveringssysteem Zus & Zo
 
-Online reserveren met Supabase (database, inloggen en Edge Function) en Resend
-(mails). De opzet komt van de module van Den Witten Haen, met strengere
-beveiliging: bezoekers kunnen de database niet zelf lezen of beschrijven en
-elke mail hoort bij een echte wijziging.
+Online reserveren met Supabase (database, inloggen, Edge Function) en Resend
+(mails). Het café regelt alles zelf in het beheer op `/beheer.html`; aan de
+code hoeft niets meer te gebeuren.
+
+## Installeren (één keer, ongeveer 10 minuten)
+
+Nodig: Node 18 of nieuwer, een Supabase-account en een Resend-account.
+
+1. **Supabase access token**: https://supabase.com/dashboard/account/tokens,
+   *Generate new token*.
+2. **Resend API key**: https://resend.com/api-keys, *Create API key*, rechten
+   **Full access** (het script meldt dan zelf het domein aan).
+3. In de map van deze repo:
+
+   ```bash
+   node installeer/installeer.mjs
+   ```
+
+   Het script vraagt om de twee sleutels, het adres van de website en het
+   e-mailadres van het café, en doet daarna alles zelf:
+
+   | Stap | Wat |
+   |---|---|
+   | 1 | Supabase-project `zus-en-zo` aanmaken in Frankfurt (of een bestaand project gebruiken) |
+   | 2 | Database inrichten met `supabase/schema.sql`, plus de nachtelijke opruimtaak |
+   | 3 | Inloggen afschermen (alleen accounts die het café toevoegt) en wachtwoordmails in het Nederlands via Resend |
+   | 4 | Edge Function `reservering` uitrollen met de juiste secrets |
+   | 5 | Inlogaccount voor het café aanmaken, met toegang tot het beheer |
+   | 6 | `lunchcafezusenzo.nl` aanmelden bij Resend en de DNS-records tonen |
+   | 7 | `src/config.js` invullen, alles controleren, en desgewenst committen en pushen |
+
+4. **Het enige handwerk**: de DNS-records die het script toont (ook in
+   `installeer/dns-records.txt`) bij de registrar van lunchcafezusenzo.nl
+   zetten. Tot Resend het domein heeft geverifieerd, gaan er geen mails uit;
+   reserveren werkt wel.
+5. Geef het café het adres van het beheer, het e-mailadres en het wachtwoord
+   dat het script aan het eind toont (ook in `installeer/.installatie.json`,
+   dat bestand gaat niet naar GitHub).
+
+Het script mag je altijd opnieuw draaien, bijvoorbeeld om later alsnog de
+Resend-key toe te voegen of na een wijziging aan de code. Bestaande
+reserveringen, instellingen en wachtwoorden blijven staan.
+
+## Wat het café zelf regelt in het beheer
+
+| Tabblad | Wat |
+|---|---|
+| **Reserveringen** | Per dag, *Te bevestigen* en *Komend*. Bevestigen, wijzigen, annuleren. Telefonische reserveringen zelf invoeren (ook zonder e-mail, buiten de vaste tijden of boven de capaciteit). Werkt live bij. |
+| **Openingstijden** | Per dag open/dicht, tijden en een notitie. Staat meteen op de website en onder elke mail. Op een dichte dag kan niemand online reserveren. |
+| **Soorten en tijden** | Lunch, high tea, diner en eventueel nieuwe soorten: naam, omschrijving, dagen, eerste en laatste tijd, elk kwartier/half uur/uur, aan of uit. |
+| **Sluitingen** | Een hele dag of een deel ervan dicht (vakantie, besloten feest). |
+| **Mailinglijst** | Gasten die zelf toestemming gaven. Zoeken, exporteren (CSV voor bijvoorbeeld MailChimp of Brevo), verwijderen. |
+| **Instellingen** | Capaciteit (gasten tegelijk, hoe lang een tafel bezet is), maximaal per online reservering, termijnen, **automatisch bevestigen** aan/uit, adres voor meldingen, nieuwsbriefvraag aan/uit en de tekst ervan, en **collega's toegang geven of intrekken**. |
+
+## Mailadressen en toestemming (AVG)
+
+- Bij het reserveren staat een vinkje *"Ja, stuur me af en toe nieuws..."*.
+  Het staat **standaard uit**; alleen wie het zelf aanzet komt op de lijst.
+- Per aanmelding worden het moment en de exacte tekst van het vinkje
+  opgeslagen, als bewijs van toestemming.
+- In elke mail aan een aangemelde gast staat een afmeldlink
+  (`#afmelden?token=...`). Afmelden haalt het adres van de lijst en wist de
+  naam.
+- Het privacybeleid op de site beschrijft dit (gegevens, grondslag
+  toestemming, bewaren tot afmelden, intrekken via link of mail).
+- Reserveringen zelf worden 6 maanden na het bezoek automatisch verwijderd,
+  zoals het privacybeleid belooft.
 
 ## Hoe het werkt
 
-1. **Gast** kiest op de site soort (lunch, high tea, diner), aantal personen,
-   datum en tijd. Volle of gesloten tijden zijn niet te kiezen.
-2. De aanvraag komt binnen als **aangevraagd**. De gast krijgt een mail
-   ("we hebben je aanvraag") en het café krijgt een mail met alle gegevens
-   en een knop naar het beheer.
-3. In het **beheer** (`/beheer.html`) drukt het café op *Bevestigen*. De gast
-   krijgt dan de bevestigingsmail. *Annuleren* kan ook; de gast krijgt
-   daar bericht van.
-4. In elke mail aan de gast staat een **annuleerlink**. Annuleert de gast,
-   dan krijgen gast en café een mail en is de plek weer vrij.
+1. De gast kiest soort, aantal personen, datum en tijd. Volle, gesloten of
+   voorbije tijden zijn niet te kiezen.
+2. De gast krijgt een mail. Standaard is dat "aanvraag ontvangen"; staat
+   automatisch bevestigen aan, dan krijgt de gast meteen de bevestiging. Het
+   café krijgt een mail met alle gegevens en een knop naar het beheer.
+3. In het beheer drukt het café op *Bevestigen*; de gast krijgt de
+   bevestiging.
+4. In elke mail staat een annuleerlink. Annuleert de gast, dan krijgen gast
+   en café een mail en is de plek weer vrij.
 
-Regels (staan in de database, de site kan ze niet omzeilen):
+Vaste regels in de database (de website kan ze niet omzeilen): de dag moet
+open zijn en bij de soort horen, de tijd moet een van de tijden van die soort
+zijn, binnen de termijnen vallen, niet gesloten zijn en er moet plek zijn.
+Maximaal 3 aanvragen per e-mailadres per uur, plus een spamval.
 
-| Regel | Waarde |
-|---|---|
-| Maandag | Gesloten |
-| Lunch | Di t/m zo, 11:30 tot en met 15:00, elk half uur |
-| High tea | Di t/m zo, 13:00 tot en met 15:00 |
-| Diner | Alleen vrijdag, 17:30 tot en met 20:30 |
-| Online per reservering | 1 tot 8 personen, vanaf 9 bellen |
-| Capaciteit | Max. **40** gasten tegelijk in een blok van 2 uur [[AANLEVEREN: echt maximum van Zus & Zo]] |
-| Vooruit | Minimaal 60 minuten, maximaal 180 dagen |
-| Misbruik | Max. 3 aanvragen per e-mailadres per uur, plus een spamval |
-| Opruimen | Reserveringen ouder dan 6 maanden worden elke nacht verwijderd (zoals in het privacybeleid staat) |
+## Beveiliging
 
-Capaciteit, maximum per reservering en de termijnen past het café zelf aan
-in het beheer onder *Instellingen*. Sluitingen (vakantie, besloten feest)
-staan onder *Sluitingen*. De tijdsloten zelf staan in `slots_for()` in
-`supabase/schema.sql` en in `TIME_SLOTS` in `src/reserve.jsx`.
+- Met de publieke sleutel op de website kun je alleen de openbare
+  instellingen en de beschikbaarheid (ja/nee per tijd) opvragen. Lezen,
+  schrijven en de interne functies geven "permission denied".
+- Alleen accounts in de tabel `staff` zien gegevens. Een willekeurig
+  Supabase-account ziet niets; aanmelden staat bovendien uit.
+- Alle mails en statuswijzigingen lopen via de Edge Function. Personeelsacties
+  controleren eerst het inlogtoken en daarna of het account personeel is.
+- De Resend-key en de service-sleutel staan alleen als secret in Supabase,
+  nooit in de website of in GitHub.
 
 ## Bestanden
 
 | Bestand | Wat |
 |---|---|
-| `supabase/schema.sql` | Tabellen, regels en rechten. Eenmalig draaien. |
-| `supabase/functions/reservering/index.ts` | Edge Function: aanmaken, annuleren, bevestigen, mails |
-| `supabase/config.toml` | Zet JWT-controle van de functie uit (de functie controleert zelf) |
-| `src/config.js` | Supabase-URL en publieke sleutel voor de site |
-| `src/reserve-api.js`, `src/reserve.jsx` | Reserveringsvenster op de site |
-| `src/page-annuleren.jsx` | Annuleerpagina (`#annuleren?id=...`) |
-| `beheer.html`, `src/beheer.jsx`, `beheer.css` | Beheer voor het café |
-| `.github/workflows/supabase-keepalive.yml` | Houdt het gratis project wakker |
-
-## Live zetten (eenmalig, ongeveer 30 minuten)
-
-### 1. Supabase-project
-
-1. https://supabase.com, *New project*. Naam `zus-en-zo`, regio
-   **Central EU (Frankfurt)** (gegevens blijven in de EU), sterk
-   databasewachtwoord.
-2. *SQL Editor*, *New query*: plak de hele inhoud van `supabase/schema.sql`
-   en klik *Run*. Er mag "pg_cron niet beschikbaar" staan; zet dan onder
-   *Database, Extensions* `pg_cron` aan en draai het bestand nog een keer
-   (dat kan veilig).
-
-### 2. Inloggen afschermen
-
-1. *Authentication, Sign In / Providers*: zet **Allow new users to sign up
-   uit**. Accounts maak jij aan.
-2. *Authentication, URL Configuration*: zet *Site URL* op het adres van de
-   site en voeg bij *Redirect URLs* `https://<adres>/beheer.html` toe (nodig
-   voor "wachtwoord vergeten").
-
-### 3. Mail via Resend
-
-1. https://resend.com, account, *Domains*, *Add domain*:
-   `lunchcafezusenzo.nl`, regio EU.
-2. Resend toont DNS-records (SPF/MX en DKIM). Die zet je bij de registrar
-   van lunchcafezusenzo.nl en daarna klik je *Verify*.
-3. *API Keys*, *Create API key* (rechten: *Sending access*).
-
-(Liever Brevo, zoals bij Den Witten Haen? Zet dan `BREVO_API_KEY` in plaats
-van `RESEND_API_KEY`; de functie kan met allebei.)
-
-### 4. Edge Function
-
-Met de CLI (vanuit de map van deze repo):
-
-```bash
-npx supabase login
-npx supabase functions deploy reservering --project-ref <project-ref>
-```
-
-Of in het dashboard: *Edge Functions*, *Deploy a new function*, *Via
-Editor*, naam `reservering`, plak `supabase/functions/reservering/index.ts`,
-en zet bij de instellingen **Verify JWT uit**.
-
-Daarna *Edge Functions, Secrets*:
-
-| Secret | Waarde |
-|---|---|
-| `RESEND_API_KEY` | sleutel uit stap 3 |
-| `FROM_EMAIL` | `reserveren@lunchcafezusenzo.nl` (moet op het geverifieerde domein) |
-| `RESTAURANT_EMAIL` | `info@lunchcafezusenzo.nl` (waar aanvragen binnenkomen) |
-| `SITE_URL` | adres van de site zonder `/` aan het eind, bijv. `https://www.lunchcafezusenzo.nl` |
-
-`SUPABASE_URL`, `SUPABASE_ANON_KEY` en `SUPABASE_SERVICE_ROLE_KEY` zet
-Supabase zelf.
-
-### 5. Account voor het café
-
-1. *Authentication, Users, Add user, Create new user*: e-mail van het café,
-   een tijdelijk wachtwoord, *Auto Confirm User* aan.
-2. *SQL Editor*:
-
-   ```sql
-   insert into public.staff (user_id, note)
-   select id, 'Eigenaar' from auth.users where email = 'info@lunchcafezusenzo.nl';
-   ```
-
-Alleen accounts in `staff` zien reserveringen. Toegang intrekken:
-`delete from public.staff where user_id = (select id from auth.users where email = '...');`
-
-### 6. Site koppelen
-
-*Project Settings, API*: kopieer de *Project URL* en de **anon public**
-(of *publishable*) key naar `src/config.js`. Commit en push. Nooit de
-`service_role`- of secret-key in de site zetten.
-
-### 7. Testen
-
-1. Reserveer op de site met je eigen e-mailadres.
-2. Controleer: mail "aanvraag ontvangen" bij jou, mail "nieuwe aanvraag" in
-   de inbox van het café.
-3. Log in op `/beheer.html`, druk *Bevestigen*: bevestigingsmail komt binnen.
-4. Klik de annuleerlink in de mail en annuleer: beide kanten krijgen een mail.
-
-Komt er geen mail? *Edge Functions, reservering, Logs* laat zien wat Resend
-terugstuurde (meestal: domein nog niet geverifieerd of `FROM_EMAIL` niet op
-dat domein).
+| `installeer/installeer.mjs` | Installatiescript |
+| `supabase/schema.sql` | Tabellen, regels, rechten en opruimtaak |
+| `supabase/functions/reservering/index.ts` | Edge Function: reserveren, annuleren, afmelden, beheer, mails |
+| `supabase/config.toml` | JWT-controle van de functie uit (de functie controleert zelf) |
+| `src/config.js` | Supabase-adres en publieke sleutel (vult het script in) |
+| `src/reserve-api.js` | Koppeling met Supabase, gedeeld door site en beheer |
+| `src/reserve.jsx` | Reserveringsvenster op de site |
+| `src/page-annuleren.jsx` | Annuleer- en afmeldpagina |
+| `beheer.html`, `src/beheer.jsx`, `beheer.css` | Beheer |
+| `.github/workflows/supabase-keepalive.yml` | Houdt het gratis Supabase-project wakker |
 
 ## Getest
 
-Lokaal met Postgres 16, PostgREST en Deno (zoals Supabase draait):
+Lokaal met Postgres 16, PostgREST en Deno, de onderdelen waarop Supabase
+draait, plus een nagebootste Supabase Management API en Resend API:
 
-- Databaseregels: maandag dicht, diner alleen vrijdag, max. 8 personen,
-  capaciteit, sluitingen, termijnen, rem op aanvragen, opruimen.
-- Rechten: met de publieke sleutel kun je alleen beschikbaarheid opvragen.
-  Lezen, schrijven of functies aanroepen geeft "permission denied". Een
-  ingelogd account dat niet in `staff` staat, ziet niets en kan niets wijzigen.
-- Edge Function: 31 end-to-end controles (aanmaken, foutmeldingen,
-  bevestigen alleen door personeel, annuleren door gast en café, inhoud en
-  ontvangers van de mails, HTML in invoer wordt onschadelijk gemaakt).
-- Browser (Chromium, 1440 en 390 breed): hele boekingsflow, volle tijden
-  dicht, annuleerpagina, beheer (inloggen, bevestigen, sluitingen,
-  instellingen, geen toegang voor niet-personeel).
+- Het installatiescript van leeg tot werkend, en opnieuw draaien zonder
+  schade.
+- Database: alle regels, wijzigingen in openingstijden en soorten die direct
+  doorwerken, capaciteit, automatisch bevestigen, toestemming, afmelden,
+  opruimen, rechten voor bezoeker, ingelogde niet-medewerker en medewerker.
+- Edge Function: 57 controles (reserveren, foutmeldingen, bevestigen,
+  telefonisch invoeren en wijzigen, annuleren, afmelden, collega's toevoegen
+  en verwijderen, ontvangers en inhoud van alle mails).
+- Browser (Nederlandse en Engelse apparaatinstelling, 1440, 390 en 320 breed):
+  de hele route van de gast en elk tabblad van het beheer.
