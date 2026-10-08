@@ -5,8 +5,8 @@
 const { useState: useStateA, useEffect: useEffectA } = React;
 
 function readHash() {
-  const h = (window.location.hash || "").replace(/^#/, "").trim();
-  const valid = [...window.NAV_PAGES.map((p) => p.id), "cookiebeleid", "privacybeleid"];
+  const h = (window.location.hash || "").replace(/^#/, "").split("?")[0].trim();
+  const valid = [...window.NAV_PAGES.map((p) => p.id), "cookiebeleid", "privacybeleid", "annuleren"];
   if (valid.includes(h)) return h;
   return "home";
 }
@@ -55,6 +55,7 @@ function App() {
   else if (page === "contact") Page = <window.PageContact openReserve={openReserve} />;
   else if (page === "cookiebeleid") Page = <window.PageCookiebeleid />;
   else if (page === "privacybeleid") Page = <window.PagePrivacybeleid />;
+  else if (page === "annuleren") Page = <window.PageAnnuleren openReserve={openReserve} />;
   else Page = <window.PageHome go={go} openReserve={openReserve} />;
 
   return (

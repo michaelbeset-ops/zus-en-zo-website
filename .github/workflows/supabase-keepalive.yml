@@ -1,0 +1,41 @@
+name: Supabase wakker houden
+
+# Een gratis Supabase-project wordt na zeven dagen zonder activiteit
+# gepauzeerd. Dan kan niemand meer reserveren totdat iemand het handmatig
+# hervat. Deze workflow vraagt elke dag de beschikbaarheid op (geen
+# persoonsgegevens, geen schrijfactie), zodat dat niet gebeurt.
+# De gegevens komen uit src/config.js; zolang die leeg is, doet hij niets.
+
+on:
+  schedule:
+    - cron: "12 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Database aanroepen
+        run: |
+          set -euo pipefail
+          url=$(sed -n 's/^ *supabaseUrl: *"\([^"]*\)".*/\1/p' src/config.js)
+          key=$(sed -n 's/^ *supabaseAnonKey: *"\([^"]*\)".*/\1/p' src/config.js)
+          if [ -z "$url" ] || [ -z "$key" ]; then
+            echo "src/config.js is nog niet ingevuld; niets te doen."
+            exit 0
+          fi
+          auth=()
+          case "$key" in eyJ*) auth=(-H "Authorization: Bearer ${key}") ;; esac
+          status=$(curl -sS -o /tmp/response.json -w '%{http_code}' \
+            -X POST "${url%/}/rest/v1/rpc/get_availability" \
+            -H "apikey: ${key}" "${auth[@]}" \
+            -H "Content-Type: application/json" \
+            -d "{\"p_date\":\"$(date -u +%F)\",\"p_type\":\"lunch\",\"p_guests\":2}")
+          echo "HTTP-status: ${status}"
+          if [ "${status}" != "200" ]; then
+            cat /tmp/response.json
+            exit 1
+          fi
+          echo "Supabase reageert normaal; het project blijft actief."

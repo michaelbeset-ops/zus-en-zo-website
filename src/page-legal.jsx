@@ -481,7 +481,8 @@ function PagePrivacybeleid() {
               Onze <strong>boekhouder</strong> (voor facturen en jaarrekeningen).
             </li>
             <li>
-              De leverancier van ons <strong>reserverings­systeem</strong> en onze
+              De leverancier van ons <strong>reserverings­systeem</strong>, de dienst die
+              onze <strong>reserveringsmails</strong> verstuurt en onze
               <strong> websitehosting</strong>, met wie we een verwerkers­overeenkomst hebben.
             </li>
             <li>

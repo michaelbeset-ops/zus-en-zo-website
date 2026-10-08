@@ -456,7 +456,32 @@ a { color: inherit; text-decoration: none; }
 }
 .time-btn:hover:not(:disabled) { border-color: var(--aubergine); color: var(--aubergine); }
 .time-btn.selected { background: var(--aubergine); color: var(--paper); border-color: var(--aubergine); }
-.time-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.time-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.time-btn .time-note {
+  display: block; margin-top: 2px;
+  font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+
+.callout-error { border-left-color: #8A3B2E; background: #F1DCD3; color: #5C2A20; }
+.field-error { margin: 6px 0 0; font-size: 12px; color: #8A3B2E; }
+.text-input[aria-invalid="true"] { border-color: #8A3B2E; }
+.form-note { font-size: 12px; color: var(--ink-mute); margin: 4px 0 0; }
+.form-note a { color: var(--aubergine); }
+.cancel-card {
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  padding: 28px 24px;
+  border-radius: 4px;
+}
+.cancel-text { color: var(--ink-soft); margin: 20px 0 0; }
+.cancel-text a { color: var(--aubergine); font-weight: 600; }
+.cancel-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.cancel-actions .btn { text-decoration: none; }
+
+.hp-field {
+  position: absolute !important; left: -10000px; top: auto;
+  width: 1px; height: 1px; overflow: hidden;
+}
 
 .modal-foot {
   padding: 18px 24px;

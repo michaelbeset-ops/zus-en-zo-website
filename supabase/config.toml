@@ -1,0 +1,5 @@
+# Instellingen voor `supabase functions deploy`.
+# De functie controleert zelf wie wat mag (personeel via is_staff()), zodat
+# hij werkt met zowel de oude anon-key als de nieuwe publishable key.
+[functions.reservering]
+verify_jwt = false

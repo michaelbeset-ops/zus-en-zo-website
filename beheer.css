@@ -1,0 +1,151 @@
+/* ============================================================
+   BEHEER (reserveringen voor personeel)
+   Bouwt op de tokens en formulierstijlen uit styles.css.
+   ============================================================ */
+body.beheer { background: var(--cream); }
+
+.bh-center {
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 16px;
+}
+.bh-card {
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: 4px;
+  padding: 24px;
+}
+.bh-login { width: 100%; max-width: 400px; }
+.bh-full { width: 100%; justify-content: center; }
+.bh-h1 { font-family: var(--serif); font-size: 28px; font-weight: 600; letter-spacing: -0.01em; margin: 8px 0 20px; }
+.bh-h2 {
+  font-family: var(--serif); font-size: 26px; font-weight: 600; letter-spacing: -0.01em;
+  margin: 24px 0 16px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px;
+}
+.bh-sum { font-family: var(--mono); font-size: 12px; font-weight: 400; letter-spacing: 0.06em; color: var(--ink-mute); }
+.bh-muted { color: var(--ink-soft); font-size: 14px; max-width: 60ch; }
+.bh-help { font-size: 12px; color: var(--ink-mute); margin: 6px 0 0; }
+.bh-empty { color: var(--ink-mute); padding: 32px 0; }
+.bh-link {
+  background: none; border: 0; padding: 0; margin-top: 16px;
+  color: var(--aubergine); font: inherit; font-size: 14px; font-weight: 600;
+  text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.bh-datenav .bh-link { margin: 0 0 0 4px; }
+
+.bh-brand {
+  font-family: var(--serif); font-size: 24px; font-weight: 700; letter-spacing: -0.02em;
+  margin: 0; color: var(--ink); display: flex; align-items: baseline; gap: 6px;
+}
+.bh-brand span { color: var(--gold); font-style: italic; font-weight: 400; }
+.bh-brand small {
+  font-family: var(--mono); font-size: 10px; font-weight: 400;
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-mute); margin-left: 6px;
+}
+
+/* Kopbalk */
+.bh-top {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--aubergine-deep); color: var(--paper-2);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px;
+  padding: 12px 16px;
+}
+.bh-top .bh-brand { color: var(--paper-2); font-size: 20px; }
+.bh-top .bh-brand span { color: var(--gold-soft); }
+.bh-top .bh-brand small { color: var(--aubergine-soft); }
+.bh-tabs { display: flex; gap: 4px; order: 3; width: 100%; overflow-x: auto; }
+.bh-tabs button, .bh-logout {
+  background: none; border: 0; color: var(--aubergine-soft);
+  font: inherit; font-size: 14px; font-weight: 600;
+  padding: 8px 12px; border-radius: 2px; cursor: pointer; white-space: nowrap;
+}
+.bh-tabs button.on { background: rgba(255, 255, 255, 0.12); color: var(--paper-2); }
+.bh-tabs button:hover, .bh-logout:hover { color: var(--paper-2); }
+.bh-logout { margin-left: auto; }
+@media (min-width: 760px) {
+  .bh-top { padding: 14px 32px; flex-wrap: nowrap; }
+  .bh-tabs { order: 0; width: auto; }
+}
+
+.bh-main { max-width: 1040px; margin: 0 auto; padding: 8px 16px 64px; }
+@media (min-width: 760px) { .bh-main { padding: 16px 32px 80px; } }
+
+/* Werkbalk */
+.bh-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 20px; }
+.bh-seg {
+  display: grid; grid-template-columns: repeat(3, auto); width: 100%;
+  border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--paper);
+}
+@media (min-width: 760px) { .bh-seg { width: auto; } }
+.bh-seg button {
+  background: none; border: 0; border-right: 1px solid var(--line);
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-soft);
+  padding: 10px 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  white-space: nowrap;
+}
+.bh-seg button:last-child { border-right: 0; }
+.bh-seg button.on { background: var(--aubergine); color: var(--paper-2); }
+.bh-badge {
+  font-family: var(--mono); font-size: 11px; line-height: 1;
+  background: var(--gold); color: var(--paper-2);
+  padding: 3px 6px; border-radius: 10px;
+}
+.bh-datenav { display: flex; align-items: center; gap: 6px; }
+.bh-datenav .date-input { width: auto; padding: 9px 10px; }
+.bh-icon {
+  width: 40px; height: 40px; border: 1px solid var(--line); background: var(--paper);
+  border-radius: 4px; font-size: 20px; line-height: 1; color: var(--ink); cursor: pointer;
+}
+.bh-icon:hover { border-color: var(--aubergine); color: var(--aubergine); }
+
+/* Lijst */
+.bh-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.bh-res {
+  display: grid; grid-template-columns: 72px 1fr; gap: 6px 14px;
+  background: var(--paper); border: 1px solid var(--line-soft);
+  border-left: 4px solid var(--line); border-radius: 4px;
+  padding: 14px 16px;
+}
+.bh-res.st-aangevraagd { border-left-color: var(--gold); }
+.bh-res.st-bevestigd { border-left-color: var(--aubergine); }
+.bh-res.st-geannuleerd { opacity: 0.6; }
+.bh-res.st-geannuleerd .bh-res-name { text-decoration: line-through; }
+.bh-res-time { font-family: var(--mono); font-size: 15px; display: flex; flex-direction: column; }
+.bh-res-date { font-size: 10px; white-space: nowrap; color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.06em; }
+.bh-res-main { min-width: 0; }
+.bh-res-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.bh-res-name { font-weight: 700; font-size: 16px; }
+.bh-res-guests { font-size: 14px; color: var(--ink-soft); }
+.bh-res-contact { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 4px; font-size: 14px; }
+.bh-res-contact a { color: var(--aubergine); text-decoration: none; overflow-wrap: anywhere; }
+.bh-res-contact a:hover { text-decoration: underline; }
+.bh-res-msg { margin: 6px 0 0; font-size: 14px; color: var(--ink-soft); font-style: italic; }
+.bh-res-actions { grid-column: 1 / -1; display: flex; gap: 8px; flex-wrap: wrap; }
+.bh-res-actions .btn { padding: 9px 16px; font-size: 13px; }
+@media (min-width: 760px) {
+  .bh-res { grid-template-columns: 72px 1fr auto; align-items: center; }
+  .bh-res-actions { grid-column: auto; justify-content: flex-end; }
+}
+
+.bh-pill {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 2px; border: 1px solid var(--line); color: var(--ink-soft);
+}
+.bh-pill.t-hightea { border-color: var(--aubergine-soft); color: var(--aubergine); }
+.bh-pill.t-diner { border-color: var(--gold-soft); color: var(--gold); }
+.bh-pill.s-aangevraagd { background: var(--gold); border-color: var(--gold); color: var(--paper-2); }
+.bh-pill.s-bevestigd { background: var(--aubergine); border-color: var(--aubergine); color: var(--paper-2); }
+
+/* Formulieren */
+.bh-form { margin-bottom: 24px; max-width: 720px; }
+.bh-form-grid { display: grid; gap: 0 16px; }
+@media (min-width: 600px) {
+  .bh-form-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .bh-form-grid .bh-grow { grid-column: 1 / -1; }
+}
+.bh-form .callout { margin: 0 0 16px; }
+select.text-input { appearance: auto; }
+
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--aubergine); outline-offset: 2px;
+}
