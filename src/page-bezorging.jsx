@@ -12,8 +12,7 @@ function PageBezorging() {
       <window.PageHero
         placeholder
         tint="daylight"
-        eyebrow="Pagina 04 · Bezorgingen"
-        number="№ 04"
+        eyebrow="Bezorgingen"
         titleNode={
           <React.Fragment>
             Lunch op kantoor,<br/>

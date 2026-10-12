@@ -10,8 +10,7 @@ function PageDiner({ openReserve }) {
         image="assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png"
         alt="Sfeervol dinerinterieur met paarse bankjes, wijnrekken en kaarsen"
         tint="evening"
-        eyebrow="Pagina 04 · Vrijdagavond & Feesten"
-        number="№ 04"
+        eyebrow="Vrijdagavond & Feesten"
         titleNode={
           <React.Fragment>
             Op vrijdagavond<br/>
@@ -89,7 +88,7 @@ function PageDiner({ openReserve }) {
       {/* FEESTEN & BEDRIJFSBEZORGING */}
       <section className="feesten">
         <div className="container">
-          <span className="eyebrow"><span className="num">№ 4.4</span>Feesten · bedrijven · op afspraak</span>
+          <span className="eyebrow">Feesten · bedrijven · op afspraak</span>
           <h2>
             Iets te <span className="em">vieren?</span><br/>
             Of iets te <span className="em">organiseren?</span>

@@ -70,9 +70,6 @@ function Nav({ page, go, openReserve }) {
                 {p.label}
               </a>
             ))}
-            <button className="nav-cta" onClick={openReserve} style={{ marginLeft: 12 }}>
-              Reserveer
-            </button>
           </nav>
           <button
             className="menu-toggle"
@@ -205,7 +202,7 @@ function FloatingReserve({ onClick }) {
 //   alt        , alt text
 //   tint       , overlay tint: "" | "evening" | "tea" | "warm"
 //   placeholder, boolean; if true (no image), shows a tinted gradient placeholder
-//   eyebrow    , top-left mono label, like "Pagina 02 · Lunch"
+//   eyebrow    , top-left mono label, like "Lunch"
 //   number     , small "№ 02"
 //   titleNode  , React node for the h1 content (can include spans)
 //   lede       , short paragraph in the right column
@@ -228,7 +225,7 @@ function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, l
         <div>
           {(number || eyebrow) && (
             <div className="page-hero-eyebrow">
-              {number && <span className="num">{number}</span>}
+              
               <span className="dash" />
               {eyebrow && <span>{eyebrow}</span>}
             </div>

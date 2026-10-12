@@ -167,8 +167,7 @@ function LegalPage({ tag, number, title, titleEm, updated, intro, sections }) {
                       window.scrollTo({ top: y, behavior: "smooth" });
                     }
                   }}>
-                    <span className="num">{String(i + 1).padStart(2, "0")}</span>
-                    {s.heading}
+                                        {s.heading}
                   </a>
                 </li>
               ))}
@@ -182,7 +181,6 @@ function LegalPage({ tag, number, title, titleEm, updated, intro, sections }) {
           <article className="legal-body">
             {sections.map((s, i) => (
               <section key={i} id={"sec-" + i} className="legal-block">
-                <span className="legal-block-num">{String(i + 1).padStart(2, "0")}</span>
                 <h2>{s.heading}</h2>
                 {s.body}
               </section>
@@ -326,8 +324,7 @@ function PageCookiebeleid() {
 
   return (
     <LegalPage
-      tag="Pagina 06 · Cookiebeleid"
-      number="№ 06"
+      tag="Cookiebeleid"
       title="Ons"
       titleEm="cookiebeleid."
       updated="22 mei 2026"
@@ -562,8 +559,7 @@ function PagePrivacybeleid() {
 
   return (
     <LegalPage
-      tag="Pagina 07 · Privacybeleid"
-      number="№ 07"
+      tag="Privacybeleid"
       title="Ons"
       titleEm="privacybeleid."
       updated="8 oktober 2026"

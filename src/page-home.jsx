@@ -25,7 +25,7 @@ function Heart() {
 }
 
 function Hero({ go, openReserve }) {
-  const words = Array.from({ length: 12 }, () => STRIP_WORDS).flat();
+  const words = Array.from({ length: 6 }, () => STRIP_WORDS).flat();
   return (
     <React.Fragment>
       <window.PageHero
@@ -54,12 +54,17 @@ function Hero({ go, openReserve }) {
 
       <div className="detail-strip" role="presentation">
         <span className="visually-hidden">Lunch, Zus &amp; Zo, High Tea</span>
-        <div className="strip-track" aria-hidden="true">
-          {words.map((w, i) => (
-            <React.Fragment key={i}>
-              <span>{w}</span>
-              <Heart />
-            </React.Fragment>
+        {/* Twee gelijke rijen naast elkaar die samen naar links schuiven: naadloos rondlopend. */}
+        <div className="strip-move" aria-hidden="true">
+          {[0, 1].map((k) => (
+            <div className="strip-track" key={k}>
+              {words.map((w, i) => (
+                <React.Fragment key={i}>
+                  <span>{w}</span>
+                  <Heart />
+                </React.Fragment>
+              ))}
+            </div>
           ))}
         </div>
       </div>
@@ -71,7 +76,7 @@ function Intro() {
   return (
     <section className="section">
       <div className="container intro-welcome">
-        <span className="eyebrow"><span className="num">№ 02</span>Even voorstellen</span>
+        <span className="eyebrow">Even voorstellen</span>
         <h2>Welkom bij Zus &amp; Zo!</h2>
         <p>
           Ons gezellige lunchcafé, waar genieten en lekker eten centraal staan. Van een lekkere
@@ -90,8 +95,8 @@ function Offerings({ go }) {
       <div className="container">
         <div className="offer-head">
           <div>
-            <span className="eyebrow"><span className="num">№ 03</span>Bij ons</span>
-            <h2>Dit doen we <span className="em">het liefst.</span></h2>
+            <span className="eyebrow">Bij ons</span>
+            <h2>Wat we <span className="em">graag doen.</span></h2>
           </div>
         </div>
 
@@ -101,8 +106,7 @@ function Offerings({ go }) {
               <img src={o.image} alt={o.alt} />
             </div>
             <div className="o-text">
-              <span className="num">{o.num}</span>
-              <h3>
+                            <h3>
                 {o.title}<br/>
                 <span className="em">{o.titleEm}.</span>
               </h3>
@@ -131,7 +135,7 @@ function InstaFeed() {
       <div className="container">
         <div className="insta-head">
           <div>
-            <span className="eyebrow"><span className="num">№ 04</span>De laatste hapjes</span>
+            <span className="eyebrow">De laatste hapjes</span>
             <h2 className="mt-sm">Op <span className="em">Instagram.</span></h2>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -169,7 +173,7 @@ function Vacature({ go }) {
           <img src="assets/vacature.png" alt="Vacature poster: Wij zoeken jou, Horeca toppers met ervaring" />
         </div>
         <div className="vac-text">
-          <span className="eyebrow"><span className="num" style={{ color: "var(--aubergine)" }}>№ 05</span>We zoeken mensen</span>
+          <span className="eyebrow">We zoeken mensen</span>
           <h2>Kom je <span className="em">bij ons werken?</span></h2>
           <p>
             We zoeken horeca-toppers met ervaring die het leuk vinden om gasten in de watten
@@ -192,7 +196,7 @@ function HoursAndImpression() {
     <section className="hours-section">
       <div className="container hours-grid">
         <div className="hours-text">
-          <span className="eyebrow"><span className="num">№ 06</span>Wanneer we open zijn</span>
+          <span className="eyebrow">Wanneer we open zijn</span>
           <h2>Openingstijden</h2>
           <p>Loop gerust binnen. Een tafel reserveren is fijn, maar niet verplicht.</p>
         </div>

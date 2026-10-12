@@ -25,7 +25,7 @@ function MenuSection({ num, eyebrow, title, titleEm, intro, items, columns = 2, 
       <div className="container">
         <div className="menu-section-head">
           <div>
-            <span className="eyebrow"><span className="num">{num}</span>{eyebrow}</span>
+            <span className="eyebrow">{eyebrow}</span>
             <h2>{title} <span className="em">{titleEm}</span></h2>
           </div>
           {intro && <p>{intro}</p>}
@@ -46,8 +46,7 @@ function PageLunch({ openReserve }) {
         image="assets/gastvrouw-tray.png"
         alt="Gastvrouw met blad lunchgerechten in de zaak"
         tint="warm"
-        eyebrow="Pagina 02 · Lunch & Menukaart"
-        number="№ 02"
+        eyebrow="Lunch & Menukaart"
         titleNode={
           <React.Fragment>
             De <span className="it">lunchkaart,</span><br/>
@@ -125,7 +124,7 @@ function PageLunch({ openReserve }) {
         <div className="container">
           <div className="menu-section-head">
             <div>
-              <span className="eyebrow"><span className="num">2.5</span>Verse sap</span>
+              <span className="eyebrow">Verse sap</span>
               <h2>Vers <span className="em">geperst.</span></h2>
             </div>
           </div>

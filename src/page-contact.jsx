@@ -95,8 +95,7 @@ function PageContact({ openReserve }) {
       <window.PageHero
         placeholder
         tint="daylight"
-        eyebrow="Pagina 05 · Contact"
-        number="№ 05"
+        eyebrow="Contact"
         titleNode={
           <React.Fragment>
             Wil je iets <span className="it">weten,</span><br/>

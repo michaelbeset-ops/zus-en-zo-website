@@ -9,8 +9,7 @@ function PageHighTea({ openReserve }) {
       <window.PageHero
         placeholder
         tint="tea"
-        eyebrow="Pagina 03 · High Tea"
-        number="№ 03"
+        eyebrow="High Tea"
         titleNode={
           <React.Fragment>
             Een middag<br/>
@@ -39,7 +38,7 @@ function PageHighTea({ openReserve }) {
               </div>
             </div>
             <div>
-              <span className="eyebrow"><span className="num">3.1</span>Wat we serveren</span>
+              <span className="eyebrow">Wat we serveren</span>
               <h2 className="serif" style={{ fontSize: "clamp(34px, 5vw, 56px)", margin: "16px 0 16px", lineHeight: 1.02, letterSpacing: "-0.015em" }}>
                 Hartig, <span style={{ fontStyle: "italic", color: "var(--aubergine)" }}>zoet,</span><br/>
                 en nóg een rondje thee.
@@ -63,21 +62,18 @@ function PageHighTea({ openReserve }) {
 
               <div className="timeline">
                 <div className="timeline-item">
-                  <div className="num">i</div>
                   <div>
                     <h4>Gang één, hartig</h4>
                     <p>Mini-quiches, sandwiches, soepje, gerookte zalm op een toastje.</p>
                   </div>
                 </div>
                 <div className="timeline-item">
-                  <div className="num">ii</div>
                   <div>
                     <h4>Gang twee, vers gebakken</h4>
                     <p>Scones uit de oven met clotted cream, jam en stroopwafelkaramel.</p>
                   </div>
                 </div>
                 <div className="timeline-item">
-                  <div className="num">iii</div>
                   <div>
                     <h4>Gang drie, zoet</h4>
                     <p>Vlaai van de week, brownie, macarons en kleine zoetigheden.</p>
