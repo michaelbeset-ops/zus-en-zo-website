@@ -52,6 +52,11 @@ function App() {
       }, 120);
       return;
     }
+    // Zelfde pagina (bijv. op het logo klikken op home): terug naar boven.
+    if (readHash() === id) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     window.location.hash = id;
   };
 

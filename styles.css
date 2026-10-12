@@ -1836,3 +1836,21 @@ body.no-scroll { overflow: hidden; }
   font-size: clamp(24px, 3vw, 32px);
   margin-bottom: 12px;
 }
+
+/* ============================================================
+   MOBIEL: niets breder dan het scherm
+   Lange woorden (mailadressen, labels in hoofdletters) mogen
+   afbreken, en kolommen worden nooit breder dan hun ruimte.
+   ============================================================ */
+main a[href^="mailto:"], footer a[href^="mailto:"], .eyebrow, .vac-cta, .f-card-eyebrow, .ph-label {
+  overflow-wrap: anywhere;
+}
+.vac-grid > *, .ht-hero > *, .feesten-cards > *, .menu-cols > *, .hours-grid > *,
+.offer-row > *, .intro-grid > *, .contact-grid > *, .legal-grid > *, .footer .container > * {
+  min-width: 0;
+}
+.dish-head .name { min-width: 0; overflow-wrap: anywhere; }
+.price-block { flex-wrap: wrap; }
+@media (max-width: 899px) {
+  .read-link { padding-top: 12px; padding-bottom: 10px; }
+}
