@@ -188,7 +188,6 @@ function Footer({ go, openReserve }) {
 function FloatingReserve({ onClick }) {
   return (
     <button className="fab" onClick={onClick} aria-label="Reserveer hier">
-      <span className="dot" aria-hidden></span>
       Reserveer hier
     </button>
   );
@@ -226,7 +225,6 @@ function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, l
           {(number || eyebrow) && (
             <div className="page-hero-eyebrow">
               
-              <span className="dash" />
               {eyebrow && <span>{eyebrow}</span>}
             </div>
           )}
@@ -242,9 +240,6 @@ function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, l
 
       {/* hero tag removed per user request */}
 
-      <div className="page-hero-scroll" aria-hidden="true">
-        <span className="line"></span> Scroll
-      </div>
     </section>
   );
 }

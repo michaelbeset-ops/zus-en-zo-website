@@ -25,7 +25,7 @@ function MapPlaceholder() {
         <line x1="260" y1="0" x2="260" y2="400" stroke="#FBF8F3" strokeWidth="14" />
         {/* plein */}
         <rect x="170" y="210" width="90" height="60" fill="#D8CFC0" />
-        <text x="180" y="247" fontSize="11" fontFamily="DM Mono, monospace" fill="#8B7355" letterSpacing="2">RAADHUISPL.</text>
+        <text x="180" y="247" fontSize="12" fontFamily="Hanken Grotesk, sans-serif" fill="#8B7355">Raadhuisplein</text>
         {/* small details */}
         <line x1="0" y1="200" x2="170" y2="200" stroke="#E4D9C6" strokeWidth="2" />
         <line x1="260" y1="200" x2="500" y2="200" stroke="#E4D9C6" strokeWidth="2" />
@@ -93,7 +93,8 @@ function PageContact({ openReserve }) {
   return (
     <main>
       <window.PageHero
-        placeholder
+        image="assets/Schermafbeelding 2026-05-22 162842.png"
+        alt="De ingang van Zus & Zo aan het Raadhuisplein"
         tint="daylight"
         eyebrow="Contact"
         titleNode={

@@ -76,7 +76,6 @@ function Intro() {
   return (
     <section className="section">
       <div className="container intro-welcome">
-        <span className="eyebrow">Even voorstellen</span>
         <h2>Welkom bij Zus &amp; Zo!</h2>
         <p>
           Ons gezellige lunchcafé, waar genieten en lekker eten centraal staan. Van een lekkere
@@ -95,7 +94,6 @@ function Offerings({ go }) {
       <div className="container">
         <div className="offer-head">
           <div>
-            <span className="eyebrow">Bij ons</span>
             <h2>Wat we <span className="em">graag doen.</span></h2>
           </div>
         </div>
@@ -135,7 +133,6 @@ function InstaFeed() {
       <div className="container">
         <div className="insta-head">
           <div>
-            <span className="eyebrow">De laatste hapjes</span>
             <h2 className="mt-sm">Op <span className="em">Instagram.</span></h2>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -173,7 +170,6 @@ function Vacature({ go }) {
           <img src="assets/vacature.png" alt="Vacature poster: Wij zoeken jou, Horeca toppers met ervaring" />
         </div>
         <div className="vac-text">
-          <span className="eyebrow">We zoeken mensen</span>
           <h2>Kom je <span className="em">bij ons werken?</span></h2>
           <p>
             We zoeken horeca-toppers met ervaring die het leuk vinden om gasten in de watten
@@ -183,7 +179,7 @@ function Vacature({ go }) {
             <a className="nav-cta" href={`mailto:${window.BRAND.email}?subject=Sollicitatie`}>
               Solliciteer nu <IconArrow />
             </a>
-            <span className="eyebrow">Stuur CV naar info@lunchcafezusenzo.nl</span>
+            <span className="vac-mail">Of stuur je cv naar <a href={`mailto:${window.BRAND.email}?subject=Sollicitatie`}>{window.BRAND.email}</a></span>
           </div>
         </div>
       </div>
@@ -196,7 +192,6 @@ function HoursAndImpression() {
     <section className="hours-section">
       <div className="container hours-grid">
         <div className="hours-text">
-          <span className="eyebrow">Wanneer we open zijn</span>
           <h2>Openingstijden</h2>
           <p>Loop gerust binnen. Een tafel reserveren is fijn, maar niet verplicht.</p>
         </div>

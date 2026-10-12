@@ -105,10 +105,10 @@ function PageDiner({ openReserve }) {
               <h3>Verjaardag, bruiloft, <span className="em">personeelsuitje.</span></h3>
               <p>De hele zaak voor jullie, of een afgescheiden hoek. We denken graag mee.</p>
               <ul>
-                <li><span className="b">a</span> Warm of koud buffet, op maat samengesteld</li>
-                <li><span className="b">b</span> Brabantse koffietafel met broodjes & soep</li>
-                <li><span className="b">c</span> Geluidsinstallatie & DJ op aanvraag</li>
-                <li><span className="b">d</span> Vanaf 15 personen, kleinere groep? ook ok.</li>
+                <li>Warm of koud buffet, op maat samengesteld</li>
+                <li>Brabantse koffietafel met broodjes & soep</li>
+                <li>Geluidsinstallatie & DJ op aanvraag</li>
+                <li>Vanaf 15 personen, kleinere groep? ook ok.</li>
               </ul>
               <a className="read-link" href={`mailto:${window.BRAND.email}?subject=Aanvraag besloten feest`} style={{ marginTop: 8 }}>
                 Doe een aanvraag <IconArrow />
@@ -120,10 +120,10 @@ function PageDiner({ openReserve }) {
               <h3>Voor bedrijven in <span className="em" style={{ color: "var(--gold-soft)" }}>Etten-Leur.</span></h3>
               <p>Ma t/m vr bezorgen we lunch en vergaderpakketten, bij jullie op kantoor, op tijd.</p>
               <ul>
-                <li><span className="b">a</span> Belegde broodjes per persoon</li>
-                <li><span className="b">b</span> Vergaderpakketten met soep, fruit, koffie</li>
-                <li><span className="b">c</span> Bestellen vóór 11:00 uur, dezelfde dag mogelijk</li>
-                <li><span className="b">d</span> Ook voor borrels &amp; high-tea aan kantoor</li>
+                <li>Belegde broodjes per persoon</li>
+                <li>Vergaderpakketten met soep, fruit, koffie</li>
+                <li>Bestellen vóór 11:00 uur, dezelfde dag mogelijk</li>
+                <li>Ook voor borrels &amp; high-tea aan kantoor</li>
               </ul>
               <a className="read-link" href={`mailto:${window.BRAND.emailOrder}?subject=Bedrijfsbezorging`}
                  style={{ marginTop: 8, color: "var(--paper)", borderColor: "rgba(255,255,255,0.4)" }}>

@@ -10,8 +10,8 @@ function PageBezorging() {
   return (
     <main>
       <window.PageHero
-        placeholder
-        tint="daylight"
+        image="assets/gastvrouw-tray.png"
+        alt="Gastvrouw met een blad vol broodjes en salades"
         eyebrow="Bezorgingen"
         titleNode={
           <React.Fragment>
@@ -36,10 +36,10 @@ function PageBezorging() {
               <h3>Voor bedrijven in <span className="em" style={{ color: "var(--gold-soft)" }}>Etten-Leur.</span></h3>
               <p>Ma t/m vr bezorgen we lunch en vergaderpakketten, bij jullie op kantoor, op tijd.</p>
               <ul>
-                <li><span className="b">a</span> Belegde broodjes per persoon</li>
-                <li><span className="b">b</span> Vergaderpakketten met soep, fruit, koffie</li>
-                <li><span className="b">c</span> Bestellen vóór 11:00 uur, dezelfde dag mogelijk</li>
-                <li><span className="b">d</span> Ook voor borrels &amp; high-tea aan kantoor</li>
+                <li>Belegde broodjes per persoon</li>
+                <li>Vergaderpakketten met soep, fruit, koffie</li>
+                <li>Bestellen vóór 11:00 uur, dezelfde dag mogelijk</li>
+                <li>Ook voor borrels &amp; high-tea aan kantoor</li>
               </ul>
               <a className="read-link" href={`mailto:${B.emailOrder}?subject=Bedrijfsbezorging`}
                  style={{ marginTop: 8, color: "var(--paper)", borderColor: "rgba(255,255,255,0.4)" }}>

@@ -7,7 +7,8 @@ function PageHighTea({ openReserve }) {
   return (
     <main className="menu-page">
       <window.PageHero
-        placeholder
+        image="assets/Schermafbeelding 2026-05-22 162856.png"
+        alt="High bites en cocktails op het terras van Zus & Zo"
         tint="tea"
         eyebrow="High Tea"
         titleNode={
@@ -30,11 +31,8 @@ function PageHighTea({ openReserve }) {
         <div className="container">
           <div className="ht-hero">
             <div className="image-stack">
-              <div className="img-a">
-                <window.PagePlaceholder label="Etagère met zoet, hartig, thee" icon="✦" />
-              </div>
-              <div className="img-b" style={{ boxShadow: "0 30px 60px -20px rgba(75,50,80,0.4)" }}>
-                <window.PagePlaceholder label="Detail · scone met jam" icon="·" />
+              <div className="img-a img-solo">
+                <img src="assets/terras-proost.png" alt="Proosten op het terras van Zus & Zo" />
               </div>
             </div>
             <div>
@@ -84,7 +82,6 @@ function PageHighTea({ openReserve }) {
           </div>
 
           <div className="diet-note" style={{ marginTop: 32 }}>
-            <span className="serif" style={{ fontStyle: "italic", fontSize: 18, color: "var(--aubergine)" }}>i</span>
             <span>
               <strong>Reserveren minimaal 24 uur van tevoren.</strong> Glutenvrij of lactosevrij?
               Laat het bij de reservering weten, we passen 'm aan.

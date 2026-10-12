@@ -1854,3 +1854,87 @@ main a[href^="mailto:"], footer a[href^="mailto:"], .eyebrow, .vac-cta, .f-card-
 @media (max-width: 899px) {
   .read-link { padding-top: 12px; padding-bottom: 10px; }
 }
+
+
+/* ============================================================
+   MINDER AI-LOOK
+   Geen typemachine-labels in hoofdletters, geen schuin paars
+   tweede deel in elke kop, geen gloeiende verloopvlakken.
+   Een accent (de paarse cursief) alleen nog in de grote kop
+   bovenaan elke pagina.
+   ============================================================ */
+:root { --mono: var(--sans); }
+/* Vaste cijferbreedte alleen waar tijden onder elkaar staan */
+.hours-row .time, .time-btn, .price-block, .recap dd { font-variant-numeric: tabular-nums; }
+
+.choice .tag,
+.detail-strip,
+.drawer-foot,
+.eyebrow,
+.f-card-eyebrow,
+.field-label,
+.footer h4,
+.footer-bottom,
+.hours-row .day .note,
+.ht-hero .image-stack .ph-label,
+.info-block h4,
+.insta-cell .placeholder .ph-label,
+.legal-block-num,
+.legal-pill,
+.legal-row-head,
+.map-pin .label,
+.o-media .o-tag,
+.o-text .meta,
+.page-hero-arrow-link,
+.page-hero-eyebrow,
+.page-hero-scroll,
+.page-hero-tag,
+.pickup-card h4,
+.price-block .label,
+.pull-quote .attr,
+.read-link,
+.recap dt,
+.step-pill {
+  text-transform: none !important;
+  letter-spacing: 0.01em !important;
+  font-size: 13px;
+}
+.detail-strip { font-size: 14px; font-weight: 500; }
+.read-link { font-size: 15px !important; font-weight: 600; border-bottom-width: 2px; }
+.eyebrow, .f-card-eyebrow { font-weight: 600; color: var(--ink-soft); }
+
+/* Koppen: steviger en strakker, zonder cursief accent */
+main h2, main h3, .modal-title, .modal-body h3 {
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+}
+.page-hero h1 { font-weight: 700; letter-spacing: -0.035em; }
+main h2 .em, main h3 .em, main h4 .em, main p .em {
+  font-style: normal !important;
+  color: inherit !important;
+}
+.intro-welcome h2 { font-style: normal; color: var(--ink); font-size: clamp(32px, 4.6vw, 48px); }
+
+/* Pagina's zonder foto: rustige effen kleur in plaats van gloed en strepen */
+.page-hero-placeholder,
+.page-hero-placeholder.tint-tea,
+.page-hero-placeholder.tint-evening,
+.page-hero-placeholder.tint-daylight { background: var(--aubergine-deep); }
+.page-hero-placeholder::before { display: none; }
+
+/* High tea: een echte foto in plaats van twee lege vlakken */
+.ht-hero .image-stack .img-solo { inset: 0; }
+.ht-hero .image-stack .img-solo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Lijstjes zonder a/b/c/d */
+.f-card ul li::before {
+  content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--aubergine); transform: translateY(-2px);
+}
+.f-card.dark ul li::before { background: var(--gold-soft); }
+
+.vac-mail { font-size: 14px; color: var(--ink-soft); }
+.vac-mail a { color: var(--aubergine); font-weight: 600; }
+.diet-note { letter-spacing: 0 !important; font-size: 14px; }
+.ht-hero .image-stack:has(.img-solo) { aspect-ratio: 4 / 3; }
+.ht-hero .image-stack .img-solo img { object-position: center 40%; }
