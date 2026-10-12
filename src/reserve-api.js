@@ -18,18 +18,18 @@
 
   const DEFAULT_CONFIG = {
     types: [
-      { id: "lunch", name: "Lunch", description: "Belegde broodjes, salades, koffie & lekkers", tag: "", days: [2, 3, 4, 5, 6, 7], first_slot: "11:30", last_slot: "15:00", interval_min: 30 },
-      { id: "hightea", name: "High Tea", description: "Uitgebreide 3-gangen high tea op reservering", tag: "", days: [2, 3, 4, 5, 6, 7], first_slot: "13:00", last_slot: "15:00", interval_min: 30 },
-      { id: "diner", name: "Diner", description: "We trekken alles uit de kast", tag: "Alleen op vrijdagavond", days: [5], first_slot: "17:30", last_slot: "20:30", interval_min: 30 },
+      { id: "lunch", name: "Lunch", description: "Belegde broodjes, salades, koffie & lekkers", tag: "", days: [1, 2, 3, 4, 5, 6], first_slot: "11:30", last_slot: "15:00", interval_min: 30 },
+      { id: "hightea", name: "High Tea", description: "Uitgebreide 3-gangen high tea op reservering", tag: "", days: [1, 2, 3, 4, 5, 6], first_slot: "13:00", last_slot: "15:00", interval_min: 30 },
+      { id: "diner", name: "Diner", description: "We trekken alles uit de kast", tag: "Alleen op vrijdagavond", days: [5], first_slot: "17:30", last_slot: "19:00", interval_min: 30 },
     ],
     hours: [
-      { isodow: 1, closed: true, open_time: null, close_time: null, note: "", highlight: false },
-      { isodow: 2, closed: false, open_time: "09:00", close_time: "17:00", note: "", highlight: false },
-      { isodow: 3, closed: false, open_time: "09:00", close_time: "17:00", note: "", highlight: false },
-      { isodow: 4, closed: false, open_time: "09:00", close_time: "17:00", note: "", highlight: false },
-      { isodow: 5, closed: false, open_time: "09:00", close_time: "22:00", note: "Diner-avond", highlight: true },
-      { isodow: 6, closed: false, open_time: "09:00", close_time: "17:00", note: "", highlight: false },
-      { isodow: 7, closed: false, open_time: "10:00", close_time: "16:00", note: "", highlight: false },
+      { isodow: 1, closed: false, open_time: "10:00", close_time: "17:30", note: "", highlight: false },
+      { isodow: 2, closed: false, open_time: "10:00", close_time: "17:30", note: "", highlight: false },
+      { isodow: 3, closed: false, open_time: "10:00", close_time: "17:30", note: "", highlight: false },
+      { isodow: 4, closed: false, open_time: "10:00", close_time: "17:30", note: "", highlight: false },
+      { isodow: 5, closed: false, open_time: "10:00", close_time: "21:00", note: "Diner-avond", highlight: true },
+      { isodow: 6, closed: false, open_time: "10:00", close_time: "17:00", note: "", highlight: false },
+      { isodow: 7, closed: false, open_time: "11:00", close_time: "17:00", note: "Alleen koopzondag (laatste zondag van de maand)", highlight: false },
     ],
     settings: {
       max_guests_online: 8,

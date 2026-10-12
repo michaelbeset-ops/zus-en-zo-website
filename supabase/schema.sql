@@ -43,9 +43,9 @@ create table if not exists public.reservation_types (
 );
 
 insert into public.reservation_types (id, name, description, tag, sort_order, days, first_slot, last_slot, interval_min) values
-  ('lunch',   'Lunch',    'Belegde broodjes, salades, koffie & lekkers',   '',                       1, '{2,3,4,5,6,7}', '11:30', '15:00', 30),
-  ('hightea', 'High Tea', 'Uitgebreide 3-gangen high tea op reservering', '',                       2, '{2,3,4,5,6,7}', '13:00', '15:00', 30),
-  ('diner',   'Diner',    'We trekken alles uit de kast',                   'Alleen op vrijdagavond', 3, '{5}',           '17:30', '20:30', 30)
+  ('lunch',   'Lunch',    'Belegde broodjes, salades, koffie & lekkers',   '',                       1, '{1,2,3,4,5,6}', '11:30', '15:00', 30),
+  ('hightea', 'High Tea', 'Uitgebreide 3-gangen high tea op reservering', '',                       2, '{1,2,3,4,5,6}', '13:00', '15:00', 30),
+  ('diner',   'Diner',    'We trekken alles uit de kast',                   'Alleen op vrijdagavond', 3, '{5}',           '17:30', '19:00', 30)
 on conflict (id) do nothing;
 
 create table if not exists public.opening_hours (
@@ -53,18 +53,18 @@ create table if not exists public.opening_hours (
   closed     boolean not null default false,
   open_time  text check (open_time is null or open_time ~ '^([01]\d|2[0-3]):[0-5]\d$'),
   close_time text check (close_time is null or close_time ~ '^([01]\d|2[0-3]):[0-5]\d$'),
-  note       text not null default '' check (char_length(note) <= 40),
+  note       text not null default '' check (char_length(note) <= 60),
   highlight  boolean not null default false
 );
 
 insert into public.opening_hours (isodow, closed, open_time, close_time, note, highlight) values
-  (1, true,  null,    null,    '',            false),
-  (2, false, '09:00', '17:00', '',            false),
-  (3, false, '09:00', '17:00', '',            false),
-  (4, false, '09:00', '17:00', '',            false),
-  (5, false, '09:00', '22:00', 'Diner-avond', true),
-  (6, false, '09:00', '17:00', '',            false),
-  (7, false, '10:00', '16:00', '',            false)
+  (1, false, '10:00', '17:30', '',            false),
+  (2, false, '10:00', '17:30', '',            false),
+  (3, false, '10:00', '17:30', '',            false),
+  (4, false, '10:00', '17:30', '',            false),
+  (5, false, '10:00', '21:00', 'Diner-avond', true),
+  (6, false, '10:00', '17:00', '',            false),
+  (7, false, '11:00', '17:00', 'Alleen koopzondag (laatste zondag van de maand)', false)
 on conflict (isodow) do nothing;
 
 create table if not exists public.reservations (
@@ -592,7 +592,7 @@ as $$
     'notify_email', (select notify_email from public.settings where id = 1),
     'types', (select json_object_agg(id, name) from public.reservation_types),
     'hours', (select json_agg(json_build_object('isodow', isodow, 'closed', closed,
-                'open_time', open_time, 'close_time', close_time) order by isodow)
+                'open_time', open_time, 'close_time', close_time, 'note', note) order by isodow)
                 from public.opening_hours)
   );
 $$;

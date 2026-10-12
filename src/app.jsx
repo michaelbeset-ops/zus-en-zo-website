@@ -66,6 +66,7 @@ function App() {
   else if (page === "hightea") Page = <window.PageHighTea openReserve={openReserve} />;
   else if (page === "diner") Page = <window.PageDiner openReserve={openReserve} />;
   else if (page === "contact") Page = <window.PageContact openReserve={openReserve} />;
+  else if (page === "bezorging") Page = <window.PageBezorging />;
   else if (page === "cookiebeleid") Page = <window.PageCookiebeleid />;
   else if (page === "privacybeleid") Page = <window.PagePrivacybeleid />;
   else if (page === "annuleren") Page = <window.PageAnnuleren openReserve={openReserve} />;

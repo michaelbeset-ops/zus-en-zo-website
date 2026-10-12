@@ -18,21 +18,23 @@ const BRAND = {
 };
 
 const NAV_PAGES = [
-  { id: "home",     label: "Home",            num: "01" },
-  { id: "lunch",    label: "Lunch & Menu",    num: "02" },
-  { id: "hightea",  label: "High Tea",        num: "03" },
-  { id: "diner",    label: "Diner & Feesten", num: "04" },
-  { id: "contact",  label: "Contact",         num: "05" },
+  { id: "home",      label: "Home",            num: "01" },
+  { id: "lunch",     label: "Lunch",           num: "02" },
+  { id: "hightea",   label: "High Moments",    num: "03" },
+  { id: "bezorging", label: "Bezorgingen",     num: "04" },
+  { id: "diner",     label: "Diner & Feesten", num: "05" },
+  { id: "contact",   label: "Contact",         num: "06" },
 ];
 
+// Terugval; de echte tijden komen uit het beheer (Openingstijden).
 const HOURS = [
-  { day: "Maandag",   time: "Gesloten", closed: true },
-  { day: "Dinsdag",   time: "09:00 – 17:00" },
-  { day: "Woensdag",  time: "09:00 – 17:00" },
-  { day: "Donderdag", time: "09:00 – 17:00" },
-  { day: "Vrijdag",   time: "09:00 – 22:00", note: "Diner-avond", special: true },
-  { day: "Zaterdag",  time: "09:00 – 17:00" },
-  { day: "Zondag",    time: "10:00 – 16:00" },
+  { day: "Maandag",   time: "10:00 – 17:30" },
+  { day: "Dinsdag",   time: "10:00 – 17:30" },
+  { day: "Woensdag",  time: "10:00 – 17:30" },
+  { day: "Donderdag", time: "10:00 – 17:30" },
+  { day: "Vrijdag",   time: "10:00 – 21:00", note: "Diner-avond", special: true },
+  { day: "Zaterdag",  time: "10:00 – 17:00" },
+  { day: "Zondag",    time: "11:00 – 17:00", note: "Alleen koopzondag (laatste zondag van de maand)" },
 ];
 
 // =============================================================
@@ -126,43 +128,34 @@ const OFFERINGS = [
   {
     id: "lunch",
     num: "01",
-    eyebrow: "Dagelijks van 9 tot 17",
-    title: "Lunch",
-    titleEm: "om langer voor te blijven zitten",
-    body: "Belegde broodjes, sandwiches, salades en flatbreads, alles met dagverse rauwkost. Vraag gerust naar onze glutenvrije of lactosevrije kaart, daar denken we aan mee.",
-    meta: ["Belegde broodjes", "Salades", "Flatbreads"],
-    layout: "left", // image left
+    title: "Met liefde",
+    titleEm: "bereid",
+    body: "Van rijk belegde broodjes tot verse salades: bij Zus & Zo wordt ieder gerecht met zorg en aandacht bereid. Ook voor gluten- en lactosevrije opties hebben we een aparte kaart samengesteld.",
+    image: "assets/gastvrouw-tray.png",
+    alt: "Gastvrouw met een blad vol lunchgerechten",
+    link: { page: "lunch", label: "Bekijk de lunchkaart" },
+    layout: "left",
+  },
+  {
+    id: "welkom",
+    num: "02",
+    title: "Een warm",
+    titleEm: "welkom",
+    body: "Met lekker eten, persoonlijke aandacht en een oprechte glimlach maken we bij Zus & Zo ieders dag graag nog een beetje mooier.",
+    image: "assets/Schermafbeelding 2026-05-22 162842.png",
+    alt: "Gastvrouw met koffie bij de ingang van Zus & Zo",
+    layout: "right",
   },
   {
     id: "hightea",
-    num: "02",
-    eyebrow: "Op reservering · 3 gangen",
-    title: "High Tea",
-    titleEm: "met etagère & verse thee",
-    body: "Een middag plat genieten met zoet, hartig en eindeloos veel thee. Geknipt voor verjaardagen, een vrijdagmiddag met je moeder, of gewoon omdat het kan.",
-    meta: ["3 gangen", "Vanaf 2 personen", "Reservering"],
-    layout: "right", // image right
-  },
-  {
-    id: "diner",
     num: "03",
-    eyebrow: "Alleen op vrijdagavond",
-    title: "Vrijdagavond Diner",
-    titleEm: "we trekken alles uit de kast",
-    body: "Eén avond in de week schakelen we 's avonds door. Voorgerechten, hooggerechten, een 3-gangen keuzemenu of onze High Bites om te delen, gemoedelijk, met een wijntje erbij.",
-    meta: ["3 gangen €32,95", "High Bites €24,95", "Vrijdag t/m 22:00"],
+    title: "High",
+    titleEm: "Moments",
+    body: "Van een gezellige high tea tot een feestelijke high cocktail of smaakvolle high bites: bij Zus & Zo maken we van ieder moment iets bijzonders. Perfect om samen te proosten, bij te kletsen en te genieten.",
+    image: "assets/terras-proost.png",
+    alt: "Gasten proosten op het terras met een sharing board",
+    link: { page: "hightea", label: "Bekijk High Moments" },
     layout: "left",
-    dark: true,
-  },
-  {
-    id: "feesten",
-    num: "04",
-    eyebrow: "Op afspraak",
-    title: "Feesten & Bedrijven",
-    titleEm: "wij koken, jullie kletsen",
-    body: "Verjaardagen, bruiloften, personeelsuitjes of een Brabantse koffietafel. Ook bezorgen we lunch en vergaderpakketten bij bedrijven in Etten-Leur, ma t/m vr.",
-    meta: ["Besloten", "Buffet warm/koud", "Bezorging"],
-    layout: "right",
   },
 ];
 

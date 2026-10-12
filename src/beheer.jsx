@@ -482,7 +482,7 @@ function OpeningHours() {
                 <label className="bh-check"><input type="checkbox" checked={r.closed} onChange={(e) => upd(i, "closed", e.target.checked)} /><span>Dicht</span></label>
                 <TimeField label={`${DAY_LONG[r.isodow]} open`} value={r.open_time} disabled={r.closed} onChange={(v) => upd(i, "open_time", v)} />
                 <TimeField label={`${DAY_LONG[r.isodow]} sluit`} value={r.close_time} disabled={r.closed} onChange={(v) => upd(i, "close_time", v)} />
-                <input className="text-input" aria-label={`${DAY_LONG[r.isodow]} notitie`} value={r.note || ""} maxLength={40} placeholder="Notitie, niet verplicht" onChange={(e) => upd(i, "note", e.target.value)} />
+                <input className="text-input" aria-label={`${DAY_LONG[r.isodow]} notitie`} value={r.note || ""} maxLength={60} placeholder="Notitie, niet verplicht" onChange={(e) => upd(i, "note", e.target.value)} />
                 <label className="bh-check"><input type="checkbox" checked={!!r.highlight} onChange={(e) => upd(i, "highlight", e.target.checked)} /><span>Uitlichten</span></label>
               </div>
             ))}

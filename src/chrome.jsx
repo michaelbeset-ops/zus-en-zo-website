@@ -127,9 +127,6 @@ function Footer({ go, openReserve }) {
           <a href="#home" onClick={(e) => { e.preventDefault(); go("home"); }} aria-label="Naar home">
             <img src="assets/logo-light.png" alt="Lunchcafé Zus & Zo" style={{ height: 56, width: "auto", marginBottom: 16, display: "block" }} />
           </a>
-          <p style={{ maxWidth: 280 }}>
-            Een huiselijke lunchgelegenheid aan het Raadhuisplein, tegenover het stadskantoor in Etten-Leur. Welkom.
-          </p>
           <button
             className="nav-cta"
             style={{ marginTop: 20, background: "transparent", border: "1px solid rgba(255,255,255,0.35)" }}

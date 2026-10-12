@@ -12,7 +12,20 @@ function PagePlaceholder({ label, icon, dark }) {
   );
 }
 
+// Beige balk: Lunch, Zus & Zo en High Tea afwisselend, met paarse hartjes,
+// tot de rand van het scherm.
+const STRIP_WORDS = ["Lunch", "Zus & Zo", "High Tea"];
+
+function Heart() {
+  return (
+    <svg className="strip-heart" viewBox="0 0 24 24" width="12" height="12" aria-hidden="true" focusable="false">
+      <path d="M12 21s-7.5-4.6-9.6-9.2C1 8.6 2.9 5 6.4 5c2 0 3.3 1.1 4.1 2.3.4.6 1.6.6 2 0C13.3 6.1 14.6 5 16.6 5 20.1 5 22 8.6 21.6 11.8 19.5 16.4 12 21 12 21z" fill="currentColor" />
+    </svg>
+  );
+}
+
 function Hero({ go, openReserve }) {
+  const words = Array.from({ length: 12 }, () => STRIP_WORDS).flat();
   return (
     <React.Fragment>
       <window.PageHero
@@ -20,13 +33,10 @@ function Hero({ go, openReserve }) {
         alt="Interieur Zus & Zo met paarse luchter, houten bar en bloemen"
         titleNode={
           <React.Fragment>
-            Genieten <span className="it">van eten,</span><br/>
-            drinken, <span className="amp">&amp;</span><br/>
-            gezelligheid.
+            Een tafel<br/>
+            <span className="it">vol gezelligheid.</span>
           </React.Fragment>
         }
-        lede="Lunch, high tea of vrijdagavond­diner. Welkom aan het Raadhuisplein."
-        tag={{ n: "№ 01", text: "'s Ochtends, voor de eerste koffie" }}
       >
         <div className="page-hero-cta-row">
           <button className="nav-cta" onClick={openReserve} style={{ padding: "14px 22px", fontSize: 14 }}>
@@ -42,12 +52,16 @@ function Hero({ go, openReserve }) {
         </div>
       </window.PageHero>
 
-      <div className="detail-strip">
-        <span>Lunch</span><span className="sep">·</span>
-        <span>High Tea</span><span className="sep">·</span>
-        <span>Vrijdagavond Diner</span><span className="sep">·</span>
-        <span>Feesten</span><span className="sep">·</span>
-        <span>Bedrijfsbezorging</span>
+      <div className="detail-strip" role="presentation">
+        <span className="visually-hidden">Lunch, Zus &amp; Zo, High Tea</span>
+        <div className="strip-track" aria-hidden="true">
+          {words.map((w, i) => (
+            <React.Fragment key={i}>
+              <span>{w}</span>
+              <Heart />
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </React.Fragment>
   );
@@ -56,21 +70,15 @@ function Hero({ go, openReserve }) {
 function Intro() {
   return (
     <section className="section">
-      <div className="container intro-grid">
-        <div className="intro-eyebrow-stack">
-          <span className="eyebrow"><span className="num">№ 02</span>Even voorstellen</span>
-          <h2>
-            Een huiselijke lunchzaak<br/>
-            <span className="em">aan het plein,</span> al jaren.
-          </h2>
-        </div>
-        <div>
-          <p>
-            Aan het Raadhuisplein, tegenover het stadskantoor. Kom binnen voor een broodje,
-            blijf voor de koffie. Op vrijdagavond trekken we alles uit de kast.
-          </p>
-          <p className="signature">Met liefs, het team van Zus &amp; Zo</p>
-        </div>
+      <div className="container intro-welcome">
+        <span className="eyebrow"><span className="num">№ 02</span>Even voorstellen</span>
+        <h2>Welkom bij Zus &amp; Zo!</h2>
+        <p>
+          Ons gezellige lunchcafé, waar genieten en lekker eten centraal staan. Van een lekkere
+          lunch en goede koffie tot een high tea. Bij Zus &amp; Zo draait alles om samen genieten,
+          lekker bijkletsen en tijd voor elkaar.
+        </p>
+        <p className="signature">Met liefs, het team van Zus &amp; Zo</p>
       </div>
     </section>
   );
@@ -83,84 +91,34 @@ function Offerings({ go }) {
         <div className="offer-head">
           <div>
             <span className="eyebrow"><span className="num">№ 03</span>Bij ons</span>
-            <h2>Wat we <span className="em">graag doen.</span></h2>
+            <h2>Dit doen we <span className="em">het liefst.</span></h2>
           </div>
-          <p>
-            Vier dingen waar we trots op zijn, elke met een eigen ritme en
-            een eigen menukaart. Klik door voor de details.
-          </p>
         </div>
 
-        {window.OFFERINGS.map((o, i) => {
-          const isDark = o.dark;
-          const Body = (
-            <React.Fragment>
-              <div className={"offer-row" + (o.layout === "right" ? " reverse" : "") + (i === window.OFFERINGS.length - 1 ? "" : "")}>
-                <div className="o-media">
-                  {o.id === "lunch" ? (
-                    <img src="assets/gastvrouw-tray.png" alt="Gastvrouw met blad lunchgerechten" />
-                  ) : o.id === "hightea" ? (
-                    <img src="assets/terras-proost.png" alt="Bediening proost op het terras met wijn en een sharing board" />
-                  ) : o.id === "feesten" ? (
-                    <img src="assets/feest-dansvloer.png" alt="Feestzaal met statafels, DJ-opstelling en sfeerverlichting" />
-                  ) : o.id === "diner" ? (
-                    <img src="assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png" alt="Sfeervol dinerinterieur met paarse bankjes en wijnrekken" />
-                  ) : (
-                    <PagePlaceholder label="Buffet & feestelijke tafel" dark={isDark} />
-                  )}
-                  <span className="o-tag">{o.eyebrow}</span>
-                </div>
-                <div className="o-text">
-                  <span className="num">{o.num}</span>
-                  <h3>
-                    {o.title}<br/>
-                    <span className="em">{o.titleEm}.</span>
-                  </h3>
-                  <div className="meta">
-                    {o.meta.map((m, j) => (
-                      <React.Fragment key={m}>
-                        {j > 0 && <span className="sep">/</span>}
-                        <span>{m}</span>
-                      </React.Fragment>
-                    ))}
-                  </div>
-                  <p>{o.body}</p>
-                  <a
-                    className="read-link"
-                    href={`#${o.id === "feesten" ? "diner" : o.id}`}
-                    onClick={(e) => { e.preventDefault(); go(o.id === "feesten" ? "diner" : o.id); }}
-                  >
-                    Lees verder <IconArrow />
-                  </a>
-                </div>
-              </div>
-            </React.Fragment>
-          );
-
-          if (isDark) {
-            return (
-              <div key={o.id} className="diner-feature">
-                <div className="container">{Body}</div>
-              </div>
-            );
-          }
-          return <React.Fragment key={o.id}>{Body}</React.Fragment>;
-        })}
-      </div>
-    </section>
-  );
-}
-
-function PullQuote() {
-  return (
-    <section className="pull-quote">
-      <div className="container">
-        <q>
-          Er zijn cafés met sterren, en er zijn cafés waar mensen op donderdagmiddag uit
-          gewoonte binnenkomen. Wij doen graag het tweede.
-        </q>
-        <div className="attr"><span className="name">Het team</span> &nbsp;·&nbsp; Raadhuisplein 37
-        </div>
+        {window.OFFERINGS.map((o) => (
+          <div key={o.id} className={"offer-row" + (o.layout === "right" ? " reverse" : "")}>
+            <div className="o-media">
+              <img src={o.image} alt={o.alt} />
+            </div>
+            <div className="o-text">
+              <span className="num">{o.num}</span>
+              <h3>
+                {o.title}<br/>
+                <span className="em">{o.titleEm}.</span>
+              </h3>
+              <p>{o.body}</p>
+              {o.link && (
+                <a
+                  className="read-link"
+                  href={`#${o.link.page}`}
+                  onClick={(e) => { e.preventDefault(); go(o.link.page); }}
+                >
+                  {o.link.label} <IconArrow />
+                </a>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -217,12 +175,6 @@ function Vacature({ go }) {
             We zoeken horeca-toppers met ervaring die het leuk vinden om gasten in de watten
             te leggen. Keuken, bediening, of een echte alleskunner, laat van je horen.
           </p>
-          <ul className="vac-list">
-            <li><span className="n">a.</span> Keukenmedewerk(st)er</li>
-            <li><span className="n">b.</span> Zelfstandig werkend gastvrouw/heer</li>
-            <li><span className="n">c.</span> Alleskunner, combi keuken/bediening</li>
-            <li><span className="n">d.</span> Parttime / fulltime vanaf 21 uur</li>
-          </ul>
           <div className="vac-cta">
             <a className="nav-cta" href={`mailto:${window.BRAND.email}?subject=Sollicitatie`}>
               Solliciteer nu <IconArrow />
@@ -241,11 +193,8 @@ function HoursAndImpression() {
       <div className="container hours-grid">
         <div className="hours-text">
           <span className="eyebrow"><span className="num">№ 06</span>Wanneer we open zijn</span>
-          <h2>Loop <span className="em">gewoon binnen.</span></h2>
-          <p>
-            Doordeweeks van negen tot vijf voor lunch en koffie. Op vrijdag blijven we 's avonds
-            open voor diner, alleen die avond. Tafel reserveren is fijn maar niet verplicht.
-          </p>
+          <h2>Openingstijden</h2>
+          <p>Loop gerust binnen. Een tafel reserveren is fijn, maar niet verplicht.</p>
         </div>
         <div className="hours-table">
           {window.HOURS.map((h, i) => (
@@ -276,7 +225,6 @@ function PageHome({ go, openReserve }) {
       <Hero go={go} openReserve={openReserve} />
       <Intro />
       <Offerings go={go} />
-      <PullQuote />
       <InstaFeed />
       <Vacature go={go} />
       <HoursAndImpression />

@@ -53,11 +53,14 @@ type MailContext = { notifyEmail: string; hours: string; types: Record<string, s
 
 const DAY_SHORT = ['', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za', 'Zo']
 
-type HourRow = { isodow: number; closed: boolean; open_time: string | null; close_time: string | null }
+type HourRow = { isodow: number; closed: boolean; open_time: string | null; close_time: string | null; note?: string }
 
 // "Di t/m do 09:00 tot 17:00 · Vr 09:00 tot 22:00 · ... · Ma gesloten"
 function hoursText(rows: HourRow[]): string {
-  const label = (h: HourRow) => (h.closed || !h.open_time ? 'gesloten' : `${h.open_time} tot ${h.close_time ?? ''}`.trim())
+  // Notities zoals "Diner-avond" of "Alleen koopzondag" horen erbij, anders lijkt een dag gewoon open.
+  const label = (h: HourRow) => (h.closed || !h.open_time
+    ? 'gesloten'
+    : `${h.open_time} tot ${h.close_time ?? ''}`.trim() + (h.note ? ` (${h.note.charAt(0).toLowerCase()}${h.note.slice(1)})` : ''))
   const sorted = [...rows].sort((a, b) => a.isodow - b.isodow)
   const groups: { from: number; to: number; text: string }[] = []
   for (const h of sorted) {
