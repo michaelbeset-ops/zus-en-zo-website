@@ -16,7 +16,6 @@ function PageBezorging() {
       <window.PageHero
         image="assets/Schermafbeelding 2026-05-22 162916.png"
         alt="Het team van Zus & Zo met de bezorgfiets"
-        eyebrow="Bezorgingen"
         titleNode={
           <React.Fragment>
             Zus &amp; Zo<br/>

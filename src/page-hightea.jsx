@@ -48,7 +48,6 @@ function PageHighTea({ openReserve }) {
         image="assets/Schermafbeelding 2026-05-22 162856.png"
         alt="High bites en cocktails op het terras van Zus & Zo"
         tint="tea"
-        eyebrow="High Moments"
         titleNode={
           <React.Fragment>
             Een feestje<br/>

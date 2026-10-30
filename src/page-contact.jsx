@@ -96,7 +96,6 @@ function PageContact({ openReserve }) {
         image="assets/Schermafbeelding 2026-05-22 162842.png"
         alt="De ingang van Zus & Zo aan het Raadhuisplein"
         tint="daylight"
-        eyebrow="Contact"
         titleNode={
           <React.Fragment>
             Wil je iets <span className="it">weten,</span><br/>

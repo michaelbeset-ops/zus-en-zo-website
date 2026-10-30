@@ -10,7 +10,6 @@ function PageDiner({ openReserve }) {
         image="assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png"
         alt="Sfeervol dinerinterieur met paarse bankjes, wijnrekken en kaarsen"
         tint="evening"
-        eyebrow="Diner & Feesten"
         titleNode={
           <React.Fragment>
             Vrijdagavond genieten<br/>

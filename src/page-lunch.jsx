@@ -45,35 +45,45 @@ function MenuBlocks({ sections }) {
 }
 
 // Uitklapbare kaarten: alleen de kaart waarop je klikt gaat open.
-function MenuCards({ cards, defaultOpen = null }) {
-  const [open, setOpen] = useStateM(defaultOpen);
+function MenuCards({ cards }) {
+  const [open, setOpen] = useStateM(cards[0] && cards[0].id);
+  const cur = cards.find((c) => c.id === open) || cards[0];
+  const onKey = (e, i) => {
+    const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const next = cards[(i + d + cards.length) % cards.length];
+    setOpen(next.id);
+    const el = document.getElementById("kaart-tab-" + next.id);
+    if (el) el.focus();
+  };
   return (
-    <div className="menu-cards">
-      {cards.map((c) => {
-        const isOpen = open === c.id;
-        return (
-          <div className={"menu-card" + (isOpen ? " open" : "")} key={c.id} id={"kaart-" + c.id}>
+    <div className="menu-tabs">
+      <div className="menu-tabs-bar" role="tablist" aria-label="Kaarten">
+        {cards.map((c, i) => {
+          const on = c.id === cur.id;
+          return (
             <button
+              key={c.id}
               type="button"
-              className="menu-card-head"
-              aria-expanded={isOpen}
+              role="tab"
+              id={"kaart-tab-" + c.id}
+              className={"menu-tab" + (on ? " on" : "")}
+              aria-selected={on}
               aria-controls={"kaart-" + c.id + "-inhoud"}
-              onClick={() => setOpen(isOpen ? null : c.id)}
+              tabIndex={on ? 0 : -1}
+              onClick={() => setOpen(c.id)}
+              onKeyDown={(e) => onKey(e, i)}
             >
-              <span>
-                <span className="menu-card-title">{c.title}</span>
-                {c.sub && <span className="menu-card-sub">{c.sub}</span>}
-              </span>
-              <span className="menu-card-toggle" aria-hidden="true">{isOpen ? "−" : "+"}</span>
+              {c.title}
             </button>
-            {isOpen && (
-              <div className="menu-card-body" id={"kaart-" + c.id + "-inhoud"}>
-                {c.sections ? <MenuBlocks sections={c.sections} /> : c.body}
-              </div>
-            )}
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      <div className="menu-tabs-panel" role="tabpanel" id={"kaart-" + cur.id + "-inhoud"} aria-labelledby={"kaart-tab-" + cur.id}>
+        {cur.sub && <p className="menu-card-sub">{cur.sub}</p>}
+        {cur.sections ? <MenuBlocks sections={cur.sections} /> : cur.body}
+      </div>
     </div>
   );
 }
@@ -100,7 +110,6 @@ function PageLunch({ openReserve }) {
         image="assets/gastvrouw-tray.png"
         alt="Gastvrouw met blad lunchgerechten in de zaak"
         tint="warm"
-        eyebrow="Lunch"
         titleNode={
           <React.Fragment>
             Ontdek onze<br/>
@@ -122,7 +131,7 @@ function PageLunch({ openReserve }) {
             <div>
               <h2>Onze kaarten</h2>
             </div>
-            <p>Klik op een kaart om hem te openen.</p>
+            <p>Kies bovenaan welke kaart je wilt zien.</p>
           </div>
           <MenuCards cards={cards} />
           <p className="allergy-note">

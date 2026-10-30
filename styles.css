@@ -2056,3 +2056,25 @@ html, body { overflow-x: clip; }
 .menu-cards > *, .menu-card-head > span:first-child, .menu-block, .menu-blocks { min-width: 0; }
 .menu-card-sub, .menu-card-title { overflow-wrap: anywhere; }
 @media (max-width: 400px) { .menu-card-head { padding: 16px; } .menu-card-body { padding: 4px 16px 10px; } .menu-card-title { font-size: 21px; } }
+
+/* Kaarten als tabbladen: één kaart open, de rest kies je in de balk erboven */
+.menu-tabs { background: var(--paper); border: 1px solid var(--line-soft); border-radius: 4px; min-width: 0; }
+.menu-tabs-bar {
+  display: flex; gap: 4px; padding: 8px; border-bottom: 1px solid var(--line-soft);
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.menu-tabs-bar::-webkit-scrollbar { display: none; }
+.menu-tab {
+  flex: 0 0 auto; padding: 12px 18px; border: 0; border-radius: 3px; background: transparent;
+  font: inherit; font-size: 16px; font-weight: 600; color: var(--ink-soft); cursor: pointer; white-space: nowrap;
+}
+.menu-tab:hover { color: var(--aubergine); background: var(--cream-2, rgba(0,0,0,0.04)); }
+.menu-tab.on { background: var(--aubergine); color: var(--paper-2, #fff); }
+.menu-tab:focus-visible { outline: 2px solid var(--aubergine); outline-offset: 2px; }
+.menu-tabs-panel { padding: 18px 22px 12px; min-width: 0; }
+.menu-tabs-panel > .menu-card-sub { margin: 0 0 4px; }
+@media (max-width: 400px) { .menu-tab { padding: 10px 14px; font-size: 15px; } .menu-tabs-panel { padding: 14px 16px 10px; } }
+@media (max-width: 700px) {
+  .menu-tabs-bar { display: grid; grid-template-columns: 1fr 1fr; overflow: visible; }
+  .menu-tab { white-space: normal; text-align: center; padding: 10px 8px; line-height: 1.25; }
+}
