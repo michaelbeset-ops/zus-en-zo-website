@@ -44,7 +44,7 @@ create table if not exists public.reservation_types (
 
 insert into public.reservation_types (id, name, description, tag, sort_order, days, first_slot, last_slot, interval_min) values
   ('lunch',   'Lunch',    'Belegde broodjes, salades, koffie & lekkers',   '',                       1, '{1,2,3,4,5,6}', '11:30', '15:00', 30),
-  ('hightea', 'High Tea', 'Uitgebreide 3-gangen high tea op reservering', '',                       2, '{1,2,3,4,5,6}', '13:00', '15:00', 30),
+  ('hightea', 'High Moments', 'High tea, high bites of high cocktail', '',                       2, '{1,2,3,4,5,6}', '13:00', '15:00', 30),
   ('diner',   'Diner',    'We trekken alles uit de kast',                   'Alleen op vrijdagavond', 3, '{5}',           '17:30', '19:00', 30)
 on conflict (id) do nothing;
 

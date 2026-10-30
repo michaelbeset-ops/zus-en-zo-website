@@ -10,80 +10,63 @@ function PageDiner({ openReserve }) {
         image="assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png"
         alt="Sfeervol dinerinterieur met paarse bankjes, wijnrekken en kaarsen"
         tint="evening"
-        eyebrow="Vrijdagavond & Feesten"
+        eyebrow="Diner & Feesten"
         titleNode={
           <React.Fragment>
-            Op vrijdagavond<br/>
-            <span className="amp">trekken we alles uit de kast.</span>
+            Vrijdagavond genieten<br/>
+            <span className="it">bij Zus &amp; Zo.</span>
           </React.Fragment>
         }
-        lede="Eén avond per week schakelen we 's avonds door. Een echte dinerkaart, een 3-gangen keuze­menu, en onze High Bites om te delen."
+        lede="Iedere vrijdagavond ben je welkom voor een gezellige avond uit. Kies voor ons 3-gangenmenu of kies lekker een hoofdgerecht van onze dinerkaart."
       >
         <div className="page-hero-cta-row">
-          <button className="nav-cta" onClick={openReserve} style={{ padding: "14px 22px", fontSize: 14 }}>
+          <button className="nav-cta" onClick={() => openReserve("diner")} style={{ padding: "14px 22px", fontSize: 14 }}>
             Reserveer vrijdag <IconArrow />
           </button>
         </div>
       </window.PageHero>
 
-      <MenuSection
-        num="4.1"
-        eyebrow="Voorgerechten"
-        title="Beginnen"
-        titleEm="met iets kleins."
-        items={window.VOORGERECHTEN}
-        columns={2}
-      />
-
-      <MenuSection
-        num="4.2"
-        eyebrow="Hoofdgerechten"
-        title="En dan,"
-        titleEm="de hoofdrol."
-        items={window.HOOFDGERECHTEN}
-        columns={2}
-      />
-
-      {/* High Bites + 3-gangen keuze menu, two callouts side-by-side */}
-      <section className="menu-section">
+      {/* De twee specials bovenaan, voor de kaart */}
+      <section className="diner-specials">
         <div className="container">
-          <div style={{ display: "grid", gap: 24, gridTemplateColumns: "1fr" }} className="duo-callout">
-            <div className="callout-card" style={{ background: "var(--cream-2)", borderColor: "var(--gold)" }}>
-              <span className="eyebrow">High Bites · om te delen</span>
-              <h3 style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
-                <span>High Bites</span>
-                <span className="price-big">€ 24,95 p.p.</span>
-              </h3>
+          <div className="special-grid">
+            <div className="special-card main">
+              <span className="special-kicker">3-gangen keuzemenu</span>
+              <h2>Terug van weg geweest</h2>
+              <div className="special-price">€ 32,95</div>
               <p>
-                <em>Een beetje van Zus &amp; een beetje van Zo.</em> We serveren 3 rondes met
-                heerlijke hartige hapjes. Mix van vlees, vis en vegetarisch. Lekker samen
-                genieten onder het genot van een hapje en een drankje.
+                Ons 3-gangenmenu! Ga je voor onze klassiekers zoals carpaccio en saté? Of kies je
+                voor de gyoza's en een heerlijke burger? Je kiest uit onze voorgerechten en
+                hoofdgerechten, en sluit het menu af met een dessert van de chef.
               </p>
+              <button className="nav-cta" onClick={() => openReserve("diner")}>Reserveer vrijdag <IconArrow /></button>
             </div>
-            <div className="callout-card">
-              <span className="eyebrow" style={{ color: "var(--aubergine)" }}>3 gangen keuzemenu</span>
-              <h3 style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap" }}>
-                <span>Terug van weg geweest</span>
-                <span className="price-big">€ 32,95</span>
-              </h3>
+            <div className="special-card">
+              <span className="special-kicker">Om te delen</span>
+              <h2>High Bites</h2>
+              <div className="special-price">€ 25,95 <span>p.p.</span></div>
               <p>
-                Ons 3-gangenmenu! Ga je voor onze klassiekers zoals carpaccio en saté? Of kies
-                je voor de heerlijke burger?! Je kunt kiezen uit onze gerechten én hooggerechten.
-                Je sluit het menu af met een <strong>dessert van de chef.</strong>
+                Een beetje van Zus en een beetje van Zo! We serveren 3 rondes met heerlijke hartige
+                hapjes: een mix van vlees, vis en vegetarisch. Lekker samen genieten onder het genot
+                van een hapje en een drankje.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <MenuSection
-        num="4.3"
-        eyebrow="Hooggerechten"
-        title="Of een"
-        titleEm="hooggerecht."
-        items={window.HOOG_GERECHTEN}
-        columns={2}
-      />
+      <section className="menu-section">
+        <div className="container">
+          <div className="menu-section-head">
+            <div>
+              <h2>Dinerkaart</h2>
+            </div>
+            <p>Alleen op vrijdagavond. Heb je een allergie? Meld het ons, er is ook een gluten- en lactosevrije kaart.</p>
+          </div>
+          <window.MenuBlocks sections={window.DINERKAART} />
+          <p className="allergy-note"><abbr className="veg" title="Vegetarisch">V</abbr> = vegetarisch. Prijzen onder voorbehoud van typfouten; de prijs in de kassa is leidend.</p>
+        </div>
+      </section>
 
       {/* FEESTEN & BEDRIJFSBEZORGING */}
       <section className="feesten">
@@ -118,12 +101,12 @@ function PageDiner({ openReserve }) {
             <div className="f-card dark">
               <span className="f-card-eyebrow">Bedrijfsbezorging</span>
               <h3>Voor bedrijven in <span className="em" style={{ color: "var(--gold-soft)" }}>Etten-Leur.</span></h3>
-              <p>Ma t/m vr bezorgen we lunch en vergaderpakketten, bij jullie op kantoor, op tijd.</p>
+              <p>Van maandag t/m zaterdag bezorgen we lunch, vergaderpakketten en hapjes bij jullie op kantoor.</p>
               <ul>
                 <li>Belegde broodjes per persoon</li>
-                <li>Vergaderpakketten met soep, fruit, koffie</li>
-                <li>Bestellen vóór 11:00 uur, dezelfde dag mogelijk</li>
-                <li>Ook voor borrels &amp; high-tea aan kantoor</li>
+                <li>Vergaderpakketten met soep, fruit en broodjes</li>
+                <li>Bestellen vóór 10:30 uur, rond 12:00 uur bezorgd</li>
+                <li>Ook high tea to go</li>
               </ul>
               <a className="read-link" href={`mailto:${window.BRAND.emailOrder}?subject=Bedrijfsbezorging`}
                  style={{ marginTop: 8, color: "var(--paper)", borderColor: "rgba(255,255,255,0.4)" }}>

@@ -38,90 +38,6 @@ const HOURS = [
 ];
 
 // =============================================================
-// LUNCH & HIGH TEA kaart (page 2)
-// =============================================================
-const BELEGDE_BROODJES = {
-  intro: "Belegd met dagverse rauwkost. Keuze uit wit of bruin stokbrood of een Italiaanse bol.",
-  items: [
-    { name: "Brie", extra: "(met spek + €0,80)", desc: "met zontomaat, walnoten, rucola en honing-mosterddressing", price: "7,50" },
-    { name: "Carpaccio", desc: "met zontomaat, pijnboompitjes, Parmezaanse kaas, rucola en truffelmayonaise", price: "8,50" },
-    { name: "Tonijnsalade", desc: "met paprika, rode ui, kappertjes, bosui en sesamdressing", price: "7,50" },
-    { name: "Gezond", desc: "met ham, kaas, ei, sla, tomaat, komkommer en cocktailsaus", price: "6,50" },
-    { name: "Gerookte zalm", desc: "met oosterse dressing, bosui en wasabi-pinda crunch", price: "8,95" },
-    { name: "Hete kip", desc: "pittige kip volgens Zus & Zo recept, rauwkost, mais, tomatensalsa en cocktailsaus", price: "8,95" },
-    { name: "Vega club", desc: "met oude kaas, hummus, gegrilde paprika, pijnboompitjes, zontomaat, mais en rucola", price: "8,50" },
-    { name: "Martino", desc: "met filet americain, ui, ei, augurk en martinosaus", price: "8,50" },
-  ],
-};
-
-const SANDWICHES = {
-  intro: "3-laagse sandwich. Belegd met dagverse rauwkost. Keuze uit wit of bruin sandwichbrood.",
-  items: [
-    { name: "Zus", desc: "met kip, spek, ei en remouladesaus", price: "8,50" },
-    { name: "Zo", desc: "met kip, gerookte zalm, ei, cocktailsaus en remouladesaus", price: "9,95" },
-    { name: "Beef & Bacon", desc: "met rosbief, spek en eisalade", price: "8,50" },
-  ],
-};
-
-const SALADES = {
-  intro: "Alle salades worden geserveerd met dagverse rauwkost, brood en kruidenboter.",
-  items: [
-    { name: "Carpaccio", desc: "met zontomaat, pijnboompitjes, Parmezaanse kaas, rucola, truffelmayonaise en vinaigrette", price: "9,75" },
-    { name: "Geitenkaas", extra: "(met spek + €0,80)", desc: "met rode biet, geitenkaasloempia's, amandel, rucola, balsamicostroop en honing-mosterddressing", price: "8,95" },
-    { name: "Zus & Zo", desc: "met gemarineerde kipfilet, mango, ei, spek, croutons, Parmezaanse kaas en honing-mosterddressing", price: "9,50" },
-    { name: "Mexicaanse kip", desc: "met pittige kip volgens Zus & Zo recept, mais, paprika, nacho's, kaas, tomatensalsa en cocktailsaus", price: "9,50" },
-    { name: "Oosterse zalm", desc: "met gerookte zalm, oosterse dressing, bosui en wasabi-pinda crunch", price: "9,95" },
-  ],
-};
-
-const FLATBREAD = {
-  intro: "Belegd met dagverse rauwkost.",
-  items: [
-    { name: "Vitello Tonato", desc: "met rosbief, tonijnmayonaise, zontomaat, rode ui en rucola", price: "9,95" },
-    { name: "Oosterse carpaccio", desc: "met kimchi-mayonaise, zontomaat, wasabi crunch en gefrituurde noedels", price: "10,25" },
-    { name: "Gerookte zalm", desc: "met roomkaas, limoendressing en dille", price: "9,50" },
-  ],
-};
-
-const SAP = {
-  items: [
-    { name: "Kleine verse jus / smoothie", price: "3,95" },
-    { name: "1 liter verse jus", price: "9,95" },
-  ],
-};
-
-// =============================================================
-// DINERKAART (page 4)
-// =============================================================
-const VOORGERECHTEN = [
-  { name: "Broodplankje", desc: "met 3 smeersels", price: "7,95" },
-  { name: "Tomatensoep", desc: "met stokbroodje", price: "7,25" },
-  { name: "Carpaccio", desc: "met zontomaat, pijnboompitjes, truffelmayonaise, rucola, vinaigrette en Parmezaanse kaas", price: "11,25" },
-  { name: "Gyoza's", extra: "3 stuks", desc: "Krokante Japanse dumplings gevuld met kip, geserveerd met Sriracha-mayonaise, bosui, paprika en sesamzaad", price: "9,95" },
-  { name: "Bietencarpaccio", extra: "(met spek + €1,25)", desc: "met geitenkaas, rode ui, zongedroogde tomaat, pijnboompitjes en balsamico", price: "12,25" },
-  { name: "Zalmcarpaccio", desc: "met mierikswortelmayonaise, kappertjes, rode ui, komkommer en rucola", price: "12,95" },
-];
-
-const HOOFDGERECHTEN = [
-  { name: "Surf & Turf tartaarpuntjes", desc: "scampi's en diverse groenten geserveerd met chimichurri", price: "n.o." },
-  { name: "Kipsaté", desc: "met satésaus en kroepoek", price: "18,95" },
-  { name: "Biefstuk", desc: "met peperjus, champignonroomsaus of kruidenboter", price: "22,95" },
-  { name: "Italiaanse biefstuk", desc: "met Parmezaanse kaas, zontomaat, balsamicostroop, pijnboompitjes en rucola", price: "22,95" },
-  { name: "Zalm teriyaki", desc: "met diverse roerbakgroenten en sesamzaad", price: "22,95" },
-  { name: "Big Zus & Zo", desc: "broodje met runderhamburger, spek, cheddar, crunch van augurk, gefrituurde uitjes en hamburgersaus", price: "18,95" },
-  { name: "Mix grillspies", desc: "met peperjus, champignonroomsaus of kruidenboter", price: "19,95" },
-  { name: "The Goat Classic", desc: "Geitenkaasburger met rode ui chutney, zongedroogde tomaat, rucola en walnoten", price: "17,95" },
-  { name: "Loaded fries truffel", desc: "met truffelmayonaise, Parmezaanse kaas en bosui", price: "6,95" },
-];
-
-const HOOG_GERECHTEN = [
-  { name: "Surf & Turf tartaarpuntjes", desc: "met diverse ingrediënten geserveerd met chimichurri", price: "19,95" },
-  { name: "Pork Belly", desc: "Ons 3 courgette, zongedroogde tomaat, rucola", price: "17,95" },
-  { name: "Pork Belly Burnt Ends", desc: "met BBQ-saus en coleslaw", price: "18,95" },
-  { name: "Loaded fries Pork Belly", desc: "Met buikspek, kimchi-mayonaise en sesamzaad", price: "9,95" },
-];
-
-// =============================================================
 // Featured offerings on the home page (with hero copy)
 // =============================================================
 const OFFERINGS = [
@@ -173,7 +89,5 @@ const INSTA_POSTS = [
 
 Object.assign(window, {
   BRAND, NAV_PAGES, HOURS,
-  BELEGDE_BROODJES, SANDWICHES, SALADES, FLATBREAD, SAP,
-  VOORGERECHTEN, HOOFDGERECHTEN, HOOG_GERECHTEN,
   OFFERINGS, INSTA_POSTS,
 });
