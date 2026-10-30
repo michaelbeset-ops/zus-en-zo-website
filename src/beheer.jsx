@@ -5,7 +5,7 @@
 // sluitingen, mailinglijst, instellingen en wie er toegang heeft.
 // Alleen voor personeel (tabel staff, zie supabase/schema.sql).
 // =============================================================
-const { useState, useEffect, useCallback } = React;
+const { useState, useEffect, useCallback, useRef } = React;
 
 const api = window.ReserveApi;
 const sb = api.configured && window.supabase
@@ -171,9 +171,99 @@ function NewPassword({ onDone }) {
   );
 }
 
+// ─── Tafels: hulpfuncties ─────────────────────────────────────────────────────
+
+const toMin = (t) => parseInt(String(t).slice(0, 2), 10) * 60 + parseInt(String(t).slice(3, 5), 10);
+const minToTime = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+const tableIdsOf = (r) => (r.reservation_tables || []).map((x) => x.table_id);
+
+// Welke tafels zijn bezet rond deze tijd? Een tafel is bezet zolang een
+// reservering duurt (settings.table_minutes), dus twee reserveringen botsen
+// als hun begintijden minder dan die duur uit elkaar liggen.
+function busyTableIds(dayRows, time, dur, excludeId) {
+  const busy = new Map();
+  if (!TIME_RE.test(time || "")) return busy;
+  const t = toMin(time);
+  for (const r of dayRows) {
+    if (r.id === excludeId || r.status === "geannuleerd") continue;
+    if (Math.abs(toMin(r.time) - t) >= dur) continue;
+    for (const id of tableIdsOf(r)) busy.set(id, r);
+  }
+  return busy;
+}
+
+// Kleinste vrije tafel die past; anders de kleinste combinatie van twee
+// vrije tafels in dezelfde ruimte.
+function suggestTables(tables, busy, guests) {
+  const free = tables.filter((t) => t.active && !busy.has(t.id)).sort((a, b) => a.seats - b.seats);
+  const one = free.find((t) => t.seats >= guests);
+  if (one) return [one.id];
+  let best = null;
+  for (let i = 0; i < free.length; i++) {
+    for (let j = i + 1; j < free.length; j++) {
+      const a = free[i], b = free[j];
+      if (a.area !== b.area || a.seats + b.seats < guests) continue;
+      if (!best || a.seats + b.seats < best.sum) best = { ids: [a.id, b.id], sum: a.seats + b.seats };
+    }
+  }
+  return best ? best.ids : [];
+}
+
+function useDiningTables() {
+  const [tables, setTables] = useState([]);
+  const load = useCallback(() => {
+    sb.from("dining_tables").select("*").order("sort_order").order("name").then(({ data }) => setTables(data || []));
+  }, []);
+  useEffect(() => { load(); }, [load]);
+  return [tables, load];
+}
+
+const tableLabel = (tables, ids) => ids.map((id) => (tables.find((t) => t.id === id) || {}).name).filter(Boolean).join(", ");
+
 // ─── Reservering invoeren of wijzigen ─────────────────────────────────────────
 
-function ReservationForm({ initial, types, token, onClose, onSaved }) {
+function TablePicker({ tables, selected, setSelected, busy, guests }) {
+  if (!tables.length) {
+    return <p className="bh-help">Nog geen tafels ingesteld. Voeg ze toe bij het tabblad Tafels, dan kun je ze hier koppelen.</p>;
+  }
+  const areas = Array.from(new Set(tables.filter((t) => t.active || selected.includes(t.id)).map((t) => t.area)));
+  const seats = selected.reduce((s, id) => s + ((tables.find((t) => t.id === id) || {}).seats || 0), 0);
+  const clash = selected.filter((id) => busy.has(id));
+  const toggle = (id) => setSelected(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
+  return (
+    <div className="bh-tablepick">
+      {areas.map((area) => (
+        <div key={area} className="bh-tablepick-area">
+          <span className="bh-tablepick-label">{area}</span>
+          <div className="bh-tablepick-list">
+            {tables.filter((t) => t.area === area && (t.active || selected.includes(t.id))).map((t) => {
+              const on = selected.includes(t.id);
+              const b = busy.get(t.id);
+              return (
+                <button type="button" key={t.id} className={"bh-tablechip" + (on ? " on" : "") + (b ? " busy" : "")}
+                  aria-pressed={on} onClick={() => toggle(t.id)}
+                  title={b ? `Bezet door ${b.name} om ${b.time}` : `${t.seats} plaatsen`}>
+                  {t.name} <span>{t.seats}p{b ? " · bezet" : ""}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+      <div className="bh-tablepick-foot">
+        <button type="button" className="bh-link" style={{ margin: 0 }} onClick={() => {
+          const s = suggestTables(tables, busy, guests);
+          if (s.length) setSelected(s); else window.alert("Er is op dit moment geen vrije tafel (of combinatie van twee) die groot genoeg is.");
+        }}>Stel een vrije tafel voor</button>
+        {selected.length > 0 && <span className="bh-help" style={{ margin: 0 }}>{seats} plaatsen voor {guests} {guests === 1 ? "persoon" : "personen"}</span>}
+      </div>
+      {selected.length > 0 && seats < guests && <div className="callout callout-error">Te weinig plaatsen: deze tafel(s) hebben samen {seats} plaatsen.</div>}
+      {clash.length > 0 && <div className="callout callout-error">Let op: {tableLabel(tables, clash)} is rond deze tijd al bezet ({clash.map((id) => `${busy.get(id).name} om ${busy.get(id).time}`).join(", ")}).</div>}
+    </div>
+  );
+}
+
+function ReservationForm({ initial, types, tables, tableMinutes, token, onClose, onSaved }) {
   const isNew = !initial.id;
   const [f, setF] = useState({
     name: initial.name || "",
@@ -185,11 +275,23 @@ function ReservationForm({ initial, types, token, onClose, onSaved }) {
     guests: initial.guests || 2,
     message: initial.message || "",
     status: initial.status || "bevestigd",
+    note: initial.internal_note || "",
   });
+  const [selected, setSelected] = useState(tableIdsOf(initial));
+  const [dayRows, setDayRows] = useState([]);
   const [notify, setNotify] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+
+  // Reserveringen van de gekozen dag, om bezette tafels te tonen.
+  useEffect(() => {
+    if (!f.date) return;
+    sb.from("reservations").select("id, name, time, status, reservation_tables(table_id)").eq("date", f.date)
+      .then(({ data }) => setDayRows(data || []));
+  }, [f.date]);
+
+  const busyMap = busyTableIds(dayRows, normTime(f.time), tableMinutes, initial.id);
 
   const save = async (e) => {
     e.preventDefault();
@@ -201,6 +303,7 @@ function ReservationForm({ initial, types, token, onClose, onSaved }) {
     const r = await api.call("staff-save", {
       id: initial.id || "", name: f.name, phone: f.phone, email: f.email, type: f.type, date: f.date,
       time, guests: Number(f.guests), message: f.message, status: f.status,
+      tables: selected, internal_note: f.note,
       notify: notify && !!f.email.trim(),
     }, token());
     setBusy(false);
@@ -264,8 +367,16 @@ function ReservationForm({ initial, types, token, onClose, onSaved }) {
             </div>
           </div>
           <div className="field">
-            <label className="field-label" htmlFor="rf-msg">Opmerking</label>
+            <span className="field-label">Tafel(s)</span>
+            <TablePicker tables={tables} selected={selected} setSelected={setSelected} busy={busyMap} guests={Number(f.guests) || 1} />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="rf-msg">Opmerking van de gast</label>
             <textarea id="rf-msg" className="textarea-input" rows="2" maxLength={1000} value={f.message} onChange={set("message")} />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="rf-note">Interne notitie (alleen voor personeel)</label>
+            <textarea id="rf-note" className="textarea-input" rows="2" maxLength={500} value={f.note} onChange={set("note")} placeholder="Bijv. vaste gast, taart staat in de koeling, aanbetaling ontvangen" />
           </div>
           <label className="consent">
             <input type="checkbox" checked={notify && !!f.email.trim()} disabled={!f.email.trim()} onChange={(e) => setNotify(e.target.checked)} />
@@ -281,13 +392,109 @@ function ReservationForm({ initial, types, token, onClose, onSaved }) {
   );
 }
 
+// ─── Tafelplan: alle tafels tegen de tijd ─────────────────────────────────────
+
+function TablePlan({ rows, tables, hours, date, tableMinutes, onOpen }) {
+  const active = rows.filter((r) => r.status !== "geannuleerd");
+  const dow = api.isoDow(date);
+  const h = hours.find((x) => x.isodow === dow);
+  let start = h && !h.closed && h.open_time ? toMin(h.open_time) : 9 * 60;
+  let end = h && !h.closed && h.close_time ? toMin(h.close_time) : 22 * 60;
+  for (const r of active) { start = Math.min(start, toMin(r.time)); end = Math.max(end, toMin(r.time) + tableMinutes); }
+  start = Math.floor(start / 60) * 60; end = Math.ceil(end / 60) * 60;
+  const span = Math.max(60, end - start);
+  const hoursMarks = [];
+  for (let m = start; m <= end; m += 60) hoursMarks.push(m);
+  const pos = (m) => ((m - start) / span) * 100 + "%";
+  const unassigned = active.filter((r) => tableIdsOf(r).length === 0);
+  const shown = tables.filter((t) => t.active || active.some((r) => tableIdsOf(r).includes(t.id)));
+
+  // Dubbel geboekte tafels: twee reserveringen op dezelfde tafel die elkaar overlappen.
+  const clashIds = new Set();
+  const clashText = [];
+  for (const t of shown) {
+    const list = active.filter((r) => tableIdsOf(r).includes(t.id)).sort((a, b) => toMin(a.time) - toMin(b.time));
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        if (toMin(list[j].time) - toMin(list[i].time) < tableMinutes) {
+          clashIds.add(t.id + list[i].id); clashIds.add(t.id + list[j].id);
+          clashText.push(`${t.name}: ${list[i].time} ${list[i].name} en ${list[j].time} ${list[j].name}`);
+        }
+      }
+    }
+  }
+
+  // Op een smal scherm meteen naar de eerste reservering schuiven.
+  const wrapRef = useRef(null);
+  const first = active.length ? Math.min(...active.map((r) => toMin(r.time))) : null;
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || first === null || el.scrollWidth - el.clientWidth < 80) return;
+    const plan = el.firstChild;
+    const trackWidth = plan.scrollWidth - 120;
+    el.scrollLeft = Math.max(0, ((first - start) / span) * trackWidth - 40);
+  }, [first, start, span, tables.length]);
+
+  if (!tables.length) {
+    return <p className="bh-empty">Nog geen tafels ingesteld. Voeg ze toe bij het tabblad Tafels, dan zie je hier per tafel wie er wanneer zit.</p>;
+  }
+  return (
+    <div>
+      {unassigned.length > 0 && (
+        <div className="bh-unassigned">
+          <strong>Nog zonder tafel ({unassigned.length}):</strong>
+          {unassigned.map((r) => (
+            <button type="button" key={r.id} className="bh-tablechip" onClick={() => onOpen(r)}>
+              {r.time} {r.name} <span>{r.guests}p</span>
+            </button>
+          ))}
+        </div>
+      )}
+      {clashText.length > 0 && (
+        <div className="callout callout-error" role="alert">
+          <strong>Dubbel geboekt:</strong> {clashText.join("; ")}. Klik op een rood blok om een andere tafel te kiezen.
+        </div>
+      )}
+      <div className="bh-plan-wrap" ref={wrapRef}>
+        <div className="bh-plan" style={{ minWidth: Math.max(640, (span / 30) * 56) }}>
+          <div className="bh-plan-row bh-plan-head">
+            <div className="bh-plan-name" />
+            <div className="bh-plan-track">
+              {hoursMarks.map((m) => <span key={m} className="bh-plan-hour" style={{ left: pos(m) }}>{minToTime(m)}</span>)}
+            </div>
+          </div>
+          {shown.map((t) => (
+            <div className="bh-plan-row" key={t.id}>
+              <div className="bh-plan-name"><strong>{t.name}</strong><span>{t.seats}p · {t.area}</span></div>
+              <div className="bh-plan-track">
+                {hoursMarks.map((m) => <span key={m} className="bh-plan-line" style={{ left: pos(m) }} />)}
+                {active.filter((r) => tableIdsOf(r).includes(t.id)).map((r) => (
+                  <button type="button" key={r.id} className={"bh-plan-block st-" + r.status + (clashIds.has(t.id + r.id) ? " clash" : "")}
+                    style={{ left: pos(toMin(r.time)), width: (tableMinutes / span) * 100 + "%" }}
+                    onClick={() => onOpen(r)} title={`${r.time} ${r.name}, ${r.guests} personen`}>
+                    <strong>{r.time} {r.name}</strong> <span>{r.guests}p</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <p className="bh-help">Elk blok duurt {tableMinutes} minuten (in te stellen bij Instellingen). Klik op een blok om de reservering te wijzigen of een andere tafel te kiezen.</p>
+    </div>
+  );
+}
+
 // ─── Reserveringen ────────────────────────────────────────────────────────────
 
 function Reservations({ token }) {
-  const [mode, setMode] = useState("dag"); // dag | open | komend
+  const [mode, setMode] = useState("dag"); // dag | plan | open | komend
   const [date, setDate] = useState(todayStr());
   const [rows, setRows] = useState([]);
   const [types, setTypes] = useState([]);
+  const [tables] = useDiningTables();
+  const [hours, setHours] = useState([]);
+  const [tableMinutes, setTableMinutes] = useState(120);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -297,12 +504,16 @@ function Reservations({ token }) {
 
   useEffect(() => {
     sb.from("reservation_types").select("*").order("sort_order").then(({ data }) => setTypes(data || []));
+    sb.from("opening_hours").select("*").then(({ data }) => setHours(data || []));
+    sb.from("settings").select("table_minutes").eq("id", 1).single().then(({ data }) => data && setTableMinutes(data.table_minutes));
   }, []);
+
+  const perDay = mode === "dag" || mode === "plan";
 
   const load = useCallback(async () => {
     setError("");
-    let q = sb.from("reservations").select("*");
-    if (mode === "dag") q = q.eq("date", date);
+    let q = sb.from("reservations").select("*, reservation_tables(table_id)");
+    if (perDay) q = q.eq("date", date);
     else if (mode === "open") q = q.eq("status", "aangevraagd").gte("date", todayStr());
     else q = q.gte("date", todayStr()).neq("status", "geannuleerd");
     const { data, error } = await q.order("date").order("time").order("created_at");
@@ -316,10 +527,11 @@ function Reservations({ token }) {
 
   useEffect(() => { setLoading(true); load(); }, [load]);
 
-  // Live bijwerken bij nieuwe of gewijzigde reserveringen.
+  // Live bijwerken bij nieuwe of gewijzigde reserveringen en tafelkoppelingen.
   useEffect(() => {
     const ch = sb.channel("reservations-live")
       .on("postgres_changes", { event: "*", schema: "public", table: "reservations" }, () => load())
+      .on("postgres_changes", { event: "*", schema: "public", table: "reservation_tables" }, () => load())
       .subscribe();
     return () => { sb.removeChannel(ch); };
   }, [load]);
@@ -346,15 +558,16 @@ function Reservations({ token }) {
 
   return (
     <section>
-      <div className="bh-toolbar">
-        <div className="bh-seg" role="tablist" aria-label="Weergave">
+      <div className="bh-toolbar bh-noprint">
+        <div className="bh-seg bh-seg-4" role="tablist" aria-label="Weergave">
           <button role="tab" aria-selected={mode === "dag"} className={mode === "dag" ? "on" : ""} onClick={() => setMode("dag")}>Per dag</button>
+          <button role="tab" aria-selected={mode === "plan"} className={mode === "plan" ? "on" : ""} onClick={() => setMode("plan")}>Tafelplan</button>
           <button role="tab" aria-selected={mode === "open"} className={mode === "open" ? "on" : ""} onClick={() => setMode("open")}>
             Te bevestigen {openCount > 0 && <span className="bh-badge">{openCount}</span>}
           </button>
           <button role="tab" aria-selected={mode === "komend"} className={mode === "komend" ? "on" : ""} onClick={() => setMode("komend")}>Komend</button>
         </div>
-        {mode === "dag" && (
+        {perDay && (
           <div className="bh-datenav">
             <button className="bh-icon" onClick={() => setDate(addDays(date, -1))} aria-label="Vorige dag">‹</button>
             <input type="date" className="date-input" value={date} onChange={(e) => e.target.value && setDate(e.target.value)} aria-label="Datum" />
@@ -362,65 +575,181 @@ function Reservations({ token }) {
             {date !== todayStr() && <button className="bh-link" onClick={() => setDate(todayStr())}>Vandaag</button>}
           </div>
         )}
-        <button className="btn btn-primary bh-new" onClick={() => setEditing({ date: mode === "dag" ? date : todayStr() })}>+ Reservering invoeren</button>
+        {mode === "dag" && <button className="btn" onClick={() => window.print()}>Print dagoverzicht</button>}
+        <button className="btn btn-primary bh-new" onClick={() => setEditing({ date: perDay ? date : todayStr() })}>+ Reservering invoeren</button>
       </div>
 
       <h2 className="bh-h2">
-        {mode === "dag" ? fmtLong(date) : mode === "open" ? "Te bevestigen" : "Komende reserveringen"}
+        {perDay ? fmtLong(date) : mode === "open" ? "Te bevestigen" : "Komende reserveringen"}
         {!loading && <span className="bh-sum">{plural(active.length, "reservering", "reserveringen")} · {plural(guests, "gast", "gasten")}</span>}
       </h2>
 
       <Alert kind="error" onClose={() => setError("")}>{error}</Alert>
       <Alert onClose={() => setNotice("")}>{notice}</Alert>
 
-      {loading ? <p className="bh-muted">Laden…</p> : rows.length === 0 ? (
+      {loading ? <p className="bh-muted">Laden…</p> : mode === "plan" ? (
+        <TablePlan rows={rows} tables={tables} hours={hours} date={date} tableMinutes={tableMinutes} onOpen={(r) => setEditing(r)} />
+      ) : rows.length === 0 ? (
         <p className="bh-empty">{mode === "open" ? "Alles is bevestigd. Lekker bezig." : "Geen reserveringen."}</p>
       ) : (
         <ul className="bh-list">
-          {rows.map((r) => (
-            <li key={r.id} className={"bh-res st-" + r.status}>
-              <div className="bh-res-time">
-                {mode !== "dag" && <span className="bh-res-date">{fmtShort(r.date)}</span>}
-                <strong>{r.time}</strong>
-              </div>
-              <div className="bh-res-main">
-                <div className="bh-res-head">
-                  <span className="bh-res-name">{r.name}</span>
-                  <span className="bh-res-guests">{plural(r.guests, "persoon", "personen")}</span>
-                  <span className="bh-pill">{typeName(r.reservation_type)}</span>
-                  <span className={"bh-pill s-" + r.status}>{STATUS_LABEL[r.status]}{r.cancelled_by === "gast" ? " door gast" : ""}</span>
-                  {r.source === "cafe" && <span className="bh-pill">Zelf ingevoerd</span>}
+          {rows.map((r) => {
+            const tl = tableLabel(tables, tableIdsOf(r));
+            return (
+              <li key={r.id} className={"bh-res st-" + r.status}>
+                <div className="bh-res-time">
+                  {!perDay && <span className="bh-res-date">{fmtShort(r.date)}</span>}
+                  <strong>{r.time}</strong>
                 </div>
-                <div className="bh-res-contact">
-                  {r.phone && <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`}>{r.phone}</a>}
-                  {r.email && <a href={`mailto:${r.email}`}>{r.email}</a>}
+                <div className="bh-res-main">
+                  <div className="bh-res-head">
+                    <span className="bh-res-name">{r.name}</span>
+                    <span className="bh-res-guests">{plural(r.guests, "persoon", "personen")}</span>
+                    <span className={"bh-pill" + (tl ? " t-table" : " t-notable")}>{tl || "Geen tafel"}</span>
+                    <span className="bh-pill">{typeName(r.reservation_type)}</span>
+                    <span className={"bh-pill s-" + r.status}>{STATUS_LABEL[r.status]}{r.cancelled_by === "gast" ? " door gast" : ""}</span>
+                    {r.source === "cafe" && <span className="bh-pill">Zelf ingevoerd</span>}
+                  </div>
+                  <div className="bh-res-contact">
+                    {r.phone && <a href={`tel:${r.phone.replace(/[^\d+]/g, "")}`}>{r.phone}</a>}
+                    {r.email && <a href={`mailto:${r.email}`}>{r.email}</a>}
+                  </div>
+                  {r.message && <p className="bh-res-msg">“{r.message}”</p>}
+                  {r.internal_note && <p className="bh-res-note"><strong>Intern:</strong> {r.internal_note}</p>}
                 </div>
-                {r.message && <p className="bh-res-msg">“{r.message}”</p>}
-              </div>
-              <div className="bh-res-actions">
-                {r.status === "aangevraagd" && (
-                  <button className="btn btn-primary" disabled={!!busy[r.id]} onClick={() => act(r, "confirm")}>
-                    {busy[r.id] === "confirm" ? "Bezig…" : "Bevestigen"}
-                  </button>
-                )}
-                <button className="btn" disabled={!!busy[r.id]} onClick={() => setEditing(r)}>Wijzigen</button>
-                {r.status !== "geannuleerd" && (
-                  <button className="btn" disabled={!!busy[r.id]} onClick={() => act(r, "staff-cancel")}>
-                    {busy[r.id] === "staff-cancel" ? "Bezig…" : "Annuleren"}
-                  </button>
-                )}
-              </div>
-            </li>
-          ))}
+                <div className="bh-res-actions bh-noprint">
+                  {r.status === "aangevraagd" && (
+                    <button className="btn btn-primary" disabled={!!busy[r.id]} onClick={() => act(r, "confirm")}>
+                      {busy[r.id] === "confirm" ? "Bezig…" : "Bevestigen"}
+                    </button>
+                  )}
+                  <button className="btn" disabled={!!busy[r.id]} onClick={() => setEditing(r)}>{tl ? "Wijzigen" : "Wijzigen / tafel"}</button>
+                  {r.status !== "geannuleerd" && (
+                    <button className="btn" disabled={!!busy[r.id]} onClick={() => act(r, "staff-cancel")}>
+                      {busy[r.id] === "staff-cancel" ? "Bezig…" : "Annuleren"}
+                    </button>
+                  )}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 
       {editing && (
         <ReservationForm
-          initial={editing} types={types} token={token}
+          initial={editing} types={types} tables={tables} tableMinutes={tableMinutes} token={token}
           onClose={() => setEditing(null)}
           onSaved={(msg) => { setEditing(null); setNotice(msg); load(); }}
         />
+      )}
+    </section>
+  );
+}
+
+// ─── Tafels beheren ───────────────────────────────────────────────────────────
+
+function TablesAdmin() {
+  const [tables, reload] = useDiningTables();
+  const [rows, setRows] = useState(null);
+  const [error, setError] = useState("");
+  const [msg, setMsg] = useState("");
+  const [bulk, setBulk] = useState({ count: 6, seats: 4, area: "Binnen", prefix: "Tafel", from: 1 });
+
+  useEffect(() => { setRows(tables.map((t) => ({ ...t }))); }, [tables]);
+
+  const upd = (i, k, v) => setRows(rows.map((r, j) => (j === i ? { ...r, [k]: v } : r)));
+
+  const saveAll = async () => {
+    setError(""); setMsg("");
+    for (const r of rows) {
+      if (!String(r.name).trim()) return setError("Elke tafel heeft een naam nodig.");
+      if (!(Number(r.seats) >= 1 && Number(r.seats) <= 50)) return setError(`Vul bij ${r.name} een aantal plaatsen in tussen 1 en 50.`);
+    }
+    const { error } = await sb.from("dining_tables").upsert(rows.map((r) => ({
+      id: r.id, name: String(r.name).trim(), seats: Number(r.seats), area: String(r.area || "Binnen").trim() || "Binnen",
+      sort_order: Number(r.sort_order) || 0, active: !!r.active,
+    })));
+    if (error) return setError(dbMessage(error, "Opslaan lukte niet."));
+    setMsg("Opgeslagen."); reload();
+  };
+
+  const addBulk = async (e) => {
+    e.preventDefault();
+    setError(""); setMsg("");
+    const n = Math.min(50, Math.max(1, Number(bulk.count) || 1));
+    const start = Number(bulk.from) || 1;
+    const base = rows.length ? Math.max(...rows.map((r) => r.sort_order || 0)) : 0;
+    const add = Array.from({ length: n }, (_, i) => ({
+      name: `${bulk.prefix.trim() || "Tafel"} ${start + i}`.trim(), seats: Number(bulk.seats) || 2,
+      area: bulk.area.trim() || "Binnen", sort_order: base + i + 1, active: true,
+    }));
+    const { error } = await sb.from("dining_tables").insert(add);
+    if (error) return setError(dbMessage(error, "Toevoegen lukte niet."));
+    setMsg(`${n} ${n === 1 ? "tafel" : "tafels"} toegevoegd.`); reload();
+  };
+
+  const remove = async (t) => {
+    if (!window.confirm(`${t.name} verwijderen? Bij reserveringen met deze tafel verdwijnt de koppeling. Liever tijdelijk uitzetten? Haal dan het vinkje bij "In gebruik" weg.`)) return;
+    const { error } = await sb.from("dining_tables").delete().eq("id", t.id);
+    if (error) return setError(dbMessage(error, "Verwijderen lukte niet."));
+    reload();
+  };
+
+  return (
+    <section>
+      <h2 className="bh-h2">Tafels</h2>
+      <p className="bh-muted">Zet hier jullie tafels neer. Daarna koppel je bij elke reservering een of meer tafels, en zie je bij Reserveringen, Tafelplan per dag wie waar zit. Tafels die je samen schuift? Koppel ze allebei aan dezelfde reservering.</p>
+      <Alert kind="error">{error}</Alert>
+      <Alert>{msg}</Alert>
+
+      <form className="bh-card bh-form bh-wide" onSubmit={addBulk}>
+        <h3 className="bh-h3">Tafels toevoegen</h3>
+        <div className="bh-form-grid bh-bulk">
+          <div className="field">
+            <label className="field-label" htmlFor="tb-count">Aantal</label>
+            <input id="tb-count" className="text-input" type="number" min="1" max="50" value={bulk.count} onChange={(e) => setBulk({ ...bulk, count: e.target.value })} />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="tb-seats">Plaatsen per tafel</label>
+            <input id="tb-seats" className="text-input" type="number" min="1" max="50" value={bulk.seats} onChange={(e) => setBulk({ ...bulk, seats: e.target.value })} />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="tb-area">Ruimte</label>
+            <input id="tb-area" className="text-input" list="tb-areas" value={bulk.area} maxLength={30} onChange={(e) => setBulk({ ...bulk, area: e.target.value })} />
+            <datalist id="tb-areas"><option value="Binnen" /><option value="Terras" /><option value="Zaal" /></datalist>
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="tb-prefix">Naam</label>
+            <input id="tb-prefix" className="text-input" value={bulk.prefix} maxLength={20} onChange={(e) => setBulk({ ...bulk, prefix: e.target.value })} />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="tb-from">Eerste nummer</label>
+            <input id="tb-from" className="text-input" type="number" min="0" value={bulk.from} onChange={(e) => setBulk({ ...bulk, from: e.target.value })} />
+          </div>
+        </div>
+        <p className="bh-help" style={{ marginTop: 0 }}>Voorbeeld: {bulk.prefix || "Tafel"} {bulk.from} tot en met {bulk.prefix || "Tafel"} {Number(bulk.from) + Math.max(1, Number(bulk.count)) - 1}, elk {bulk.seats} plaatsen, {bulk.area || "Binnen"}.</p>
+        <button className="btn btn-primary" type="submit">Toevoegen</button>
+      </form>
+
+      {!rows ? <p className="bh-muted">Laden…</p> : rows.length === 0 ? <p className="bh-empty">Nog geen tafels.</p> : (
+        <div className="bh-card bh-form bh-wide">
+          <h3 className="bh-h3">Jullie tafels <span className="bh-sum">{rows.filter((r) => r.active).length} in gebruik · {rows.filter((r) => r.active).reduce((s, r) => s + (Number(r.seats) || 0), 0)} plaatsen</span></h3>
+          <div className="bh-tables">
+            <div className="bh-tables-head" aria-hidden="true"><span>Naam</span><span>Plaatsen</span><span>Ruimte</span><span>Volgorde</span><span>In gebruik</span><span /></div>
+            {rows.map((r, i) => (
+              <div className={"bh-tables-row" + (r.active ? "" : " is-off")} key={r.id}>
+                <input className="text-input" aria-label="Naam" value={r.name} maxLength={30} onChange={(e) => upd(i, "name", e.target.value)} />
+                <input className="text-input" aria-label={`Plaatsen ${r.name}`} type="number" min="1" max="50" value={r.seats} onChange={(e) => upd(i, "seats", e.target.value)} />
+                <input className="text-input" aria-label={`Ruimte ${r.name}`} list="tb-areas" value={r.area} maxLength={30} onChange={(e) => upd(i, "area", e.target.value)} />
+                <input className="text-input" aria-label={`Volgorde ${r.name}`} type="number" value={r.sort_order} onChange={(e) => upd(i, "sort_order", e.target.value)} />
+                <label className="bh-check"><input type="checkbox" checked={!!r.active} onChange={(e) => upd(i, "active", e.target.checked)} /><span>In gebruik</span></label>
+                <button type="button" className="bh-link" style={{ margin: 0 }} onClick={() => remove(r)}>Verwijderen</button>
+              </div>
+            ))}
+          </div>
+          <button className="btn btn-primary" type="button" onClick={saveAll}>Wijzigingen opslaan</button>
+        </div>
       )}
     </section>
   );
@@ -969,6 +1298,7 @@ function Settings({ token }) {
 
 const TABS = [
   ["reserveringen", "Reserveringen"],
+  ["tafels", "Tafels"],
   ["openingstijden", "Openingstijden"],
   ["soorten", "Soorten en tijden"],
   ["sluitingen", "Sluitingen"],
@@ -1043,6 +1373,7 @@ function Beheer() {
       </header>
       <main className="bh-main">
         {view === "reserveringen" && <Reservations token={token} />}
+        {view === "tafels" && <TablesAdmin />}
         {view === "openingstijden" && <OpeningHours />}
         {view === "soorten" && <Types />}
         {view === "sluitingen" && <Closures />}

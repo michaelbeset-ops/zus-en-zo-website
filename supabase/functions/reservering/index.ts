@@ -60,7 +60,7 @@ function hoursText(rows: HourRow[]): string {
   // Notities zoals "Diner-avond" of "Alleen koopzondag" horen erbij, anders lijkt een dag gewoon open.
   const label = (h: HourRow) => (h.closed || !h.open_time
     ? 'gesloten'
-    : `${h.open_time} tot ${h.close_time ?? ''}`.trim() + (h.note ? ` (${h.note.charAt(0).toLowerCase()}${h.note.slice(1)})` : ''))
+    : `${h.open_time} tot ${h.close_time ?? ''}`.trim() + (h.note ? `, ${h.note.charAt(0).toLowerCase()}${h.note.slice(1)}` : ''))
   const sorted = [...rows].sort((a, b) => a.isodow - b.isodow)
   const groups: { from: number; to: number; text: string }[] = []
   for (const h of sorted) {
@@ -698,8 +698,12 @@ async function handle(req: Request): Promise<Response> {
       p_type: str(body.type, 30),
       p_message: str(body.message, 1000) || null,
       p_status: status || null,
+      // Niet meegestuurd = niet aanpassen (null); lege lijst = geen tafel.
+      p_tables: Array.isArray(body.tables) ? body.tables.map((t) => str(t, 36)).slice(0, 12) : null,
+      p_internal_note: typeof body.internal_note === 'string' ? body.internal_note.slice(0, 500) : null,
     }
     if (input.p_id === 'x') return json({ ok: false, code: 'niet_gevonden' }, 404)
+    if (input.p_tables && !input.p_tables.every(isUuid)) return json({ ok: false, code: 'ongeldig' }, 400)
     if (!/^\d{4}-\d{2}-\d{2}$/.test(input.p_date)) return json({ ok: false, code: 'ongeldig' }, 400)
     const { data, error } = await rpc<(Res & { id: string; status: string })[]>('staff_save_reservation', input)
     if (error) return dbFail(error)

@@ -219,3 +219,98 @@ section > .callout { margin: 0 0 16px; position: relative; padding-right: 40px; 
   padding: 10px 0; border-bottom: 1px solid var(--line-soft); font-size: 14px; overflow-wrap: anywhere;
 }
 .bh-time { font-family: var(--mono); letter-spacing: 0.04em; }
+
+/* ─── Tafels ─────────────────────────────────────────────── */
+.bh-seg-4 { grid-template-columns: repeat(4, auto); }
+@media (max-width: 520px) { .bh-seg-4 { grid-template-columns: repeat(2, 1fr); } .bh-seg-4 button { border-bottom: 1px solid var(--line); } }
+.bh-pill.t-table { background: var(--aubergine-wash); border-color: var(--aubergine-soft); color: var(--aubergine-deep); }
+.bh-pill.t-notable { border-style: dashed; color: var(--ink-mute); }
+.bh-res-note { margin: 6px 0 0; font-size: 14px; color: var(--ink); background: #F4E7C9; padding: 6px 10px; border-left: 3px solid var(--gold); }
+
+.bh-tablepick { display: grid; gap: 10px; }
+.bh-tablepick-area { display: grid; gap: 6px; }
+.bh-tablepick-label { font-size: 12px; font-weight: 600; color: var(--ink-mute); }
+.bh-tablepick-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.bh-tablechip {
+  display: inline-flex; align-items: baseline; gap: 6px;
+  padding: 8px 12px; border: 1px solid var(--line); border-radius: 4px; background: var(--paper-2);
+  font: inherit; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer;
+}
+.bh-tablechip span { font-size: 12px; font-weight: 500; color: var(--ink-mute); }
+.bh-tablechip:hover { border-color: var(--aubergine); }
+.bh-tablechip.busy { background: #F1DCD3; border-color: #D9B3A6; }
+.bh-tablechip.on { background: var(--aubergine); border-color: var(--aubergine); color: var(--paper-2); }
+.bh-tablechip.on span { color: var(--aubergine-soft); }
+.bh-tablepick-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+.bh-tablepick .callout { margin: 0; }
+
+.bh-unassigned { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 16px; padding: 12px 14px; background: #F4E7C9; border-left: 3px solid var(--gold); }
+
+.bh-plan-wrap { overflow-x: auto; border: 1px solid var(--line-soft); background: var(--paper); border-radius: 4px; }
+.bh-plan { display: grid; }
+.bh-plan-row { display: grid; grid-template-columns: 120px 1fr; min-height: 52px; border-bottom: 1px solid var(--line-soft); }
+.bh-plan-row:last-child { border-bottom: 0; }
+.bh-plan-head { min-height: 32px; background: var(--cream-2); position: sticky; top: 0; }
+.bh-plan-name { padding: 8px 10px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid var(--line-soft); background: var(--paper); position: sticky; left: 0; z-index: 1; }
+.bh-plan-name strong { font-size: 14px; }
+.bh-plan-name span { font-size: 11px; color: var(--ink-mute); }
+.bh-plan-track { position: relative; }
+.bh-plan-hour { position: absolute; top: 8px; transform: translateX(-50%); font-size: 11px; font-weight: 600; color: var(--ink-mute); }
+.bh-plan-hour:first-child { transform: none; padding-left: 4px; }
+.bh-plan-line { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line-soft); }
+.bh-plan-block {
+  position: absolute; top: 6px; bottom: 6px; z-index: 1;
+  display: flex; align-items: center; gap: 6px; overflow: hidden; white-space: nowrap;
+  padding: 0 8px; border: 0; border-radius: 3px; cursor: pointer; text-align: left;
+  font: inherit; font-size: 12px; background: var(--aubergine); color: var(--paper-2);
+}
+.bh-plan-block.st-aangevraagd { background: var(--gold); }
+.bh-plan-block span { opacity: 0.8; }
+.bh-plan-block:hover { filter: brightness(1.08); }
+
+.bh-tables { display: grid; gap: 6px; margin-bottom: 16px; }
+.bh-tables-head { display: none; }
+.bh-tables-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line-soft); }
+.bh-tables-row .text-input { padding: 9px 10px; }
+.bh-tables-row.is-off { opacity: 0.6; }
+@media (min-width: 760px) {
+  .bh-tables-head, .bh-tables-row { display: grid; grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr auto; gap: 10px; align-items: center; }
+  .bh-tables-head { font-size: 12px; font-weight: 600; color: var(--ink-mute); }
+  .bh-tables-row { padding: 4px 0; border-bottom: 0; }
+}
+@media (min-width: 600px) { .bh-bulk { grid-template-columns: repeat(5, minmax(0, 1fr)) !important; } }
+
+/* Printen: alleen het dagoverzicht, zonder knoppen en menu */
+@media print {
+  body.beheer { background: #fff; }
+  .bh-top, .bh-noprint, .callout, .bh-x { display: none !important; }
+  .bh-main { max-width: none; padding: 0; }
+  .bh-h2 { margin: 0 0 8px; font-size: 20px; }
+  .bh-list { gap: 0; }
+  .bh-res { border: 0; border-bottom: 1px solid #999; border-left: 0; border-radius: 0; padding: 6px 0; grid-template-columns: 60px 1fr; break-inside: avoid; background: #fff; }
+  .bh-res.st-geannuleerd { display: none; }
+  .bh-pill { border-color: #999; }
+  a { color: #000 !important; text-decoration: none; }
+}
+.bh-plan-block.clash {
+  background: repeating-linear-gradient(135deg, #8A3B2E 0 8px, #A34A3B 8px 16px);
+  outline: 2px solid #5C2A20; opacity: 0.92;
+}
+
+/* ─── Wit beheer: geen zandkleur, alleen wit met lichte lijnen ─── */
+body.beheer {
+  --cream: #FFFFFF; --cream-2: #F5F5F5; --paper: #FFFFFF; --paper-2: #FFFFFF;
+  --line: #DADADA; --line-soft: #E8E8E8; --ink-soft: #4A4A4A; --ink-mute: #767676;
+  background: #FFFFFF;
+}
+body.beheer .bh-card, body.beheer .bh-res, body.beheer .menu-card, body.beheer .modal,
+body.beheer .modal-head, body.beheer .modal-foot, body.beheer .bh-plan-wrap, body.beheer .bh-plan-name { background: #FFFFFF; }
+body.beheer .bh-res { border-color: #E3E3E3; }
+body.beheer .text-input, body.beheer .date-input, body.beheer .textarea-input, body.beheer select { background: #FFFFFF; border-color: #CFCFCF; }
+body.beheer .bh-seg, body.beheer .bh-icon, body.beheer .bh-day, body.beheer .bh-tablechip { background: #FFFFFF; }
+body.beheer .bh-plan-head { background: #F5F5F5; }
+body.beheer .bh-unassigned, body.beheer .bh-res-note { background: #FFF6E0; }
+body.beheer .callout { background: #F3EEF5; }
+body.beheer .callout-error { background: #FBEAE6; }
+body.beheer .bh-tablechip.busy { background: #FBEAE6; }
+body.beheer .bh-tablechip.on, body.beheer .bh-day.on { background: var(--aubergine); border-color: var(--aubergine); color: var(--paper-2); }

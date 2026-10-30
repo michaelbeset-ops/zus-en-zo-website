@@ -47,7 +47,8 @@ reserveringen, instellingen en wachtwoorden blijven staan.
 
 | Tabblad | Wat |
 |---|---|
-| **Reserveringen** | Per dag, *Te bevestigen* en *Komend*. Bevestigen, wijzigen, annuleren. Telefonische reserveringen zelf invoeren (ook zonder e-mail, buiten de vaste tijden of boven de capaciteit). Werkt live bij. |
+| **Reserveringen** | Bevestigen, wijzigen, annuleren. Telefonische reserveringen zelf invoeren (ook zonder e-mail, buiten de vaste tijden of boven de capaciteit). Werkt live bij. Weergaven *Per dag*, *Tafelplan* (tijdlijn per tafel, dubbele boekingen rood), *Te bevestigen* en *Komend*. Tafels koppelen (met voorstel voor een vrije tafel en waarschuwing bij te weinig plaatsen of dubbel boeken), interne notitie voor personeel en **Print dagoverzicht** ter vervanging van de papieren agenda. |
+| **Tafels** | Eigen tafels aanmaken (ook in één keer, bijvoorbeeld 8 tafels van 4), plaatsen, ruimte (Binnen, Terras, ...), volgorde, aan of uit. |
 | **Openingstijden** | Per dag open/dicht, tijden en een notitie. Staat meteen op de website en onder elke mail. Op een dichte dag kan niemand online reserveren. |
 | **Soorten en tijden** | Lunch, high tea, diner en eventueel nieuwe soorten: naam, omschrijving, dagen, eerste en laatste tijd, elk kwartier/half uur/uur, aan of uit. |
 | **Sluitingen** | Een hele dag of een deel ervan dicht (vakantie, besloten feest). |
@@ -122,7 +123,7 @@ draait, plus een nagebootste Supabase Management API en Resend API:
 - Database: alle regels, wijzigingen in openingstijden en soorten die direct
   doorwerken, capaciteit, automatisch bevestigen, toestemming, afmelden,
   opruimen, rechten voor bezoeker, ingelogde niet-medewerker en medewerker.
-- Edge Function: 57 controles (reserveren, foutmeldingen, bevestigen,
+- Edge Function: 73 controles (inclusief tafels koppelen en interne notitie) (reserveren, foutmeldingen, bevestigen,
   telefonisch invoeren en wijzigen, annuleren, afmelden, collega's toevoegen
   en verwijderen, ontvangers en inhoud van alle mails).
 - Browser (Nederlandse en Engelse apparaatinstelling, 1440, 390 en 320 breed):

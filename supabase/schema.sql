@@ -128,6 +128,28 @@ create table if not exists public.subscribers (
   unsubscribed_at timestamptz
 );
 
+-- Tafels van het café (beheer, Tafels) en welke tafel(s) bij een reservering horen.
+create table if not exists public.dining_tables (
+  id         uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name       text not null check (char_length(name) between 1 and 30),
+  seats      integer not null check (seats between 1 and 50),
+  area       text not null default 'Binnen' check (char_length(area) between 1 and 30),
+  sort_order integer not null default 0,
+  active     boolean not null default true
+);
+
+create table if not exists public.reservation_tables (
+  reservation_id uuid not null references public.reservations (id) on delete cascade,
+  table_id       uuid not null references public.dining_tables (id) on delete cascade,
+  primary key (reservation_id, table_id)
+);
+create index if not exists reservation_tables_table_idx on public.reservation_tables (table_id);
+
+-- Interne notitie: alleen zichtbaar voor personeel, nooit in mails.
+alter table public.reservations add column if not exists internal_note text
+  check (internal_note is null or char_length(internal_note) <= 500);
+
 create table if not exists public.staff (
   user_id    uuid primary key references auth.users (id) on delete cascade,
   created_at timestamptz not null default now(),
@@ -390,24 +412,31 @@ $$;
 
 -- ─── Reservering door het café (alleen via de Edge Function) ──────────────────
 -- Nieuw (p_id null) of wijzigen. Geen capaciteitscontrole: het café beslist.
+-- p_tables: null = tafels niet aanpassen, lege lijst = geen tafel.
+-- p_internal_note: null = niet aanpassen, '' = leegmaken.
 -- Foutcodes: P0003 ongeldig, P0004 niet gevonden
+drop function if exists public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text);
 create or replace function public.staff_save_reservation(
-  p_id      uuid,
-  p_name    text,
-  p_email   text,
-  p_phone   text,
-  p_date    date,
-  p_time    text,
-  p_guests  integer,
-  p_type    text,
-  p_message text default null,
-  p_status  text default null
+  p_id            uuid,
+  p_name          text,
+  p_email         text,
+  p_phone         text,
+  p_date          date,
+  p_time          text,
+  p_guests        integer,
+  p_type          text,
+  p_message       text default null,
+  p_status        text default null,
+  p_tables        uuid[] default null,
+  p_internal_note text default null
 )
 returns setof public.reservations
 language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  rid uuid;
 begin
   p_name    := nullif(btrim(p_name), '');
   p_email   := lower(nullif(btrim(p_email), ''));
@@ -432,31 +461,43 @@ begin
   if p_status is not null and p_status not in ('aangevraagd', 'bevestigd', 'geannuleerd') then
     raise exception 'Ongeldige status' using errcode = 'P0003';
   end if;
+  if p_tables is not null and cardinality(p_tables) > 0
+     and (select count(*) from public.dining_tables where id = any (p_tables)) <> cardinality(array(select distinct unnest(p_tables))) then
+    raise exception 'Onbekende tafel' using errcode = 'P0003';
+  end if;
 
   if p_id is null then
-    return query
-      insert into public.reservations (name, email, phone, date, time, guests, reservation_type, message, status, source)
-      values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type, left(p_message, 1000),
-              coalesce(p_status, 'bevestigd'), 'cafe')
-      returning *;
+    insert into public.reservations (name, email, phone, date, time, guests, reservation_type, message, status, source, internal_note)
+    values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type, left(p_message, 1000),
+            coalesce(p_status, 'bevestigd'), 'cafe', nullif(left(btrim(p_internal_note), 500), ''))
+    returning id into rid;
   else
-    return query
-      update public.reservations
-         set name = left(p_name, 100), email = p_email, phone = left(p_phone, 40), date = p_date,
-             time = p_time, guests = p_guests, reservation_type = p_type, message = left(p_message, 1000),
-             status = coalesce(p_status, status),
-             cancelled_by = case
-               when coalesce(p_status, status) <> 'geannuleerd' then null
-               when status <> 'geannuleerd' then 'cafe'
-               else cancelled_by
-             end,
-             updated_at = now()
-       where id = p_id
-      returning *;
-    if not found then
+    update public.reservations r
+       set name = left(p_name, 100), email = p_email, phone = left(p_phone, 40), date = p_date,
+           time = p_time, guests = p_guests, reservation_type = p_type, message = left(p_message, 1000),
+           status = coalesce(p_status, r.status),
+           cancelled_by = case
+             when coalesce(p_status, r.status) <> 'geannuleerd' then null
+             when r.status <> 'geannuleerd' then 'cafe'
+             else r.cancelled_by
+           end,
+           internal_note = case when p_internal_note is null then r.internal_note
+                                else nullif(left(btrim(p_internal_note), 500), '') end,
+           updated_at = now()
+     where r.id = p_id
+    returning r.id into rid;
+    if rid is null then
       raise exception 'Reservering niet gevonden' using errcode = 'P0004';
     end if;
   end if;
+
+  if p_tables is not null then
+    delete from public.reservation_tables where reservation_id = rid;
+    insert into public.reservation_tables (reservation_id, table_id)
+    select distinct rid, t from unnest(p_tables) as t;
+  end if;
+
+  return query select * from public.reservations where id = rid;
 end;
 $$;
 
@@ -621,13 +662,15 @@ alter table public.blocked_slots     enable row level security;
 alter table public.settings          enable row level security;
 alter table public.subscribers       enable row level security;
 alter table public.staff             enable row level security;
+alter table public.dining_tables     enable row level security;
+alter table public.reservation_tables enable row level security;
 
 -- Personeel mag alles in de beheertabellen. Status wijzigen en nieuwe
 -- reserveringen lopen via de Edge Function (die ook de mails stuurt).
 do $$
 declare t text;
 begin
-  foreach t in array array['reservation_types', 'opening_hours', 'blocked_slots', 'settings', 'subscribers'] loop
+  foreach t in array array['reservation_types', 'opening_hours', 'blocked_slots', 'settings', 'subscribers', 'dining_tables', 'reservation_tables'] loop
     execute format('drop policy if exists staff_all on public.%I', t);
     execute format('create policy staff_all on public.%I for all to authenticated using (public.is_staff()) with check (public.is_staff())', t);
   end loop;
@@ -650,9 +693,12 @@ create policy staff_read on public.staff
 -- Supabase geeft anon en authenticated standaard alle rechten op nieuwe
 -- tabellen. Eerst alles intrekken, dan alleen teruggeven wat nodig is.
 revoke all on public.reservations, public.reservation_types, public.opening_hours, public.blocked_slots,
-              public.settings, public.subscribers, public.staff from anon, authenticated;
+              public.settings, public.subscribers, public.staff, public.dining_tables, public.reservation_tables
+  from anon, authenticated;
 grant all on public.reservations, public.reservation_types, public.opening_hours, public.blocked_slots,
-             public.settings, public.subscribers, public.staff to service_role;
+             public.settings, public.subscribers, public.staff, public.dining_tables, public.reservation_tables
+  to service_role;
+grant select, insert, update, delete on public.dining_tables, public.reservation_tables to authenticated;
 grant select, update on public.reservations to authenticated;
 grant select, insert, update, delete on public.reservation_types, public.blocked_slots, public.subscribers to authenticated;
 grant select, insert, update on public.opening_hours to authenticated;
@@ -668,7 +714,7 @@ grant execute on function public.get_availability(date, text, integer) to anon, 
 grant execute on function public.is_staff() to authenticated, service_role;
 
 grant execute on function public.create_reservation(text, text, text, date, text, integer, text, text, boolean) to service_role;
-grant execute on function public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text) to service_role;
+grant execute on function public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text, uuid[], text) to service_role;
 grant execute on function public.get_reservation_for_cancel(uuid) to service_role;
 grant execute on function public.cancel_reservation(uuid, text) to service_role;
 grant execute on function public.confirm_reservation(uuid) to service_role;
@@ -697,6 +743,13 @@ begin
         where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'reservations'
      ) then
     alter publication supabase_realtime add table public.reservations;
+  end if;
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime')
+     and not exists (
+       select 1 from pg_publication_tables
+        where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'reservation_tables'
+     ) then
+    alter publication supabase_realtime add table public.reservation_tables;
   end if;
 end $$;
 
