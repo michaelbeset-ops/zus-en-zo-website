@@ -1292,7 +1292,7 @@ function Settings({ token }) {
           {num("min_minutes_ahead", "Minimaal minuten van tevoren", "Hoe kort van tevoren iemand nog online kan reserveren.", 0, 10080)}
           {num("max_days_ahead", "Maximaal dagen vooruit", "Hoe ver vooruit de agenda openstaat.", 1, 730)}
         </div>
-        <h3 className="bh-h3">Bevestigen en meldingen</h3>
+        <h3 className="bh-h3">Meldingen</h3>
         <div className="field">
           <label className="field-label" htmlFor="s-notify">Meldingen van nieuwe reserveringen naar</label>
           <input id="s-notify" className="text-input" type="email" value={s.notify_email} onChange={(e) => setS({ ...s, notify_email: e.target.value })} />
