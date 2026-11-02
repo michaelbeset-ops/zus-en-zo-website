@@ -13,6 +13,6 @@
 // reserveringen is afgeschermd in de database (zie supabase/schema.sql).
 // Zet hier NOOIT de service_role- of secret-key neer.
 window.RESERVERING_CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://fkltybawpoufbpevpacd.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZrbHR5YmF3cG91ZmJwZXZwYWNkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MTk4OTIsImV4cCI6MjEwOTE5NTg5Mn0.y5qXdcdP-tWmS0gRCNu2EOaW2VgW3DiIsLEMGfxBkm8",
 };
