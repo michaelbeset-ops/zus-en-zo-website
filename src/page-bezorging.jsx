@@ -49,7 +49,6 @@ function PageBezorging() {
               <ul>
                 <li>Belegde broodjes per persoon</li>
                 <li>Vergaderpakketten met soep, fruit en broodjes</li>
-                <li>Bestellen vóór 10:30 uur, rond 12:00 uur bezorgd</li>
                 <li>Vanaf € 35,- bezorgen we gratis</li>
               </ul>
               <a className="read-link" href={orderMail}
@@ -85,8 +84,8 @@ function PageBezorging() {
           </div>
 
           <div className="order-info">
-            <div><strong>Bestellen vóór 10:30 uur</strong> via <a href={orderMail}>{B.emailOrder}</a> of <a href={B.phoneHref}>{B.phone}</a>.</div>
-            <div>Bezorging rond 12:00 uur, alleen in Etten-Leur. Vanaf € 35,- gratis.</div>
+            <div><strong>Bestellen</strong> via <a href={orderMail}>{B.emailOrder}</a> of <a href={B.phoneHref}>{B.phone}</a>.</div>
+            <div>Bezorging alleen in Etten-Leur. Vanaf € 35,- gratis.</div>
             <div>Afhalen is ook mogelijk. Voor plastic verpakkingsmateriaal rekenen we een verplichte toeslag.</div>
           </div>
 
