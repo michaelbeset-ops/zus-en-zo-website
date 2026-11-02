@@ -104,7 +104,6 @@ function PageDiner({ openReserve }) {
               <ul>
                 <li>Belegde broodjes per persoon</li>
                 <li>Vergaderpakketten met soep, fruit en broodjes</li>
-                <li>Bestellen vóór 10:30 uur, rond 12:00 uur bezorgd</li>
                 <li>Ook high tea to go</li>
               </ul>
               <a className="read-link" href={`mailto:${window.BRAND.emailOrder}?subject=Bedrijfsbezorging`}
