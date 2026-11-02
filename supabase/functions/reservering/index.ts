@@ -579,7 +579,7 @@ async function handle(req: Request): Promise<Response> {
 
   if (action === 'create') {
     // Honeypot: een verborgen veld dat mensen niet invullen, bots wel.
-    if (str(body.website)) return json({ ok: true, id: null, status: 'aangevraagd', mailed: false })
+    if (str(body.website)) return json({ ok: true, id: null, status: 'bevestigd', mailed: false })
 
     const input = {
       p_name: str(body.name, 100),

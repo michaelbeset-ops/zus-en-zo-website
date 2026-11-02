@@ -72,8 +72,35 @@ function Alert({ kind, children, onClose }) {
 
 // ─── Inloggen ─────────────────────────────────────────────────────────────────
 
-function BrandMark() {
-  return <p className="bh-brand">Zus <span>&amp;</span> Zo <small>Beheer</small></p>;
+function BrandMark({ onClick }) {
+  return (
+    <button type="button" className="bh-brand" onClick={onClick} aria-label="Naar het begin">
+      <img src="assets/logo-light.png" alt="Lunchcafé Zus & Zo" />
+      <small>Beheer</small>
+    </button>
+  );
+}
+
+// Inlogschermen: foto van het café met logo, formulier ernaast.
+function AuthShell({ children }) {
+  return (
+    <div className="bh-auth">
+      <aside className="bh-auth-side" aria-hidden="true">
+        <img className="bh-auth-side-logo" src="assets/logo-light.png" alt="" />
+        <div>
+          <p className="bh-auth-quote">Een tafel vol gezelligheid.</p>
+          <p className="bh-auth-place">Lunchcafé Zus &amp; Zo · Etten-Leur</p>
+        </div>
+      </aside>
+      <div className="bh-auth-main">
+        <div className="bh-auth-box">
+          <img className="bh-auth-logo" src="assets/logo-transparent.png" alt="Lunchcafé Zus & Zo" />
+          {children}
+        </div>
+        <a className="bh-auth-back" href="./">Naar de website</a>
+      </div>
+    </div>
+  );
 }
 
 function Login() {
@@ -101,10 +128,13 @@ function Login() {
   };
 
   return (
-    <div className="bh-center">
-      <div className="bh-card bh-login">
-        <BrandMark />
+    <AuthShell>
         <h1 className="bh-h1">{mode === "login" ? "Inloggen" : "Wachtwoord vergeten"}</h1>
+        <p className="bh-auth-lede">
+          {mode === "login"
+            ? "Beheer reserveringen, tafels en openingstijden."
+            : "Vul je e-mailadres in, dan sturen we je een link om een nieuw wachtwoord in te stellen."}
+        </p>
         {mode === "verstuurd" ? (
           <React.Fragment>
             <p className="bh-muted">Als dit adres bij ons bekend is, staat er nu een mail met een link om een nieuw wachtwoord in te stellen.</p>
@@ -131,8 +161,7 @@ function Login() {
             </button>
           </form>
         )}
-      </div>
-    </div>
+    </AuthShell>
   );
 }
 
@@ -152,10 +181,10 @@ function NewPassword({ onDone }) {
     else onDone();
   };
   return (
-    <div className="bh-center">
-      <form className="bh-card bh-login" onSubmit={save}>
-        <BrandMark />
+    <AuthShell>
+      <form onSubmit={save}>
         <h1 className="bh-h1">Nieuw wachtwoord</h1>
+        <p className="bh-auth-lede">Kies een wachtwoord van minstens 8 tekens.</p>
         <Alert kind="error">{error}</Alert>
         <div className="field">
           <label className="field-label" htmlFor="n-pw">Nieuw wachtwoord</label>
@@ -167,7 +196,7 @@ function NewPassword({ onDone }) {
         </div>
         <button className="btn btn-primary bh-full" type="submit" disabled={busy}>{busy ? "Opslaan…" : "Opslaan"}</button>
       </form>
-    </div>
+    </AuthShell>
   );
 }
 
@@ -360,7 +389,7 @@ function ReservationForm({ initial, types, tables, tableMinutes, token, onClose,
             <div className="field">
               <label className="field-label" htmlFor="rf-status">Status</label>
               <select id="rf-status" className="text-input" value={f.status} onChange={set("status")}>
-                <option value="aangevraagd">Aangevraagd</option>
+                {f.status === "aangevraagd" && <option value="aangevraagd">Aangevraagd</option>}
                 <option value="bevestigd">Bevestigd</option>
                 {!isNew && <option value="geannuleerd">Geannuleerd</option>}
               </select>
@@ -488,7 +517,7 @@ function TablePlan({ rows, tables, hours, date, tableMinutes, onOpen }) {
 // ─── Reserveringen ────────────────────────────────────────────────────────────
 
 function Reservations({ token }) {
-  const [mode, setMode] = useState("dag"); // dag | plan | open | komend
+  const [mode, setMode] = useState("dag"); // dag | plan | komend
   const [date, setDate] = useState(todayStr());
   const [rows, setRows] = useState([]);
   const [types, setTypes] = useState([]);
@@ -499,7 +528,6 @@ function Reservations({ token }) {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busy, setBusy] = useState({});
-  const [openCount, setOpenCount] = useState(0);
   const [editing, setEditing] = useState(null);
 
   useEffect(() => {
@@ -514,15 +542,11 @@ function Reservations({ token }) {
     setError("");
     let q = sb.from("reservations").select("*, reservation_tables(table_id)");
     if (perDay) q = q.eq("date", date);
-    else if (mode === "open") q = q.eq("status", "aangevraagd").gte("date", todayStr());
     else q = q.gte("date", todayStr()).neq("status", "geannuleerd");
     const { data, error } = await q.order("date").order("time").order("created_at");
     setLoading(false);
     if (error) { setError("Reserveringen laden lukte niet. Controleer je verbinding."); return; }
     setRows(data || []);
-    const c = await sb.from("reservations").select("id", { count: "exact", head: true })
-      .eq("status", "aangevraagd").gte("date", todayStr());
-    if (!c.error) setOpenCount(c.count || 0);
   }, [mode, date]);
 
   useEffect(() => { setLoading(true); load(); }, [load]);
@@ -559,12 +583,9 @@ function Reservations({ token }) {
   return (
     <section>
       <div className="bh-toolbar bh-noprint">
-        <div className="bh-seg bh-seg-4" role="tablist" aria-label="Weergave">
+        <div className="bh-seg" role="tablist" aria-label="Weergave">
           <button role="tab" aria-selected={mode === "dag"} className={mode === "dag" ? "on" : ""} onClick={() => setMode("dag")}>Per dag</button>
           <button role="tab" aria-selected={mode === "plan"} className={mode === "plan" ? "on" : ""} onClick={() => setMode("plan")}>Tafelplan</button>
-          <button role="tab" aria-selected={mode === "open"} className={mode === "open" ? "on" : ""} onClick={() => setMode("open")}>
-            Te bevestigen {openCount > 0 && <span className="bh-badge">{openCount}</span>}
-          </button>
           <button role="tab" aria-selected={mode === "komend"} className={mode === "komend" ? "on" : ""} onClick={() => setMode("komend")}>Komend</button>
         </div>
         {perDay && (
@@ -575,12 +596,11 @@ function Reservations({ token }) {
             {date !== todayStr() && <button className="bh-link" onClick={() => setDate(todayStr())}>Vandaag</button>}
           </div>
         )}
-        {mode === "dag" && <button className="btn" onClick={() => window.print()}>Print dagoverzicht</button>}
         <button className="btn btn-primary bh-new" onClick={() => setEditing({ date: perDay ? date : todayStr() })}>+ Reservering invoeren</button>
       </div>
 
       <h2 className="bh-h2">
-        {perDay ? fmtLong(date) : mode === "open" ? "Te bevestigen" : "Komende reserveringen"}
+        {perDay ? fmtLong(date) : "Komende reserveringen"}
         {!loading && <span className="bh-sum">{plural(active.length, "reservering", "reserveringen")} · {plural(guests, "gast", "gasten")}</span>}
       </h2>
 
@@ -590,7 +610,7 @@ function Reservations({ token }) {
       {loading ? <p className="bh-muted">Laden…</p> : mode === "plan" ? (
         <TablePlan rows={rows} tables={tables} hours={hours} date={date} tableMinutes={tableMinutes} onOpen={(r) => setEditing(r)} />
       ) : rows.length === 0 ? (
-        <p className="bh-empty">{mode === "open" ? "Alles is bevestigd. Lekker bezig." : "Geen reserveringen."}</p>
+        <p className="bh-empty">Geen reserveringen.</p>
       ) : (
         <ul className="bh-list">
           {rows.map((r) => {
@@ -1233,7 +1253,7 @@ function Settings({ token }) {
       max_guests_online: Number(s.max_guests_online),
       min_minutes_ahead: Number(s.min_minutes_ahead),
       max_days_ahead: Number(s.max_days_ahead),
-      auto_confirm: !!s.auto_confirm,
+      auto_confirm: true,
       notify_email: s.notify_email.trim(),
       ask_marketing: !!s.ask_marketing,
       marketing_text: s.marketing_text.trim(),
@@ -1273,7 +1293,6 @@ function Settings({ token }) {
           {num("max_days_ahead", "Maximaal dagen vooruit", "Hoe ver vooruit de agenda openstaat.", 1, 730)}
         </div>
         <h3 className="bh-h3">Bevestigen en meldingen</h3>
-        {check("auto_confirm", "Reserveringen automatisch bevestigen", "Aan: de gast krijgt meteen een bevestiging. Uit: je bevestigt elke aanvraag zelf.")}
         <div className="field">
           <label className="field-label" htmlFor="s-notify">Meldingen van nieuwe reserveringen naar</label>
           <input id="s-notify" className="text-input" type="email" value={s.notify_email} onChange={(e) => setS({ ...s, notify_email: e.target.value })} />
@@ -1330,14 +1349,17 @@ function Beheer() {
     sb.rpc("is_staff").then(({ data, error }) => setStaff(!error && data === true));
   }, [session && session.user.id]);
 
+  // Logo: terug naar reserveringen van vandaag, bovenaan de pagina.
+  const [homeKey, setHomeKey] = useState(0);
+  const goHome = () => { go("reserveringen"); setHomeKey((k) => k + 1); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const go = (id) => { setView(id); try { window.history.replaceState(null, "", "#" + id); } catch (e) { /* ignore */ } };
 
   if (!sb) {
     return (
-      <div className="bh-center"><div className="bh-card bh-login"><BrandMark />
+      <AuthShell>
         <h1 className="bh-h1">Nog niet gekoppeld</h1>
         <p className="bh-muted">Draai het installatiescript (zie RESERVERINGEN.md). Daarna werkt deze pagina.</p>
-      </div></div>
+      </AuthShell>
     );
   }
   if (session === undefined) return <div className="bh-center"><p className="bh-muted">Laden…</p></div>;
@@ -1349,11 +1371,11 @@ function Beheer() {
 
   if (!staff) {
     return (
-      <div className="bh-center"><div className="bh-card bh-login"><BrandMark />
+      <AuthShell>
         <h1 className="bh-h1">Geen toegang</h1>
         <p className="bh-muted">Het account {session.user.email} heeft geen toegang tot het beheer. Vraag een collega met toegang om je toe te voegen bij Instellingen.</p>
         <button className="btn bh-full" onClick={logout}>Uitloggen</button>
-      </div></div>
+      </AuthShell>
     );
   }
 
@@ -1363,16 +1385,17 @@ function Beheer() {
   return (
     <div className="bh-app">
       <header className="bh-top">
-        <BrandMark />
+        <BrandMark onClick={goHome} />
         <nav className="bh-tabs" aria-label="Beheer">
           {TABS.map(([id, label]) => (
             <button key={id} className={view === id ? "on" : ""} aria-current={view === id ? "page" : undefined} onClick={() => go(id)}>{label}</button>
           ))}
         </nav>
+        <span className="bh-user" title="Ingelogd als">{session.user.email}</span>
         <button className="bh-logout" onClick={logout}>Uitloggen</button>
       </header>
       <main className="bh-main">
-        {view === "reserveringen" && <Reservations token={token} />}
+        {view === "reserveringen" && <Reservations key={homeKey} token={token} />}
         {view === "tafels" && <TablesAdmin />}
         {view === "openingstijden" && <OpeningHours />}
         {view === "soorten" && <Types />}

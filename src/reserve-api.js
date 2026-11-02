@@ -37,7 +37,7 @@
       max_days_ahead: 180,
       ask_marketing: true,
       marketing_text: "Ja, stuur me af en toe nieuws en acties van Zus & Zo per mail. Afmelden kan altijd.",
-      auto_confirm: false,
+      auto_confirm: true,
     },
   };
 

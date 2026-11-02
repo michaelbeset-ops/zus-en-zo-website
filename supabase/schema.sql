@@ -108,7 +108,7 @@ create table if not exists public.settings (
   max_guests_online  integer not null default 8   check (max_guests_online between 1 and 50),
   min_minutes_ahead  integer not null default 60  check (min_minutes_ahead between 0 and 10080),
   max_days_ahead     integer not null default 180 check (max_days_ahead between 1 and 730),
-  auto_confirm       boolean not null default false,
+  auto_confirm       boolean not null default true,
   notify_email       text not null default 'info@lunchcafezusenzo.nl' check (notify_email ~ '^[^\s@]+@[^\s@]+\.[^\s@]+$'),
   ask_marketing      boolean not null default true,
   marketing_text     text not null default 'Ja, stuur me af en toe nieuws en acties van Zus & Zo per mail. Afmelden kan altijd.'
@@ -116,6 +116,8 @@ create table if not exists public.settings (
   updated_at         timestamptz not null default now()
 );
 insert into public.settings (id) values (1) on conflict (id) do nothing;
+-- Elke reservering is meteen bevestigd (er is geen stap 'te bevestigen' meer).
+update public.settings set auto_confirm = true where id = 1 and not auto_confirm;
 
 create table if not exists public.subscribers (
   email           text primary key check (email = lower(email) and email ~ '^[^\s@]+@[^\s@]+\.[^\s@]+$'),
@@ -387,7 +389,7 @@ begin
     raise exception 'Dit tijdslot heeft niet genoeg ruimte' using errcode = 'P0001';
   end if;
 
-  new_st := case when s.auto_confirm then 'bevestigd' else 'aangevraagd' end;
+  new_st := 'bevestigd';
 
   insert into public.reservations (name, email, phone, date, time, guests, reservation_type, message, status, marketing_consent)
   values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type, left(p_message, 1000),

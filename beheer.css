@@ -314,3 +314,45 @@ body.beheer .callout { background: #F3EEF5; }
 body.beheer .callout-error { background: #FBEAE6; }
 body.beheer .bh-tablechip.busy { background: #FBEAE6; }
 body.beheer .bh-tablechip.on, body.beheer .bh-day.on { background: var(--aubergine); border-color: var(--aubergine); color: var(--paper-2); }
+
+/* ── Inlogscherm: foto met logo links, formulier rechts ── */
+.bh-brand img { height: 30px; width: auto; display: block; }
+.bh-top .bh-brand { align-items: center; }
+.bh-auth { min-height: 100vh; min-height: 100dvh; display: grid; grid-template-columns: 1fr; background: #FFFFFF; }
+.bh-auth-side { display: none; }
+.bh-auth-main {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 20px 28px; gap: 28px;
+}
+.bh-auth-box { width: 100%; max-width: 380px; }
+.bh-auth-logo { display: block; width: 210px; max-width: 70%; height: auto; margin: 0 0 36px; }
+.bh-auth .bh-h1 { font-size: 30px; margin: 0 0 6px; }
+.bh-auth-lede { color: var(--ink-mute); font-size: 15px; margin: 0 0 26px; }
+.bh-auth .field { margin-bottom: 18px; }
+.bh-auth .text-input { height: 48px; }
+.bh-auth .btn-primary { height: 50px; margin-top: 6px; font-size: 15px; }
+.bh-auth .bh-link { display: inline-block; margin-top: 18px; }
+.bh-auth-back { font-size: 13px; color: var(--ink-mute); text-decoration: none; }
+.bh-auth-back:hover { color: var(--aubergine); text-decoration: underline; }
+@media (min-width: 900px) {
+  .bh-auth { grid-template-columns: minmax(0, 1.1fr) minmax(440px, 1fr); }
+  .bh-auth-side {
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 48px 56px; color: #FFFFFF;
+    background:
+      linear-gradient(180deg, rgba(42, 28, 46, 0.55) 0%, rgba(42, 28, 46, 0.25) 40%, rgba(42, 28, 46, 0.85) 100%),
+      url("assets/interieur.jpg") center / cover no-repeat;
+  }
+  .bh-auth-side-logo { width: 220px; height: auto; display: block; }
+  .bh-auth-quote { font-family: var(--serif); font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 10px; max-width: 14ch; }
+  .bh-auth-place { margin: 0; font-size: 14px; color: rgba(255, 255, 255, 0.8); }
+  .bh-auth-logo { display: none; }
+}
+.bh-user { display: none; font-size: 13px; color: var(--aubergine-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 240px; }
+@media (min-width: 1180px) {
+  .bh-user { display: block; margin-left: auto; }
+  .bh-user + .bh-logout { margin-left: 0; }
+}
+@media (max-width: 759px) { .bh-brand img { height: 26px; } }
+button.bh-brand { background: none; border: 0; padding: 4px 0; cursor: pointer; font: inherit; }
+button.bh-brand:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 4px; border-radius: 2px; }

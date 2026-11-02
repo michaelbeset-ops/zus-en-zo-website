@@ -237,7 +237,7 @@ function ReserveModal({ open, onClose, initialType }) {
               </button>
             ) : (
               <button className="btn btn-primary" onClick={onSubmit} disabled={sending || (touched && !formValid)}>
-                {sending ? "Versturen…" : S.auto_confirm ? "Reserveer" : "Verstuur aanvraag"}
+                {sending ? "Versturen…" : "Reserveer"}
               </button>
             )}
           </div>

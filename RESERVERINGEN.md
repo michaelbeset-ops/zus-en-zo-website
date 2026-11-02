@@ -53,13 +53,13 @@ reserveringen, instellingen en wachtwoorden blijven staan.
 
 | Tabblad | Wat |
 |---|---|
-| **Reserveringen** | Bevestigen, wijzigen, annuleren. Telefonische reserveringen zelf invoeren (ook zonder e-mail, buiten de vaste tijden of boven de capaciteit). Werkt live bij. Weergaven *Per dag*, *Tafelplan* (tijdlijn per tafel, dubbele boekingen rood), *Te bevestigen* en *Komend*. Tafels koppelen (met voorstel voor een vrije tafel en waarschuwing bij te weinig plaatsen of dubbel boeken), interne notitie voor personeel en **Print dagoverzicht** ter vervanging van de papieren agenda. |
+| **Reserveringen** | Wijzigen, annuleren. Telefonische reserveringen zelf invoeren (ook zonder e-mail, buiten de vaste tijden of boven de capaciteit). Werkt live bij. Weergaven *Per dag*, *Tafelplan* (tijdlijn per tafel, dubbele boekingen rood) en *Komend*. Tafels koppelen (met voorstel voor een vrije tafel en waarschuwing bij te weinig plaatsen of dubbel boeken) en een interne notitie voor personeel. |
 | **Tafels** | Eigen tafels aanmaken (ook in één keer, bijvoorbeeld 8 tafels van 4), plaatsen, ruimte (Binnen, Terras, ...), volgorde, aan of uit. |
 | **Openingstijden** | Per dag open/dicht, tijden en een notitie. Staat meteen op de website en onder elke mail. Op een dichte dag kan niemand online reserveren. |
 | **Soorten en tijden** | Lunch, high tea, diner en eventueel nieuwe soorten: naam, omschrijving, dagen, eerste en laatste tijd, elk kwartier/half uur/uur, aan of uit. |
 | **Sluitingen** | Een hele dag of een deel ervan dicht (vakantie, besloten feest). |
 | **Mailinglijst** | Gasten die zelf toestemming gaven. Zoeken, exporteren (CSV voor bijvoorbeeld MailChimp of Brevo), verwijderen. |
-| **Instellingen** | Capaciteit (gasten tegelijk, hoe lang een tafel bezet is), maximaal per online reservering, termijnen, **automatisch bevestigen** aan/uit, adres voor meldingen, nieuwsbriefvraag aan/uit en de tekst ervan, en **collega's toegang geven of intrekken**. |
+| **Instellingen** | Capaciteit (gasten tegelijk, hoe lang een tafel bezet is), maximaal per online reservering, termijnen, adres voor meldingen, nieuwsbriefvraag aan/uit en de tekst ervan, en **collega's toegang geven of intrekken**. |
 
 ## Mailadressen en toestemming (AVG)
 
@@ -79,12 +79,9 @@ reserveringen, instellingen en wachtwoorden blijven staan.
 
 1. De gast kiest soort, aantal personen, datum en tijd. Volle, gesloten of
    voorbije tijden zijn niet te kiezen.
-2. De gast krijgt een mail. Standaard is dat "aanvraag ontvangen"; staat
-   automatisch bevestigen aan, dan krijgt de gast meteen de bevestiging. Het
-   café krijgt een mail met alle gegevens en een knop naar het beheer.
-3. In het beheer drukt het café op *Bevestigen*; de gast krijgt de
-   bevestiging.
-4. In elke mail staat een annuleerlink. Annuleert de gast, dan krijgen gast
+2. De reservering staat meteen vast: de gast krijgt direct de bevestiging,
+   het café een mail met alle gegevens en een knop naar het beheer.
+3. In elke mail staat een annuleerlink. Annuleert de gast, dan krijgen gast
    en café een mail en is de plek weer vrij.
 
 Vaste regels in de database (de website kan ze niet omzeilen): de dag moet
@@ -127,7 +124,7 @@ draait, plus een nagebootste Supabase Management API, Brevo API en Resend API:
 - Het installatiescript van leeg tot werkend, en opnieuw draaien zonder
   schade.
 - Database: alle regels, wijzigingen in openingstijden en soorten die direct
-  doorwerken, capaciteit, automatisch bevestigen, toestemming, afmelden,
+  doorwerken, capaciteit, direct bevestigen, toestemming, afmelden,
   opruimen, rechten voor bezoeker, ingelogde niet-medewerker en medewerker.
 - Edge Function: 73 controles (inclusief tafels koppelen en interne notitie) (reserveren, foutmeldingen, bevestigen,
   telefonisch invoeren en wijzigen, annuleren, afmelden, collega's toevoegen
