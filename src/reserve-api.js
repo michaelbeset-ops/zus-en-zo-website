@@ -19,7 +19,7 @@
   const DEFAULT_CONFIG = {
     types: [
       { id: "lunch", name: "Lunch", description: "Belegde broodjes, salades, koffie & lekkers", tag: "", days: [1, 2, 3, 4, 5, 6], first_slot: "11:30", last_slot: "15:00", interval_min: 30 },
-      { id: "hightea", name: "High Moments", description: "High tea, high bites of high cocktail", tag: "", days: [1, 2, 3, 4, 5, 6], first_slot: "13:00", last_slot: "15:00", interval_min: 30 },
+      { id: "hightea", name: "High Moments", description: "High tea, high bites of high cocktail", tag: "", days: [1, 2, 3, 4, 5, 6], first_slot: "13:00", last_slot: "15:00", interval_min: 30, options: ["High tea", "High bites", "High cocktail"] },
       { id: "diner", name: "Diner", description: "We trekken alles uit de kast", tag: "Alleen op vrijdagavond", days: [5], first_slot: "17:30", last_slot: "19:00", interval_min: 30 },
     ],
     hours: [

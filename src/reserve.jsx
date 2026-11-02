@@ -1,6 +1,6 @@
 /* global window, React */
 // =============================================================
-// Reservation modal, 4-step flow
+// Reserveren in 5 stappen: personen, datum, soort (en keuze), tijd, gegevens
 // Soorten, dagen, tijden en termijnen komen uit het beheer via
 // window.ReserveApi (src/reserve-api.js); de database beslist.
 // =============================================================
@@ -26,13 +26,12 @@ function useReserveConfig() {
 
 function StepIndicator({ step, total }) {
   return (
-    <div className="steps" role="progressbar" aria-valuemin="1" aria-valuemax={total} aria-valuenow={step}>
+    <div className="steps" role="progressbar" aria-valuemin="1" aria-valuemax={total} aria-valuenow={step} aria-label={`Stap ${step} van ${total}`}>
       {Array.from({ length: total }).map((_, i) => {
         const n = i + 1;
         const cls = n < step ? "step-pill done" : n === step ? "step-pill active" : "step-pill";
         return (
           <div key={i} className={cls}>
-            <span>0{n}</span>
             <span className="bar" />
           </div>
         );
@@ -51,13 +50,19 @@ function fmtDate(dateStr) {
 
 const EMPTY_FORM = { name: "", email: "", phone: "", notes: "", website: "", marketing: false };
 
+// Stappen: 1 personen, 2 datum, 3 wat (soort en eventueel keuze), 4 tijd, 5 gegevens.
+const STEPS = 5;
+
+// initialType: soort, eventueel met keuze erachter, bijv. "hightea:High tea".
 function ReserveModal({ open, onClose, initialType }) {
+  const [initType, initChoice] = String(initialType || "").split(":");
   const cfg = useReserveConfig();
   const S = cfg.settings;
   const MAX_ONLINE = S.max_guests_online;
 
   const [step, setStep] = useStateR(1);
-  const [typeId, setTypeId] = useStateR(initialType || null);
+  const [typeId, setTypeId] = useStateR(initType || null);
+  const [choice, setChoice] = useStateR(initChoice || "");
   const [party, setParty] = useStateR(2);
   const [date, setDate] = useStateR("");
   const [time, setTime] = useStateR("");
@@ -73,7 +78,8 @@ function ReserveModal({ open, onClose, initialType }) {
   useEffectR(() => {
     if (open) {
       setStep(1);
-      setTypeId(initialType || null);
+      setTypeId(initType || null);
+      setChoice(initChoice || "");
       setParty(2);
       setDate("");
       setTime("");
@@ -88,17 +94,29 @@ function ReserveModal({ open, onClose, initialType }) {
     document.body.classList.toggle("no-scroll", open);
   }, [open, initialType]);
 
-  const type = cfg.types.find((t) => t.id === typeId) || null;
-
-  // Een vooraf gekozen soort die niet (meer) bestaat: gewoon laten kiezen.
+  // Escape sluit het venster.
   useEffectR(() => {
-    if (open && typeId && !type) setTypeId(null);
-  }, [open, typeId, type]);
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  // Alleen de soorten die op de gekozen dag kunnen (diner dus alleen op vrijdag).
+  const typesOnDate = date ? cfg.types.filter((t) => window.ReserveApi.dayAllowed(t, date)) : [];
+  const type = typesOnDate.find((t) => t.id === typeId) || null;
+  const options = (type && type.options) || [];
+
+  // Kan de vooraf gekozen soort niet op deze dag, of is er maar één soort: kiezen voor de gast.
+  useEffectR(() => {
+    if (!open || !date) return;
+    if (typeId && !typesOnDate.some((t) => t.id === typeId)) { setTypeId(null); setChoice(""); }
+    if (!typeId && typesOnDate.length === 1) setTypeId(typesOnDate[0].id);
+  }, [open, date, cfg.types]);
 
   // Beschikbaarheid ophalen zodra soort, aantal en datum bekend zijn.
-  const dateClosed = !!date && !!type && !window.ReserveApi.dayAllowed(type, date);
   useEffectR(() => {
-    if (!open || !type || !date || dateClosed) { setSlots(null); return; }
+    if (!open || !type || !date) { setSlots(null); return; }
     let cancelled = false;
     setSlots(null);
     setSlotsError("");
@@ -113,7 +131,7 @@ function ReserveModal({ open, onClose, initialType }) {
       else { setSlots([]); setSlotsError(window.ReserveApi.message(r.code)); }
     });
     return () => { cancelled = true; };
-  }, [open, typeId, type && type.first_slot, party, date, dateClosed, slotsVersion]);
+  }, [open, typeId, type && type.first_slot, party, date, slotsVersion]);
 
   // Gekozen tijd valt weg als die niet meer beschikbaar is.
   useEffectR(() => {
@@ -134,12 +152,16 @@ function ReserveModal({ open, onClose, initialType }) {
   };
   const formValid = !formErrors.name && !formErrors.email && !formErrors.phone;
 
-  const canNext1 = !!type;
-  const canNext2 = !tooBig;
-  const canNext3 = !!date && !!time && !dateClosed;
+  const canNext = {
+    1: !tooBig,
+    2: !!date && typesOnDate.length > 0,
+    3: !!type && (options.length === 0 || options.includes(choice)),
+    4: !!time,
+  };
 
-  const next = () => setStep((s) => Math.min(4, s + 1));
+  const next = () => setStep((s) => Math.min(STEPS, s + 1));
   const prev = () => { setSubmitError(""); setStep((s) => Math.max(1, s - 1)); };
+  const pickType = (id) => { if (id !== typeId) { setTypeId(id); setChoice(""); setTime(""); } };
 
   const onSubmit = async () => {
     setTouched(true);
@@ -153,6 +175,7 @@ function ReserveModal({ open, onClose, initialType }) {
       date, time,
       guests: party,
       type: type.id,
+      choice: options.length ? choice : "",
       message: form.notes.trim(),
       marketing: S.ask_marketing && form.marketing === true,
       website: form.website,
@@ -168,10 +191,12 @@ function ReserveModal({ open, onClose, initialType }) {
       setTime("");
       setSlotsVersion((v) => v + 1);
       window.ReserveApi.loadConfig(true);
-      if (code !== "ongeldig") setStep(3);
+      if (code !== "ongeldig") setStep(4);
     }
     setSubmitError(window.ReserveApi.message(code));
   };
+
+  const label = type ? (options.length && choice ? choice : type.name) : "";
 
   return (
     <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -185,28 +210,26 @@ function ReserveModal({ open, onClose, initialType }) {
               <IconClose />
             </button>
           </div>
-          {!result && <StepIndicator step={step} total={4} />}
+          {!result && <StepIndicator step={step} total={STEPS} />}
         </div>
 
         <div className="modal-body">
           {result ? (
-            <Confirmation type={type} party={party} date={date} time={time} form={form} result={result} />
+            <Confirmation label={label} party={party} date={date} time={time} form={form} result={result} />
           ) : step === 1 ? (
-            <Step1 types={cfg.types} typeId={typeId} setType={(t) => { setTypeId(t); setTime(""); }} />
+            <StepParty party={party} setParty={setParty} tooBig={tooBig} max={MAX_ONLINE} />
           ) : step === 2 ? (
-            <Step2 party={party} setParty={setParty} tooBig={tooBig} max={MAX_ONLINE} />
-          ) : step === 3 ? (
-            <Step3
-              type={type} date={date} setDate={setDate}
-              time={time} setTime={setTime}
-              today={today} maxDate={maxDate}
-              dateClosed={dateClosed}
-              slots={slots} slotsError={slotsError}
-              submitError={submitError}
+            <StepDate
+              types={cfg.types} date={date} setDate={(d) => { setDate(d); setTime(""); }}
+              today={today} maxDate={maxDate} typesOnDate={typesOnDate}
             />
+          ) : step === 3 ? (
+            <StepType types={typesOnDate} typeId={typeId} setType={pickType} choice={choice} setChoice={setChoice} date={date} />
+          ) : step === 4 ? (
+            <StepTime label={label} time={time} setTime={setTime} slots={slots} slotsError={slotsError} submitError={submitError} date={date} />
           ) : (
-            <Step4
-              form={form} setForm={setForm} type={type} party={party} date={date} time={time}
+            <StepDetails
+              form={form} setForm={setForm} label={label} party={party} date={date} time={time}
               errors={touched ? formErrors : {}} submitError={submitError}
               askMarketing={S.ask_marketing} marketingText={S.marketing_text}
             />
@@ -223,15 +246,11 @@ function ReserveModal({ open, onClose, initialType }) {
             >
               {step === 1 ? "Annuleren" : "← Terug"}
             </button>
-            {step < 4 ? (
+            {step < STEPS ? (
               <button
                 className="btn btn-primary"
                 onClick={() => { setSubmitError(""); next(); }}
-                disabled={
-                  (step === 1 && !canNext1) ||
-                  (step === 2 && !canNext2) ||
-                  (step === 3 && !canNext3)
-                }
+                disabled={!canNext[step]}
               >
                 Volgende →
               </button>
@@ -252,40 +271,15 @@ function ReserveModal({ open, onClose, initialType }) {
   );
 }
 
-function Step1({ types, typeId, setType }) {
+function HeartMark() {
   return (
-    <React.Fragment>
-      <h3>Waarvoor wil je reserveren?</h3>
-      <p className="sub">Kies waar je voor komt. We bereiden alvast de juiste tafel voor.</p>
-      {types.length === 0 ? (
-        <div className="callout">
-          Online reserveren kan op dit moment niet. Bel ons gerust op{" "}
-          <a href={window.BRAND.phoneHref}>{window.BRAND.phone}</a>.
-        </div>
-      ) : (
-        <div className="choice-grid">
-          {types.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              className={"choice" + (typeId === t.id ? " selected" : "")}
-              onClick={() => setType(t.id)}
-            >
-              <span className="icon-mark">{t.name.charAt(0).toUpperCase()}</span>
-              <span style={{ flex: 1 }}>
-                <span className="title" style={{ display: "block" }}>{t.name}</span>
-                {t.description && <p className="desc">{t.description}</p>}
-                {t.tag && <span className="tag">{t.tag}</span>}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-    </React.Fragment>
+    <svg className="icon-heart" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="currentColor" d="M12 21s-7.5-4.6-10-9.2C.4 8.6 2.1 4.5 6 4.5c2.3 0 3.6 1.3 4.4 2.5h3.2c.8-1.2 2.1-2.5 4.4-2.5 3.9 0 5.6 4.1 4 7.3C19.5 16.4 12 21 12 21z" />
+    </svg>
   );
 }
 
-function Step2({ party, setParty, tooBig, max }) {
+function StepParty({ party, setParty, tooBig, max }) {
   const counts = Array.from({ length: max + 1 }, (_, i) => i + 1);
   return (
     <React.Fragment>
@@ -313,19 +307,17 @@ function Step2({ party, setParty, tooBig, max }) {
   );
 }
 
-const SLOT_REASON = { vol: "vol", gesloten: "dicht", voorbij: "voorbij", te_ver: "te ver" };
-
-function Step3({ type, date, setDate, time, setTime, today, maxDate, dateClosed, slots, slotsError, submitError }) {
-  const noneFree = slots && slots.length > 0 && !slots.some((s) => s.available);
-  const days = window.ReserveApi.daysText(window.ReserveApi.bookableDays(type));
-  const name = type.name.toLowerCase();
+function StepDate({ types, date, setDate, today, maxDate, typesOnDate }) {
+  const api = window.ReserveApi;
+  const when = types
+    .map((t) => ({ name: t.name, days: api.daysText(api.bookableDays(t)) }))
+    .filter((t) => t.days);
   return (
     <React.Fragment>
       <h3>Wanneer komen jullie?</h3>
       <p className="sub">
-        {days ? `${type.name} kan op ${days}. ` : ""}Kies een datum en daarna een tijd.
+        {when.length ? when.map((t) => `${t.name} kan op ${t.days}`).join(". ") + "." : "Kies een datum."}
       </p>
-      {submitError && <div className="callout callout-error" role="alert" style={{ marginTop: 0, marginBottom: 16 }}>{submitError}</div>}
       <div className="field">
         <label className="field-label" htmlFor="r-date">Datum</label>
         <input
@@ -334,62 +326,124 @@ function Step3({ type, date, setDate, time, setTime, today, maxDate, dateClosed,
           min={today}
           max={maxDate}
           value={date}
-          onChange={(e) => { setDate(e.target.value); setTime(""); }}
+          onChange={(e) => setDate(e.target.value)}
           className="date-input"
         />
-        {dateClosed && (
+        {date && <p className="sub" style={{ margin: "8px 0 0" }}>{fmtDate(date)}</p>}
+        {date && typesOnDate.length === 0 && (
           <div className="callout" style={{ marginTop: 12 }}>
-            Op {window.ReserveApi.DAY_NAMES[window.ReserveApi.isoDow(date)]} kun je geen {name} reserveren.
-            {days ? ` Dat kan op ${days}.` : ""}
+            Op {api.DAY_NAMES[api.isoDow(date)]} kun je online niet reserveren. Kies een andere dag, of bel ons op{" "}
+            <a href={window.BRAND.phoneHref}>{window.BRAND.phone}</a>.
           </div>
         )}
       </div>
-      {date && !dateClosed && (
-        <div className="field">
-          <label className="field-label">Tijdslot</label>
-          {slots === null ? (
-            <p className="sub" aria-live="polite" style={{ margin: "8px 0 0" }}>Beschikbaarheid ophalen…</p>
-          ) : slotsError ? (
-            <div className="callout callout-error" role="alert">{slotsError}</div>
-          ) : (
-            <React.Fragment>
-              <div className="time-grid">
-                {slots.map((s) => (
-                  <button
-                    key={s.slot}
-                    type="button"
-                    className={"time-btn" + (time === s.slot ? " selected" : "")}
-                    onClick={() => setTime(s.slot)}
-                    disabled={!s.available}
-                    aria-label={s.available ? s.slot : `${s.slot}, ${SLOT_REASON[s.reason] || "niet beschikbaar"}`}
-                  >
-                    {s.slot}
-                    {!s.available && <span className="time-note">{SLOT_REASON[s.reason] || "bezet"}</span>}
-                  </button>
-                ))}
-              </div>
-              {(noneFree || slots.length === 0) && (
-                <div className="callout">
-                  Op deze dag is online niets meer vrij. Kies een andere dag, of bel{" "}
-                  <a href={window.BRAND.phoneHref}>{window.BRAND.phone}</a>: soms kunnen we nog schuiven.
-                </div>
-              )}
-            </React.Fragment>
-          )}
+    </React.Fragment>
+  );
+}
+
+function StepType({ types, typeId, setType, choice, setChoice, date }) {
+  const type = types.find((t) => t.id === typeId);
+  const options = (type && type.options) || [];
+  const day = fmtDate(date);
+  return (
+    <React.Fragment>
+      <h3>Waarvoor wil je reserveren?</h3>
+      <p className="sub">Dit kan op {day.charAt(0).toLowerCase() + day.slice(1)}.</p>
+      <div className="choice-grid">
+        {types.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className={"choice" + (typeId === t.id ? " selected" : "")}
+            onClick={() => setType(t.id)}
+            aria-pressed={typeId === t.id}
+          >
+            <span className="icon-mark"><HeartMark /></span>
+            <span style={{ flex: 1 }}>
+              <span className="title" style={{ display: "block" }}>{t.name}</span>
+              {t.description && <p className="desc">{t.description}</p>}
+              {t.tag && <span className="tag">{t.tag}</span>}
+            </span>
+          </button>
+        ))}
+      </div>
+      {options.length > 0 && (
+        <div className="field" style={{ marginTop: 20 }}>
+          <label className="field-label" id="r-choice-label">Wat wil je bij {type.name}?</label>
+          <div className="option-grid" role="radiogroup" aria-labelledby="r-choice-label">
+            {options.map((o) => (
+              <button
+                key={o}
+                type="button"
+                role="radio"
+                aria-checked={choice === o}
+                className={"party-btn option-btn" + (choice === o ? " selected" : "")}
+                onClick={() => setChoice(o)}
+              >
+                {o}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </React.Fragment>
   );
 }
 
-function Step4({ form, setForm, type, party, date, time, errors, submitError, askMarketing, marketingText }) {
+const SLOT_REASON = { vol: "vol", gesloten: "dicht", voorbij: "voorbij", te_ver: "te ver" };
+
+function StepTime({ label, time, setTime, slots, slotsError, submitError, date }) {
+  const noneFree = slots && slots.length > 0 && !slots.some((s) => s.available);
+  const day = fmtDate(date);
+  return (
+    <React.Fragment>
+      <h3>Hoe laat?</h3>
+      <p className="sub">{label} op {day.charAt(0).toLowerCase() + day.slice(1)}. Kies een tijd.</p>
+      {submitError && <div className="callout callout-error" role="alert" style={{ marginTop: 0, marginBottom: 16 }}>{submitError}</div>}
+      <div className="field">
+        <label className="field-label">Tijdslot</label>
+        {slots === null ? (
+          <p className="sub" aria-live="polite" style={{ margin: "8px 0 0" }}>Beschikbaarheid ophalen…</p>
+        ) : slotsError ? (
+          <div className="callout callout-error" role="alert">{slotsError}</div>
+        ) : (
+          <React.Fragment>
+            <div className="time-grid">
+              {slots.map((s) => (
+                <button
+                  key={s.slot}
+                  type="button"
+                  className={"time-btn" + (time === s.slot ? " selected" : "")}
+                  onClick={() => setTime(s.slot)}
+                  disabled={!s.available}
+                  aria-label={s.available ? s.slot : `${s.slot}, ${SLOT_REASON[s.reason] || "niet beschikbaar"}`}
+                >
+                  {s.slot}
+                  {!s.available && <span className="time-note">{SLOT_REASON[s.reason] || "bezet"}</span>}
+                </button>
+              ))}
+            </div>
+            {(noneFree || slots.length === 0) && (
+              <div className="callout">
+                Op deze dag is online niets meer vrij. Kies een andere dag, of bel{" "}
+                <a href={window.BRAND.phoneHref}>{window.BRAND.phone}</a>: soms kunnen we nog schuiven.
+              </div>
+            )}
+          </React.Fragment>
+        )}
+      </div>
+    </React.Fragment>
+  );
+}
+
+function StepDetails({ form, setForm, label, party, date, time, errors, submitError, askMarketing, marketingText }) {
   const upd = (k) => (e) => setForm({ ...form, [k]: e.target.value });
   const err = (k) => errors[k] ? <p className="field-error" id={`r-${k}-err`}>{errors[k]}</p> : null;
   return (
     <React.Fragment>
       <h3>Tot zo!</h3>
       <p className="sub">
-        Je reserveert <strong>{type.name.toLowerCase()}</strong> voor <strong>{party} {party === 1 ? "persoon" : "personen"}</strong> op <strong>{fmtDate(date).charAt(0).toLowerCase() + fmtDate(date).slice(1)}</strong> om <strong>{time}</strong>.
+        Je reserveert <strong>{label.toLowerCase()}</strong> voor <strong>{party} {party === 1 ? "persoon" : "personen"}</strong> op <strong>{fmtDate(date).charAt(0).toLowerCase() + fmtDate(date).slice(1)}</strong> om <strong>{time}</strong>.
       </p>
 
       {submitError && <div className="callout callout-error" role="alert" style={{ marginTop: 0, marginBottom: 16 }}>{submitError}</div>}
@@ -447,7 +501,7 @@ function Step4({ form, setForm, type, party, date, time, errors, submitError, as
   );
 }
 
-function Confirmation({ type, party, date, time, form, result }) {
+function Confirmation({ label, party, date, time, form, result }) {
   const confirmed = result.status === "bevestigd";
   return (
     <div className="confirmation">
@@ -466,7 +520,7 @@ function Confirmation({ type, party, date, time, form, result }) {
 
       <dl className="recap">
         <dt>Reservering</dt>
-        <dd>{type.name}</dd>
+        <dd>{label}</dd>
         <dt>Gasten</dt>
         <dd>{party} {party === 1 ? "persoon" : "personen"}</dd>
         <dt>Datum & tijd</dt>

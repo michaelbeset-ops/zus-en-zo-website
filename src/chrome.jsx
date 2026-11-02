@@ -178,7 +178,7 @@ function Footer({ go, openReserve }) {
         </div>
       </div>
       <div className="container footer-bottom">
-        <span>© {new Date().getFullYear()} · Lunchcafé Zus &amp; Zo · KvK 12345678</span>
+        <span>© {new Date().getFullYear()} · Lunchcafé Zus &amp; Zo</span>
         <span>Gemaakt met liefde in Etten-Leur</span>
       </div>
     </footer>

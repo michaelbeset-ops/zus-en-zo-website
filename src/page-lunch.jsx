@@ -29,17 +29,34 @@ function Dish({ item }) {
   );
 }
 
-// Kaart als reeks blokjes (Belegde broodjes, Salades, ...)
+// Kaart als reeks categorieën (Belegde broodjes, Salades, ...). Elke categorie
+// klapt open als je erop klikt, zodat de kaart overzichtelijk blijft.
 function MenuBlocks({ sections }) {
+  const [open, setOpen] = useStateM([]);
+  const toggle = (t) => setOpen(open.includes(t) ? open.filter((x) => x !== t) : [...open, t]);
   return (
-    <div className="menu-blocks">
-      {sections.map((sec) => (
-        <div className="menu-block" key={sec.title}>
-          <h3 className="menu-block-title">{sec.title}</h3>
-          {sec.intro && <p className="menu-block-intro">{sec.intro}</p>}
-          {sec.items.map((it, i) => <Dish key={it.name + i} item={it} />)}
-        </div>
-      ))}
+    <div className="menu-acc">
+      {sections.map((sec, n) => {
+        const isOpen = open.includes(sec.title);
+        const id = "cat-" + n + "-" + sec.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+        return (
+          <div className={"menu-acc-item" + (isOpen ? " open" : "")} key={sec.title}>
+            <button type="button" className="menu-acc-head" aria-expanded={isOpen} aria-controls={id} onClick={() => toggle(sec.title)}>
+              <span className="menu-acc-title">{sec.title}</span>
+              <span className="menu-acc-count">{sec.items.length} {sec.items.length === 1 ? "gerecht" : "gerechten"}</span>
+              <span className="menu-acc-icon" aria-hidden="true">{isOpen ? "−" : "+"}</span>
+            </button>
+            {isOpen && (
+              <div className="menu-acc-body" id={id}>
+                {sec.intro && <p className="menu-block-intro">{sec.intro}</p>}
+                <div className="menu-acc-dishes">
+                  {sec.items.map((it, i) => <Dish key={it.name + i} item={it} />)}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -82,7 +99,7 @@ function MenuCards({ cards }) {
       </div>
       <div className="menu-tabs-panel" role="tabpanel" id={"kaart-" + cur.id + "-inhoud"} aria-labelledby={"kaart-tab-" + cur.id}>
         {cur.sub && <p className="menu-card-sub">{cur.sub}</p>}
-        {cur.sections ? <MenuBlocks sections={cur.sections} /> : cur.body}
+        {cur.sections ? <MenuBlocks key={cur.id} sections={cur.sections} /> : cur.body}
       </div>
     </div>
   );

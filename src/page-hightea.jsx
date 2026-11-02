@@ -91,7 +91,7 @@ function PageHighTea({ openReserve }) {
                     </ul>
                   </div>
                 )}
-                <button className="nav-cta" onClick={() => openReserve("hightea")}>
+                <button className="nav-cta" onClick={() => openReserve("hightea:" + m.name)}>
                   Reserveer {m.name.toLowerCase()} <IconArrow />
                 </button>
               </div>

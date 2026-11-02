@@ -56,7 +56,7 @@ reserveringen, instellingen en wachtwoorden blijven staan.
 | **Reserveringen** | Wijzigen, annuleren. Telefonische reserveringen zelf invoeren (ook zonder e-mail, buiten de vaste tijden of boven de capaciteit). Werkt live bij. Weergaven *Per dag*, *Tafelplan* (tijdlijn per tafel, dubbele boekingen rood) en *Komend*. Tafels koppelen (met voorstel voor een vrije tafel en waarschuwing bij te weinig plaatsen of dubbel boeken) en een interne notitie voor personeel. |
 | **Tafels** | Eigen tafels aanmaken (ook in één keer, bijvoorbeeld 8 tafels van 4), plaatsen, ruimte (Binnen, Terras, ...), volgorde, aan of uit. |
 | **Openingstijden** | Per dag open/dicht, tijden en een notitie. Staat meteen op de website en onder elke mail. Op een dichte dag kan niemand online reserveren. |
-| **Soorten en tijden** | Lunch, high tea, diner en eventueel nieuwe soorten: naam, omschrijving, dagen, eerste en laatste tijd, elk kwartier/half uur/uur, aan of uit. |
+| **Soorten en tijden** | Lunch, High Moments, diner en eventueel nieuwe soorten: naam, omschrijving, keuzes voor de gast (zoals high tea, high bites, high cocktail), dagen, eerste en laatste tijd, elk kwartier/half uur/uur, aan of uit. |
 | **Sluitingen** | Een hele dag of een deel ervan dicht (vakantie, besloten feest). |
 | **Mailinglijst** | Gasten die zelf toestemming gaven. Zoeken, exporteren (CSV voor bijvoorbeeld MailChimp of Brevo), verwijderen. |
 | **Instellingen** | Capaciteit (gasten tegelijk, hoe lang een tafel bezet is), maximaal per online reservering, termijnen, adres voor meldingen, nieuwsbriefvraag aan/uit en de tekst ervan, en **collega's toegang geven of intrekken**. |
@@ -77,8 +77,10 @@ reserveringen, instellingen en wachtwoorden blijven staan.
 
 ## Hoe het werkt
 
-1. De gast kiest soort, aantal personen, datum en tijd. Volle, gesloten of
-   voorbije tijden zijn niet te kiezen.
+1. De gast kiest het aantal personen, dan de datum, dan wat er die dag kan
+   (diner alleen op vrijdag) met eventueel een keuze (High Moments: high tea,
+   high bites of high cocktail), en dan de tijd. Volle, gesloten of voorbije
+   tijden zijn niet te kiezen.
 2. De reservering staat meteen vast: de gast krijgt direct de bevestiging,
    het café een mail met alle gegevens en een knop naar het beheer.
 3. In elke mail staat een annuleerlink. Annuleert de gast, dan krijgen gast

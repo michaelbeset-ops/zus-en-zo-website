@@ -72,10 +72,54 @@ function Hero({ go, openReserve }) {
   );
 }
 
+// Paarse tekeningetjes naast het welkom: kopje met hartjes links, etagère rechts.
+function IntroDecoLeft() {
+  return (
+    <svg className="intro-deco intro-deco-left" viewBox="0 0 200 320" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M58 150c-6-10 6-16 0-26M78 146c-6-10 6-16 0-26M98 150c-6-10 6-16 0-26" opacity=".55" />
+        <path d="M40 168h80l-8 52a20 20 0 0 1-20 17H68a20 20 0 0 1-20-17z" />
+        <path d="M118 182h10a14 14 0 0 1 0 28h-14" />
+        <path d="M30 248h110" />
+        <path d="M150 40c10 18 10 36 0 54" opacity=".35" />
+        <path d="M24 70c14-6 28-6 42 0" opacity=".35" />
+      </g>
+      <path className="h1" d="M80 205s-12-7-15-14c-2-5 1-11 7-11 4 0 6 2 8 5 2-3 4-5 8-5 6 0 9 6 7 11-3 7-15 14-15 14z" />
+      <path className="h2" d="M150 120s-10-6-12-11c-2-4 1-9 6-9 3 0 5 2 6 4 1-2 3-4 6-4 5 0 8 5 6 9-2 5-12 11-12 11z" />
+      <path className="h3" d="M46 60s-8-5-10-9c-1-3 1-7 5-7 2 0 4 1 5 3 1-2 3-3 5-3 4 0 6 4 5 7-2 4-10 9-10 9z" />
+      <path className="h2" d="M120 290s-7-4-8-8c-1-3 1-6 4-6 2 0 3 1 4 3 1-2 2-3 4-3 3 0 5 3 4 6-1 4-8 8-8 8z" />
+    </svg>
+  );
+}
+
+function IntroDecoRight() {
+  return (
+    <svg className="intro-deco intro-deco-right" viewBox="0 0 200 320" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M100 112v136" />
+        <path d="M62 172h76" />
+        <path d="M44 236h112" />
+        <path d="M76 172a12 12 0 0 1 24 0M108 172a10 10 0 0 1 20 0" />
+        <path d="M56 236a12 12 0 0 1 24 0M86 236a14 14 0 0 1 28 0M120 236a12 12 0 0 1 24 0" />
+        <path d="M80 252h40" />
+        <path d="M44 70c8 14 8 30 0 44" opacity=".35" />
+        <path d="M140 52c14 6 28 6 42 0" opacity=".35" />
+      </g>
+      <circle className="h1" cx="100" cy="106" r="6" />
+      <path className="h2" d="M60 128s-10-6-12-11c-2-4 1-9 6-9 3 0 5 2 6 4 1-2 3-4 6-4 5 0 8 5 6 9-2 5-12 11-12 11z" />
+      <path className="h3" d="M160 92s-8-5-10-9c-1-3 1-7 5-7 2 0 4 1 5 3 1-2 3-3 5-3 4 0 6 4 5 7-2 4-10 9-10 9z" />
+      <path className="h1" d="M150 296s-9-5-11-10c-2-4 1-8 5-8 3 0 5 2 6 4 1-2 3-4 6-4 4 0 7 4 5 8-2 5-11 10-11 10z" />
+    </svg>
+  );
+}
+
 function Intro() {
   return (
-    <section className="section">
+    <section className="section intro-section">
+      <IntroDecoLeft />
+      <IntroDecoRight />
       <div className="container intro-welcome">
+        <p className="intro-hearts" aria-hidden="true"><span>♥</span><span>♥</span><span>♥</span></p>
         <h2>Welkom bij Zus &amp; Zo!</h2>
         <p>
           Ons gezellige lunchcafé, waar genieten en lekker eten centraal staan. Van een lekkere

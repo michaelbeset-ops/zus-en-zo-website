@@ -2078,3 +2078,51 @@ html, body { overflow-x: clip; }
   .menu-tabs-bar { display: grid; grid-template-columns: 1fr 1fr; overflow: visible; }
   .menu-tab { white-space: normal; text-align: center; padding: 10px 8px; line-height: 1.25; }
 }
+
+/* Reserveren: hartje in plaats van letter, keuzes binnen een soort */
+.choice .icon-mark { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; padding-top: 4px; color: var(--aubergine); }
+.choice .icon-heart { display: block; }
+.option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin-top: 6px; }
+.option-btn { font-size: 15px; padding: 14px 10px; height: auto; }
+
+/* Welkom: paarse tekeningetjes aan de zijkanten */
+.intro-section { position: relative; overflow: hidden; }
+.intro-deco { position: absolute; top: 50%; transform: translateY(-50%); width: 190px; height: auto; color: var(--aubergine); display: none; }
+.intro-deco .h1 { fill: var(--aubergine); }
+.intro-deco .h2 { fill: var(--aubergine-soft, #C9B4CF); }
+.intro-deco .h3 { fill: none; stroke: var(--aubergine); stroke-width: 2; }
+.intro-deco-left { left: max(16px, calc(50% - 600px)); }
+.intro-deco-right { right: max(16px, calc(50% - 600px)); }
+@media (min-width: 1100px) { .intro-deco { display: block; } }
+.intro-hearts { display: flex; gap: 10px; justify-content: center; margin: 0 0 4px; color: var(--aubergine); font-size: 15px; line-height: 1; }
+.intro-hearts span:nth-child(2) { color: var(--aubergine-soft, #C9B4CF); transform: translateY(-3px); }
+@media (min-width: 1100px) { .intro-hearts { display: none; } }
+
+/* Menukaart: categorieën die je openklikt */
+.menu-acc { display: grid; gap: 0; border-top: 1px solid var(--line-soft); }
+.menu-acc-item { border-bottom: 1px solid var(--line-soft); min-width: 0; }
+.menu-acc-head {
+  width: 100%; display: flex; align-items: center; gap: 14px; padding: 18px 4px;
+  background: none; border: 0; text-align: left; cursor: pointer; color: inherit; font: inherit;
+}
+.menu-acc-title { font-family: var(--serif); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: var(--aubergine-deep); flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.menu-acc-count { font-size: 13px; color: var(--ink-mute); white-space: nowrap; }
+.menu-acc-icon {
+  flex: none; width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--aubergine); color: var(--paper-2, #fff); font-size: 18px; line-height: 1;
+}
+.menu-acc-head:hover .menu-acc-title { color: var(--aubergine); }
+.menu-acc-head:focus-visible { outline: 2px solid var(--aubergine); outline-offset: 2px; }
+.menu-acc-item.open .menu-acc-icon { background: var(--aubergine-deep); }
+.menu-acc-body { padding: 0 4px 22px; }
+.menu-acc-dishes { display: grid; grid-template-columns: 1fr; column-gap: 48px; }
+.menu-acc-dishes > * { min-width: 0; }
+@media (min-width: 900px) { .menu-acc-dishes { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 400px) { .menu-acc-title { font-size: 19px; } .menu-acc-count { display: none; } }
+.option-grid .option-btn {
+  aspect-ratio: auto; height: auto; min-height: 52px; padding: 12px 10px;
+  font-family: var(--sans); font-size: 15px; font-weight: 600;
+  background: var(--paper); color: var(--ink); border: 1px solid var(--line);
+}
+.option-grid .option-btn:hover { border-color: var(--aubergine); color: var(--aubergine); }
+.option-grid .option-btn.selected { background: var(--aubergine); color: #fff; border-color: var(--aubergine); }

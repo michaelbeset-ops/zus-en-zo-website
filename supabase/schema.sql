@@ -48,6 +48,19 @@ insert into public.reservation_types (id, name, description, tag, sort_order, da
   ('diner',   'Diner',    'We trekken alles uit de kast',                   'Alleen op vrijdagavond', 3, '{5}',           '17:30', '19:00', 30)
 on conflict (id) do nothing;
 
+-- Keuzes binnen een soort, bijvoorbeeld High Moments: high tea, high bites of
+-- high cocktail. Leeg = geen keuze. De beginwaarde komt er eenmalig in, daarna
+-- beheert het café de lijst bij Soorten en tijden.
+do $$
+begin
+  if not exists (select 1 from information_schema.columns
+                  where table_schema = 'public' and table_name = 'reservation_types' and column_name = 'options') then
+    alter table public.reservation_types add column options text[] not null default '{}'
+      check (cardinality(options) <= 8);
+    update public.reservation_types set options = '{"High tea","High bites","High cocktail"}' where id = 'hightea';
+  end if;
+end $$;
+
 create table if not exists public.opening_hours (
   isodow     smallint primary key check (isodow between 1 and 7),
   closed     boolean not null default false,
@@ -149,6 +162,8 @@ create table if not exists public.reservation_tables (
 create index if not exists reservation_tables_table_idx on public.reservation_tables (table_id);
 
 -- Interne notitie: alleen zichtbaar voor personeel, nooit in mails.
+alter table public.reservations add column if not exists choice text
+  check (choice is null or char_length(choice) <= 60);
 alter table public.reservations add column if not exists internal_note text
   check (internal_note is null or char_length(internal_note) <= 500);
 
@@ -260,7 +275,7 @@ as $$
       select json_agg(json_build_object(
                'id', id, 'name', name, 'description', description, 'tag', tag,
                'days', days, 'first_slot', first_slot, 'last_slot', last_slot,
-               'interval_min', interval_min) order by sort_order, name)
+               'interval_min', interval_min, 'options', options) order by sort_order, name)
         from public.reservation_types where active), '[]'::json),
     'hours', (
       select json_agg(json_build_object(
@@ -318,6 +333,7 @@ $$;
 --   P0001 vol         P0002 gesloten       P0003 ongeldige invoer
 --   P0007 te veel aanvragen vanaf dit e-mailadres
 drop function if exists public.create_reservation(text, text, text, date, text, integer, text, text);
+drop function if exists public.create_reservation(text, text, text, date, text, integer, text, text, boolean);
 create or replace function public.create_reservation(
   p_name      text,
   p_email     text,
@@ -327,7 +343,8 @@ create or replace function public.create_reservation(
   p_guests    integer,
   p_type      text,
   p_message   text default null,
-  p_marketing boolean default false
+  p_marketing boolean default false,
+  p_choice    text default null
 )
 returns table (id uuid, status text, unsubscribe_token uuid)
 language plpgsql
@@ -341,6 +358,7 @@ declare
   new_st  text;
   tok     uuid;
   recent  integer;
+  opts    text[];
 begin
   select * into s from public.settings where id = 1;
 
@@ -360,6 +378,16 @@ begin
   end if;
   if p_date is null or p_time is null or not (p_time = any (public.slots_for(p_type, p_date))) then
     raise exception 'Ongeldig tijdslot' using errcode = 'P0003';
+  end if;
+  -- Heeft de soort keuzes (zoals High Moments), dan moet er een gekozen zijn.
+  select t.options into opts from public.reservation_types t where t.id = p_type;
+  p_choice := nullif(btrim(p_choice), '');
+  if coalesce(cardinality(opts), 0) > 0 then
+    if p_choice is null or not (p_choice = any (opts)) then
+      raise exception 'Kies wat je wilt reserveren' using errcode = 'P0003';
+    end if;
+  else
+    p_choice := null;
   end if;
   if p_date > (public.nl_now())::date + s.max_days_ahead then
     raise exception 'Datum ligt te ver vooruit' using errcode = 'P0003';
@@ -391,8 +419,8 @@ begin
 
   new_st := 'bevestigd';
 
-  insert into public.reservations (name, email, phone, date, time, guests, reservation_type, message, status, marketing_consent)
-  values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type, left(p_message, 1000),
+  insert into public.reservations (name, email, phone, date, time, guests, reservation_type, choice, message, status, marketing_consent)
+  values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type, p_choice, left(p_message, 1000),
           new_st, coalesce(p_marketing, false) and s.ask_marketing)
   returning reservations.id into new_id;
 
@@ -418,6 +446,7 @@ $$;
 -- p_internal_note: null = niet aanpassen, '' = leegmaken.
 -- Foutcodes: P0003 ongeldig, P0004 niet gevonden
 drop function if exists public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text);
+drop function if exists public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text, uuid[], text);
 create or replace function public.staff_save_reservation(
   p_id            uuid,
   p_name          text,
@@ -430,7 +459,8 @@ create or replace function public.staff_save_reservation(
   p_message       text default null,
   p_status        text default null,
   p_tables        uuid[] default null,
-  p_internal_note text default null
+  p_internal_note text default null,
+  p_choice        text default null
 )
 returns setof public.reservations
 language plpgsql
@@ -469,8 +499,9 @@ begin
   end if;
 
   if p_id is null then
-    insert into public.reservations (name, email, phone, date, time, guests, reservation_type, message, status, source, internal_note)
-    values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type, left(p_message, 1000),
+    insert into public.reservations (name, email, phone, date, time, guests, reservation_type, choice, message, status, source, internal_note)
+    values (left(p_name, 100), p_email, left(p_phone, 40), p_date, p_time, p_guests, p_type,
+            nullif(left(btrim(p_choice), 60), ''), left(p_message, 1000),
             coalesce(p_status, 'bevestigd'), 'cafe', nullif(left(btrim(p_internal_note), 500), ''))
     returning id into rid;
   else
@@ -485,6 +516,8 @@ begin
            end,
            internal_note = case when p_internal_note is null then r.internal_note
                                 else nullif(left(btrim(p_internal_note), 500), '') end,
+           choice = case when p_choice is null then r.choice
+                         else nullif(left(btrim(p_choice), 60), '') end,
            updated_at = now()
      where r.id = p_id
     returning r.id into rid;
@@ -521,7 +554,7 @@ stable
 security definer
 set search_path = public
 as $$
-  select r.name, r.date, r.time, r.guests, r.status, r.reservation_type, t.name,
+  select r.name, r.date, r.time, r.guests, r.status, r.reservation_type, coalesce(r.choice, t.name),
          (r.date + r.time::time) < public.nl_now() as is_past
     from public.reservations r
     join public.reservation_types t on t.id = r.reservation_type
@@ -566,7 +599,7 @@ begin
 
   return query
     select r.name, r.email, r.date, r.time, r.guests, r.reservation_type,
-           (select t.name from public.reservation_types t where t.id = r.reservation_type);
+           coalesce(r.choice, (select t.name from public.reservation_types t where t.id = r.reservation_type));
 end;
 $$;
 
@@ -606,7 +639,7 @@ begin
 
   return query
     select r.name, r.email, r.date, r.time, r.guests, r.reservation_type,
-           (select t.name from public.reservation_types t where t.id = r.reservation_type), r.message;
+           coalesce(r.choice, (select t.name from public.reservation_types t where t.id = r.reservation_type)), r.message;
 end;
 $$;
 
@@ -715,8 +748,8 @@ grant execute on function public.get_public_config() to anon, authenticated;
 grant execute on function public.get_availability(date, text, integer) to anon, authenticated;
 grant execute on function public.is_staff() to authenticated, service_role;
 
-grant execute on function public.create_reservation(text, text, text, date, text, integer, text, text, boolean) to service_role;
-grant execute on function public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text, uuid[], text) to service_role;
+grant execute on function public.create_reservation(text, text, text, date, text, integer, text, text, boolean, text) to service_role;
+grant execute on function public.staff_save_reservation(uuid, text, text, text, date, text, integer, text, text, text, uuid[], text, text) to service_role;
 grant execute on function public.get_reservation_for_cancel(uuid) to service_role;
 grant execute on function public.cancel_reservation(uuid, text) to service_role;
 grant execute on function public.confirm_reservation(uuid) to service_role;

@@ -102,7 +102,6 @@ function PageContact({ openReserve }) {
             of langskomen?
           </React.Fragment>
         }
-        lede="Reserveren, sollicitatie, een vraag over een verjaardag, schroom niet. We zitten aan het Raadhuisplein en zijn er bijna elke dag."
         tag={{ n: "PLACEHOLDER", text: "Gevel & terras aan het Raadhuisplein" }}
       >
         <div className="page-hero-cta-row">
@@ -130,7 +129,7 @@ function PageContact({ openReserve }) {
           <div className="info-block">
             <h4>Mail</h4>
             <p className="big"><a href={`mailto:${B.email}`}>{B.email}</a></p>
-            <p>Bestellingen vóór 11:00 uur: <a href={`mailto:${B.emailOrder}`}>{B.emailOrder}</a></p>
+            <p>Bestellingen: <a href={`mailto:${B.emailOrder}`}>{B.emailOrder}</a></p>
           </div>
           <div className="info-block">
             <h4>Openingstijden</h4>
@@ -138,7 +137,10 @@ function PageContact({ openReserve }) {
               {window.HOURS.map((h, i) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px dotted var(--line)", padding: "6px 0" }}>
                   <span style={{ color: h.closed ? "var(--ink-mute)" : "var(--ink)" }}>{h.day}</span>
-                  <span style={{ color: h.special ? "var(--aubergine)" : "var(--ink-soft)", fontWeight: h.special ? 600 : 400 }}>{h.time}</span>
+                  <span style={{ textAlign: "right", color: h.special ? "var(--aubergine)" : "var(--ink-soft)", fontWeight: h.special ? 600 : 400 }}>
+                    {h.time}
+                    {h.day === "Zondag" && <span style={{ display: "block", fontSize: 11, color: "var(--ink-mute)" }}>alleen koopzondagen</span>}
+                  </span>
                 </div>
               ))}
             </div>

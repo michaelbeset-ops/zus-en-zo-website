@@ -305,6 +305,7 @@ function ReservationForm({ initial, types, tables, tableMinutes, token, onClose,
     message: initial.message || "",
     status: initial.status || "bevestigd",
     note: initial.internal_note || "",
+    choice: initial.choice || "",
   });
   const [selected, setSelected] = useState(tableIdsOf(initial));
   const [dayRows, setDayRows] = useState([]);
@@ -322,6 +323,10 @@ function ReservationForm({ initial, types, tables, tableMinutes, token, onClose,
 
   const busyMap = busyTableIds(dayRows, normTime(f.time), tableMinutes, initial.id);
 
+  // Keuzes van de gekozen soort (High Moments: high tea, high bites, high cocktail).
+  const typeOptions = ((types.find((t) => t.id === f.type) || {}).options) || [];
+  const choiceList = f.choice && !typeOptions.includes(f.choice) ? [...typeOptions, f.choice] : typeOptions;
+
   const save = async (e) => {
     e.preventDefault();
     if (!f.name.trim()) return setError("Vul een naam in.");
@@ -333,6 +338,7 @@ function ReservationForm({ initial, types, tables, tableMinutes, token, onClose,
       id: initial.id || "", name: f.name, phone: f.phone, email: f.email, type: f.type, date: f.date,
       time, guests: Number(f.guests), message: f.message, status: f.status,
       tables: selected, internal_note: f.note,
+      choice: typeOptions.length ? f.choice : "",
       notify: notify && !!f.email.trim(),
     }, token());
     setBusy(false);
@@ -373,6 +379,15 @@ function ReservationForm({ initial, types, tables, tableMinutes, token, onClose,
                 {types.map((t) => <option key={t.id} value={t.id}>{t.name}{t.active ? "" : " (niet actief)"}</option>)}
               </select>
             </div>
+            {choiceList.length > 0 && (
+              <div className="field">
+                <label className="field-label" htmlFor="rf-choice">Keuze</label>
+                <select id="rf-choice" className="text-input" value={f.choice} onChange={set("choice")}>
+                  <option value="">Nog niet bekend</option>
+                  {choiceList.map((o) => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+            )}
             <div className="field">
               <label className="field-label" htmlFor="rf-date">Datum</label>
               <input id="rf-date" className="date-input" type="date" value={f.date} onChange={set("date")} required />
@@ -500,7 +515,7 @@ function TablePlan({ rows, tables, hours, date, tableMinutes, onOpen }) {
                 {active.filter((r) => tableIdsOf(r).includes(t.id)).map((r) => (
                   <button type="button" key={r.id} className={"bh-plan-block st-" + r.status + (clashIds.has(t.id + r.id) ? " clash" : "")}
                     style={{ left: pos(toMin(r.time)), width: (tableMinutes / span) * 100 + "%" }}
-                    onClick={() => onOpen(r)} title={`${r.time} ${r.name}, ${r.guests} personen`}>
+                    onClick={() => onOpen(r)} title={`${r.time} ${r.name}, ${r.guests} personen${r.choice ? ", " + r.choice : ""}`}>
                     <strong>{r.time} {r.name}</strong> <span>{r.guests}p</span>
                   </button>
                 ))}
@@ -626,7 +641,7 @@ function Reservations({ token }) {
                     <span className="bh-res-name">{r.name}</span>
                     <span className="bh-res-guests">{plural(r.guests, "persoon", "personen")}</span>
                     <span className={"bh-pill" + (tl ? " t-table" : " t-notable")}>{tl || "Geen tafel"}</span>
-                    <span className="bh-pill">{typeName(r.reservation_type)}</span>
+                    <span className="bh-pill">{r.choice || typeName(r.reservation_type)}</span>
                     <span className={"bh-pill s-" + r.status}>{STATUS_LABEL[r.status]}{r.cancelled_by === "gast" ? " door gast" : ""}</span>
                     {r.source === "cafe" && <span className="bh-pill">Zelf ingevoerd</span>}
                   </div>
@@ -847,11 +862,12 @@ function OpeningHours() {
 // ─── Soorten reservering en tijden ────────────────────────────────────────────
 
 function TypeEditor({ t, existingIds, onSaved, onDeleted }) {
-  const [f, setF] = useState(t);
+  const [f, setF] = useState({ ...t, optionsText: (t.options || []).join(", ") });
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [error, setError] = useState("");
   const set = (k, v) => setF({ ...f, [k]: v });
+  const options = f.optionsText.split(",").map((o) => o.trim()).filter(Boolean);
   const toggleDay = (d) => set("days", f.days.includes(d) ? f.days.filter((x) => x !== d) : [...f.days, d].sort());
 
   const first = normTime(f.first_slot), last = normTime(f.last_slot);
@@ -864,6 +880,8 @@ function TypeEditor({ t, existingIds, onSaved, onDeleted }) {
     if (!TIME_RE.test(first) || !TIME_RE.test(last)) return setError("Vul de tijden in als uu:mm, bijvoorbeeld 11:30.");
     if (last < first) return setError("De laatste tijd moet na de eerste tijd liggen.");
     if (f.days.length === 0 && f.active) return setError("Kies minstens een dag, of zet de soort op niet actief.");
+    if (options.length > 8) return setError("Maximaal 8 keuzes.");
+    if (options.some((o) => o.length > 40)) return setError("Houd elke keuze korter dan 40 tekens.");
     setBusy(true);
     let id = f.id;
     if (t.isNew) {
@@ -875,6 +893,7 @@ function TypeEditor({ t, existingIds, onSaved, onDeleted }) {
       id, name: f.name.trim(), description: (f.description || "").trim(), tag: (f.tag || "").trim(),
       active: f.active, sort_order: Number(f.sort_order) || 0, days: f.days,
       first_slot: first, last_slot: last, interval_min: Number(f.interval_min),
+      options: [...new Set(options)],
     };
     const { error } = t.isNew
       ? await sb.from("reservation_types").insert(row)
@@ -906,6 +925,11 @@ function TypeEditor({ t, existingIds, onSaved, onDeleted }) {
         <div className="field bh-span2">
           <label className="field-label" htmlFor={`t-desc-${f.id}`}>Korte omschrijving</label>
           <input id={`t-desc-${f.id}`} className="text-input" value={f.description || ""} maxLength={200} onChange={(e) => set("description", e.target.value)} />
+        </div>
+        <div className="field bh-span2">
+          <label className="field-label" htmlFor={`t-opt-${f.id}`}>Keuzes voor de gast (niet verplicht)</label>
+          <input id={`t-opt-${f.id}`} className="text-input" value={f.optionsText} maxLength={340} placeholder="Bijv. High tea, High bites, High cocktail" onChange={(e) => set("optionsText", e.target.value)} />
+          <p className="bh-help">Gescheiden door komma's. De gast moet er dan een kiezen bij het reserveren.</p>
         </div>
         <div className="field">
           <label className="field-label" htmlFor={`t-tag-${f.id}`}>Label (niet verplicht)</label>
@@ -968,7 +992,7 @@ function Types() {
   useEffect(load, [load]);
 
   const startNew = () => {
-    setAdding({ id: "nieuw", name: "", description: "", tag: "", active: true, sort_order: (types || []).length + 1, days: [2, 3, 4, 5, 6, 7], first_slot: "12:00", last_slot: "14:00", interval_min: 30, isNew: true });
+    setAdding({ id: "nieuw", name: "", description: "", tag: "", active: true, sort_order: (types || []).length + 1, days: [2, 3, 4, 5, 6, 7], first_slot: "12:00", last_slot: "14:00", interval_min: 30, options: [], isNew: true });
   };
 
   return (

@@ -206,12 +206,14 @@ type Res = {
   guests: number
   reservation_type: string
   type_name?: string
+  choice?: string | null
   message?: string | null
 }
 
 type Mail = { subject: string; html: string; text: string }
 
-const typeName = (ctx: MailContext, r: Res) => r.type_name || ctx.types[r.reservation_type] || 'Reservering'
+// Een gekozen optie (zoals High tea binnen High Moments) zegt meer dan de soort.
+const typeName = (ctx: MailContext, r: Res) => r.choice || r.type_name || ctx.types[r.reservation_type] || 'Reservering'
 
 const detailRows = (ctx: MailContext, r: Res, withMessage = true) => [
   row('Reservering', escape(typeName(ctx, r))),
@@ -591,6 +593,7 @@ async function handle(req: Request): Promise<Response> {
       p_type: str(body.type, 30),
       p_message: str(body.message, 1000) || null,
       p_marketing: body.marketing === true,
+      p_choice: str(body.choice, 60) || null,
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(input.p_date)) return json({ ok: false, code: 'ongeldig' }, 400)
 
@@ -608,6 +611,7 @@ async function handle(req: Request): Promise<Response> {
       time: input.p_time,
       guests: input.p_guests,
       reservation_type: input.p_type,
+      choice: input.p_choice,
       message: input.p_message,
     }
     const confirmed = created.status === 'bevestigd'
@@ -703,6 +707,7 @@ async function handle(req: Request): Promise<Response> {
       // Niet meegestuurd = niet aanpassen (null); lege lijst = geen tafel.
       p_tables: Array.isArray(body.tables) ? body.tables.map((t) => str(t, 36)).slice(0, 12) : null,
       p_internal_note: typeof body.internal_note === 'string' ? body.internal_note.slice(0, 500) : null,
+      p_choice: typeof body.choice === 'string' ? body.choice.slice(0, 60) : null,
     }
     if (input.p_id === 'x') return json({ ok: false, code: 'niet_gevonden' }, 404)
     if (input.p_tables && !input.p_tables.every(isUuid)) return json({ ok: false, code: 'ongeldig' }, 400)
