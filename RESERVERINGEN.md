@@ -1,46 +1,52 @@
 # Reserveringssysteem Zus & Zo
 
-Online reserveren met Supabase (database, inloggen, Edge Function) en Resend
+Online reserveren met Supabase (database, inloggen, Edge Function) en Brevo
 (mails). Het café regelt alles zelf in het beheer op `/beheer.html`; aan de
 code hoeft niets meer te gebeuren.
 
 ## Installeren (één keer, ongeveer 10 minuten)
 
-Nodig: Node 18 of nieuwer, een Supabase-account en een Resend-account.
+Nodig: Node 18 of nieuwer, een Supabase-account en een Brevo-account
+(gratis, 300 mails per dag). Resend kan ook: kies dan *resend* als het script
+ernaar vraagt.
 
 1. **Supabase access token**: https://supabase.com/dashboard/account/tokens,
    *Generate new token*.
-2. **Resend API key**: https://resend.com/api-keys, *Create API key*, rechten
-   **Full access** (het script meldt dan zelf het domein aan).
+2. **Brevo API key**: https://app.brevo.com/settings/keys/api, *Generate a new
+   API key*. En voor de mail "wachtwoord vergeten" een **SMTP key**:
+   https://app.brevo.com/settings/keys/smtp, *Generate a new SMTP key*.
+   Zet bij Brevo **Authorised IPs** uit
+   (https://app.brevo.com/security/authorised_ips), anders weigert Brevo de
+   mails die vanuit Supabase komen.
 3. In de map van deze repo:
 
    ```bash
    node installeer/installeer.mjs
    ```
 
-   Het script vraagt om de twee sleutels, het adres van de website en het
+   Het script vraagt om de sleutels, het adres van de website en het
    e-mailadres van het café, en doet daarna alles zelf:
 
    | Stap | Wat |
    |---|---|
    | 1 | Supabase-project `zus-en-zo` aanmaken in Frankfurt (of een bestaand project gebruiken) |
    | 2 | Database inrichten met `supabase/schema.sql`, plus de nachtelijke opruimtaak |
-   | 3 | Inloggen afschermen (alleen accounts die het café toevoegt) en wachtwoordmails in het Nederlands via Resend |
+   | 3 | Inloggen afschermen (alleen accounts die het café toevoegt) en wachtwoordmails in het Nederlands via Brevo (of Resend) |
    | 4 | Edge Function `reservering` uitrollen met de juiste secrets |
    | 5 | Inlogaccount voor het café aanmaken, met toegang tot het beheer |
-   | 6 | `lunchcafezusenzo.nl` aanmelden bij Resend en de DNS-records tonen |
+   | 6 | `lunchcafezusenzo.nl` en de afzender aanmelden bij Brevo (of Resend) en de DNS-records tonen |
    | 7 | `src/config.js` invullen, alles controleren, en desgewenst committen en pushen |
 
 4. **Het enige handwerk**: de DNS-records die het script toont (ook in
    `installeer/dns-records.txt`) bij de registrar van lunchcafezusenzo.nl
-   zetten. Tot Resend het domein heeft geverifieerd, gaan er geen mails uit;
+   zetten. Tot Brevo het domein heeft geverifieerd, gaan er geen mails uit;
    reserveren werkt wel.
 5. Geef het café het adres van het beheer, het e-mailadres en het wachtwoord
    dat het script aan het eind toont (ook in `installeer/.installatie.json`,
    dat bestand gaat niet naar GitHub).
 
 Het script mag je altijd opnieuw draaien, bijvoorbeeld om later alsnog de
-Resend-key toe te voegen of na een wijziging aan de code. Bestaande
+mailsleutel toe te voegen of na een wijziging aan de code. Bestaande
 reserveringen, instellingen en wachtwoorden blijven staan.
 
 ## Wat het café zelf regelt in het beheer
@@ -95,7 +101,7 @@ Maximaal 3 aanvragen per e-mailadres per uur, plus een spamval.
   Supabase-account ziet niets; aanmelden staat bovendien uit.
 - Alle mails en statuswijzigingen lopen via de Edge Function. Personeelsacties
   controleren eerst het inlogtoken en daarna of het account personeel is.
-- De Resend-key en de service-sleutel staan alleen als secret in Supabase,
+- De mailsleutel (Brevo of Resend) en de service-sleutel staan alleen als secret in Supabase,
   nooit in de website of in GitHub.
 
 ## Bestanden
@@ -116,7 +122,7 @@ Maximaal 3 aanvragen per e-mailadres per uur, plus een spamval.
 ## Getest
 
 Lokaal met Postgres 16, PostgREST en Deno, de onderdelen waarop Supabase
-draait, plus een nagebootste Supabase Management API en Resend API:
+draait, plus een nagebootste Supabase Management API, Brevo API en Resend API:
 
 - Het installatiescript van leeg tot werkend, en opnieuw draaien zonder
   schade.

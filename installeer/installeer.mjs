@@ -6,14 +6,14 @@
 //
 //   node installeer/installeer.mjs
 //
-// Het script vraagt om een Supabase access token en (liefst) een Resend
-// API key en doet daarna alles zelf:
+// Het script vraagt om een Supabase access token en (liefst) een Brevo-
+// of Resend-sleutel en doet daarna alles zelf:
 //   1. Supabase-project aanmaken (of een bestaand project gebruiken)
 //   2. Database inrichten (supabase/schema.sql)
-//   3. Inloggen afschermen, wachtwoordmails in het Nederlands via Resend
+//   3. Inloggen afschermen, wachtwoordmails in het Nederlands via Brevo of Resend
 //   4. Edge Function "reservering" uitrollen met de juiste secrets
 //   5. Inlogaccount voor het café aanmaken
-//   6. Maildomein bij Resend aanmelden en de DNS-records klaarzetten
+//   6. Maildomein bij Brevo of Resend aanmelden en de DNS-records klaarzetten
 //   7. src/config.js invullen en alles controleren
 //
 // Opnieuw draaien mag altijd: het gaat verder waar het was en laat
@@ -35,6 +35,7 @@ const DNS_FILE = path.join(ROOT, 'installeer', 'dns-records.txt')
 
 const MGMT = (process.env.ZZ_MGMT_API || 'https://api.supabase.com').replace(/\/+$/, '')
 const RESEND = (process.env.ZZ_RESEND_API || 'https://api.resend.com').replace(/\/+$/, '')
+const BREVO = (process.env.ZZ_BREVO_API || 'https://api.brevo.com').replace(/\/+$/, '')
 const DOMAIN = 'lunchcafezusenzo.nl'
 const DEFAULTS = {
   site: 'https://michaelbeset-ops.github.io/zus-en-zo-website',
@@ -109,10 +110,29 @@ async function main() {
   info('Supabase access token: https://supabase.com/dashboard/account/tokens, "Generate new token".')
   const sbToken = await ask('Supabase access token', '', 'SUPABASE_ACCESS_TOKEN')
   if (!sbToken) fail('Zonder Supabase access token kan het script niets doen.')
-  info('Resend API key: https://resend.com/api-keys, "Create API key", rechten "Full access".')
-  info('(Enter om over te slaan: dan werkt alles behalve de mails; later opnieuw draaien kan.)')
-  const resendKey = await ask(state.resendSet ? 'Resend API key (Enter = de huidige houden)' : 'Resend API key', '', 'RESEND_API_KEY')
-  const keepResend = !resendKey && !!state.resendSet
+  const provider = (await ask('Mail versturen via brevo of resend', state.mailProvider || 'brevo', 'ZZ_MAIL')).toLowerCase().startsWith('r') ? 'resend' : 'brevo'
+  const P = provider === 'brevo' ? 'Brevo' : 'Resend'
+  let resendKey = ''
+  let brevoKey = ''
+  let brevoSmtpKey = ''
+  if (provider === 'resend') {
+    info('Resend API key: https://resend.com/api-keys, "Create API key", rechten "Full access".')
+    info('(Enter om over te slaan: dan werkt alles behalve de mails; later opnieuw draaien kan.)')
+    resendKey = await ask(state.resendSet ? 'Resend API key (Enter = de huidige houden)' : 'Resend API key', '', 'RESEND_API_KEY')
+  } else {
+    info('Brevo API key: https://app.brevo.com/settings/keys/api, "Generate a new API key".')
+    info('(Enter om over te slaan: dan werkt alles behalve de mails; later opnieuw draaien kan.)')
+    brevoKey = await ask(state.brevoSet ? 'Brevo API key (Enter = de huidige houden)' : 'Brevo API key', '', 'BREVO_API_KEY')
+    if (brevoKey) {
+      const acc = await http('GET', `${BREVO}/v3/account`, { headers: { 'api-key': brevoKey, accept: 'application/json' } })
+      if (acc.status === 401) fail(`Brevo weigert de API key: ${errText(acc)}\n  Staat er iets over een IP-adres? Zet dan "Authorised IPs" uit op https://app.brevo.com/security/authorised_ips en draai het script opnieuw.`)
+      info('Brevo SMTP key, voor de mail "nieuw wachtwoord": https://app.brevo.com/settings/keys/smtp, "Generate a new SMTP key".')
+      info('(Enter om over te slaan: inloggen werkt, alleen "wachtwoord vergeten" stuurt dan nog geen mail.)')
+      brevoSmtpKey = await ask('Brevo SMTP key', '', 'BREVO_SMTP_KEY')
+    }
+  }
+  const mailKey = resendKey || brevoKey
+  const keepMail = !mailKey && provider === state.mailProvider && !!(provider === 'brevo' ? state.brevoSet : state.resendSet)
   const site = (await ask('Adres van de website', state.site || DEFAULTS.site, 'ZZ_SITE_URL')).replace(/\/+$/, '')
   const cafeEmail = (await ask('Inlog en meldingen voor het café (e-mail)', state.cafeEmail || DEFAULTS.cafeEmail, 'ZZ_CAFE_EMAIL')).toLowerCase()
   Object.assign(state, { site, cafeEmail })
@@ -198,6 +218,7 @@ async function main() {
       '<p>Heb je dit niet zelf gevraagd? Dan kun je deze mail negeren.</p>',
   }
   const useResend = resendKey || null
+  let smtpSet = false
   if (useResend) {
     Object.assign(auth, {
       smtp_admin_email: DEFAULTS.fromEmail,
@@ -207,23 +228,44 @@ async function main() {
       smtp_pass: useResend,
       smtp_sender_name: 'Lunchcafé Zus & Zo',
     })
+    smtpSet = true
+  } else if (brevoKey && brevoSmtpKey) {
+    const acc = await http('GET', `${BREVO}/v3/account`, { headers: { 'api-key': brevoKey, accept: 'application/json' } })
+    let login = acc.ok ? acc.data?.relay?.data?.userName : ''
+    if (!login) login = await ask('Brevo SMTP-login (staat op de pagina met de SMTP key, bijv. 12ab34@smtp-brevo.com)', '', 'BREVO_SMTP_LOGIN')
+    if (login) {
+      Object.assign(auth, {
+        smtp_admin_email: DEFAULTS.fromEmail,
+        smtp_host: 'smtp-relay.brevo.com',
+        smtp_port: '587',
+        smtp_user: login,
+        smtp_pass: brevoSmtpKey,
+        smtp_sender_name: 'Lunchcafé Zus & Zo',
+      })
+      smtpSet = true
+    }
   }
   const a = await http('PATCH', `${MGMT}/v1/projects/${ref}/config/auth`, { token: sbToken, body: auth })
   if (!a.ok) fail(`Inloginstellingen opslaan lukte niet (${a.status}): ${errText(a)}`)
   ok('Alleen accounts die het café zelf toevoegt kunnen inloggen')
-  ok(useResend ? 'Wachtwoordmails gaan in het Nederlands via Resend' : keepResend ? 'Wachtwoordmails: instellingen van Resend ongewijzigd' : 'Wachtwoordmails staan in het Nederlands klaar (Resend nog niet ingesteld)')
+  if (smtpSet) state.smtpSet = provider
+  ok(smtpSet ? `Wachtwoordmails gaan in het Nederlands via ${P}` : state.smtpSet ? 'Wachtwoordmails: eerder ingestelde verzending ongewijzigd' : 'Wachtwoordmails staan in het Nederlands klaar (versturen nog niet ingesteld)')
 
   // ── 4. Edge Function ──
   step(4, 'Edge Function "reservering"')
   const secrets = [
     { name: 'FROM_EMAIL', value: DEFAULTS.fromEmail },
     { name: 'SITE_URL', value: site },
+    { name: 'MAIL_PROVIDER', value: provider },
   ]
   if (useResend) secrets.push({ name: 'RESEND_API_KEY', value: useResend })
+  if (brevoKey) secrets.push({ name: 'BREVO_API_KEY', value: brevoKey })
   const sec = await http('POST', `${MGMT}/v1/projects/${ref}/secrets`, { token: sbToken, body: secrets })
   if (!sec.ok) fail(`Secrets opslaan lukte niet (${sec.status}): ${errText(sec)}`)
   if (useResend) state.resendSet = true
-  ok(`Secrets: ${secrets.map((s) => s.name).join(', ')}${keepResend ? ' (RESEND_API_KEY ongewijzigd)' : ''}`)
+  if (brevoKey) state.brevoSet = true
+  state.mailProvider = provider
+  ok(`Secrets: ${secrets.map((s) => s.name).join(', ')}${keepMail ? ` (${provider === 'brevo' ? 'BREVO' : 'RESEND'}_API_KEY ongewijzigd)` : ''}`)
 
   const code = await readFile(path.join(ROOT, 'supabase', 'functions', 'reservering', 'index.ts'))
   const form = new FormData()
@@ -264,12 +306,42 @@ async function main() {
   ok('Heeft toegang tot het beheer; meldingen gaan naar dit adres')
   await saveState(state)
 
-  // ── 6. Mail (Resend) ──
+  // ── 6. Mail (Brevo of Resend) ──
   step(6, `Maildomein ${DOMAIN}`)
   const rKey = useResend
   let dnsDone = false
-  if (!rKey) {
-    warn(keepResend ? 'Resend was al ingesteld; domein niet opnieuw gecontroleerd.' : 'Overgeslagen (geen Resend API key). Mails worden pas verstuurd na opnieuw draaien met een key.')
+  if (!mailKey) {
+    warn(keepMail ? `${P} was al ingesteld; domein niet opnieuw gecontroleerd.` : `Overgeslagen (geen ${P} API key). Mails worden pas verstuurd na opnieuw draaien met een key.`)
+  } else if (brevoKey) {
+    const bh = { 'api-key': brevoKey, accept: 'application/json' }
+    let d = await http('GET', `${BREVO}/v3/senders/domains/${DOMAIN}`, { headers: bh })
+    if (!d.ok && d.status === 404) {
+      const c = await http('POST', `${BREVO}/v3/senders/domains`, { headers: bh, body: { name: DOMAIN } })
+      if (!c.ok) warn(`Domein aanmelden bij Brevo lukte niet (${c.status}): ${errText(c)}. Voeg ${DOMAIN} zelf toe op app.brevo.com/senders/domain/list.`)
+      else d = await http('GET', `${BREVO}/v3/senders/domains/${DOMAIN}`, { headers: bh })
+    }
+    if (!d.ok && d.status !== 404) warn(`Brevo geeft geen toegang tot domeinen (${d.status}): ${errText(d)}`)
+    if (d.ok) {
+      const det = d.data || {}
+      if (det.authenticated) { ok('Domein is geverifieerd bij Brevo; mails kunnen de deur uit'); dnsDone = true }
+      else {
+        await http('PUT', `${BREVO}/v3/senders/domains/${DOMAIN}/authenticate`, { headers: bh })
+        const recs = Object.values(det.dns_records || {}).filter((r) => r && r.value)
+        const lines = recs.map((r) => `${(r.type || '').padEnd(5)}  naam: ${r.host_name || '@'}\n       waarde: ${r.value}`)
+        const text = `DNS-records voor ${DOMAIN} (zet ze bij de registrar van ${DOMAIN}):\n\n${lines.join('\n\n')}\n\nDaarna controleert Brevo het domein (meestal binnen een uur).\nControleren: app.brevo.com/senders/domain/list, of dit script opnieuw draaien.\n`
+        await writeFile(DNS_FILE, text)
+        warn(`Nog niet geverifieerd. Zet deze ${recs.length} DNS-records bij de registrar (ook opgeslagen in installeer/dns-records.txt):`)
+        console.log('\n' + text.split('\n').map((l) => '     ' + l).join('\n'))
+      }
+    }
+    const snd = await http('GET', `${BREVO}/v3/senders`, { headers: bh })
+    const has = snd.ok && (snd.data?.senders || []).some((x) => (x.email || '').toLowerCase() === DEFAULTS.fromEmail)
+    if (has) ok(`Afzender ${DEFAULTS.fromEmail} staat bij Brevo`)
+    else {
+      const ns = await http('POST', `${BREVO}/v3/senders`, { headers: bh, body: { name: 'Lunchcafé Zus & Zo', email: DEFAULTS.fromEmail } })
+      if (ns.ok) ok(`Afzender ${DEFAULTS.fromEmail} aangemaakt bij Brevo`)
+      else warn(`Afzender aanmaken lukte niet (${ns.status}): ${errText(ns)}. Voeg ${DEFAULTS.fromEmail} zelf toe op app.brevo.com/senders/list.`)
+    }
   } else {
     const doms = await http('GET', `${RESEND}/domains`, { token: rKey })
     let dom = doms.ok ? (doms.data.data || []).find((d) => d.name === DOMAIN) : null
@@ -340,8 +412,9 @@ async function main() {
   console.log(`   Beheer:     ${site}/beheer.html`)
   console.log(`   Inloggen:   ${cafeEmail}`)
   if (newPassword) console.log(`   Wachtwoord: ${newPassword}   (geef dit aan het café; ook opgeslagen in installeer/.installatie.json)`)
-  if (!rKey && !keepResend) console.log(color('33', '\n   Mails staan nog uit: draai het script opnieuw met een Resend API key.'))
-  else if (rKey && !dnsDone) console.log(color('33', `\n   Nog te doen: de DNS-records hierboven bij de registrar van ${DOMAIN} zetten.`))
+  if (!mailKey && !keepMail) console.log(color('33', `\n   Mails staan nog uit: draai het script opnieuw met een ${P} API key.`))
+  else if (mailKey && !dnsDone) console.log(color('33', `\n   Nog te doen: de DNS-records hierboven bij de registrar van ${DOMAIN} zetten.`))
+  if (brevoKey) console.log(color('33', '   Brevo: zet "Authorised IPs" uit op https://app.brevo.com/security/authorised_ips, anders weigert Brevo de mails van Supabase.'))
   console.log('')
   rl?.close()
 }

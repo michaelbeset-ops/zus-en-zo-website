@@ -17,7 +17,8 @@
 //   team-remove   personeel  toegang intrekken
 //
 // Secrets (Supabase, Edge Functions, Secrets; zet installeer/installeer.mjs):
-//   RESEND_API_KEY    (of BREVO_API_KEY) voor mail
+//   BREVO_API_KEY of RESEND_API_KEY voor mail; MAIL_PROVIDER (brevo|resend) kiest
+//                     welke als ze er allebei staan
 //   FROM_EMAIL        afzender, standaard reserveren@lunchcafezusenzo.nl
 //   SITE_URL          adres van de website
 // Het adres voor meldingen aan het café staat in het beheer (Instellingen).
@@ -433,7 +434,8 @@ async function sendMail(to: Addr, replyTo: Addr, mail: Mail, tag: string): Promi
   const brevoKey = env('BREVO_API_KEY')
   try {
     let res: Response
-    if (resendKey) {
+    const useBrevo = !!brevoKey && (env('MAIL_PROVIDER') === 'brevo' || !resendKey)
+    if (resendKey && !useBrevo) {
       res = await fetch(env('RESEND_API_URL', 'https://api.resend.com/emails'), {
         method: 'POST',
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
@@ -447,7 +449,7 @@ async function sendMail(to: Addr, replyTo: Addr, mail: Mail, tag: string): Promi
           tags: [{ name: 'type', value: tag }],
         }),
       })
-    } else if (brevoKey) {
+    } else if (useBrevo) {
       res = await fetch(env('BREVO_API_URL', 'https://api.brevo.com/v3/smtp/email'), {
         method: 'POST',
         headers: { 'api-key': brevoKey, 'Content-Type': 'application/json' },
