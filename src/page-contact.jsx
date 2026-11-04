@@ -102,7 +102,6 @@ function PageContact({ openReserve }) {
             of langskomen?
           </React.Fragment>
         }
-        tag={{ n: "PLACEHOLDER", text: "Gevel & terras aan het Raadhuisplein" }}
       >
         <div className="page-hero-cta-row">
           <button className="nav-cta" onClick={openReserve} style={{ padding: "14px 22px", fontSize: 14 }}>

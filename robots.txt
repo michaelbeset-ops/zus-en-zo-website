@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /beheer.html
+Disallow: /installeer/
+Disallow: /supabase/
+
+Sitemap: https://michaelbeset-ops.github.io/zus-en-zo-website/sitemap.xml

@@ -148,7 +148,8 @@ function Offerings({ go }) {
               <img src={o.image} alt={o.alt} />
             </div>
             <div className="o-text">
-                            <h3>
+              <span className="o-kicker" aria-hidden="true"><Heart /></span>
+              <h3>
                 {o.title}<br/>
                 <span className="em">{o.titleEm}.</span>
               </h3>
@@ -231,6 +232,67 @@ function Vacature({ go }) {
   );
 }
 
+// Een greep uit de echte lunchkaart (src/menus.jsx), zodat de prijzen altijd kloppen.
+const TEASER_DISHES = [
+  ["Belegde broodjes", "Carpaccio"],
+  ["Warme lunch specialiteiten", "Hete kip"],
+  ["Sandwiches (3-laags)", "Healthy sandwich"],
+  ["Salades", "Salade Zus & Zo"],
+  ["Soepen en specials", "Tomatensoep"],
+];
+
+function MenuTeaser({ go }) {
+  const dishes = TEASER_DISHES
+    .map(([cat, name]) => {
+      const sec = (window.LUNCHKAART || []).find((x) => x.title === cat);
+      return sec && sec.items.find((it) => it.name === name);
+    })
+    .filter(Boolean);
+  if (!dishes.length) return null;
+  return (
+    <section className="menu-teaser section">
+      <div className="container menu-teaser-grid">
+        <div className="menu-teaser-text">
+          <h2>Een greep uit <span className="em">de lunchkaart.</span></h2>
+          <p>Belegde broodjes, sandwiches, salades en warme lunch. Ook met een lactosevrije en glutenvrije kaart.</p>
+          <a className="read-link" href="#lunch" onClick={(e) => { e.preventDefault(); go("lunch"); }}>
+            Bekijk de hele kaart <IconArrow />
+          </a>
+        </div>
+        <div className="menu-teaser-list">
+          {dishes.map((d) => <window.Dish key={d.name} item={d} />)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AlsoBand({ go, openReserve }) {
+  return (
+    <section className="also-band">
+      <div className="container also-grid">
+        <div className="also-item">
+          <span className="also-kicker">Vrijdagavond</span>
+          <h2>Diner bij Zus &amp; Zo.</h2>
+          <p>Iedere vrijdagavond ben je welkom voor een gezellige avond uit. Kies voor ons 3-gangenmenu of een hoofdgerecht van de dinerkaart.</p>
+          <div className="also-actions">
+            <button className="nav-cta" onClick={() => openReserve("diner")}>Reserveer vrijdag <IconArrow /></button>
+            <a className="read-link" href="#diner" onClick={(e) => { e.preventDefault(); go("diner"); }}>Bekijk de dinerkaart <IconArrow /></a>
+          </div>
+        </div>
+        <div className="also-item">
+          <span className="also-kicker">Op kantoor</span>
+          <h2>Lunch op de werkvloer.</h2>
+          <p>Voor bedrijven in Etten-Leur bezorgen we lunch, vergaderpakketten en hapjes. Van maandag t/m zaterdag.</p>
+          <div className="also-actions">
+            <a className="read-link" href="#bezorging" onClick={(e) => { e.preventDefault(); go("bezorging"); }}>Bekijk de bezorgkaart <IconArrow /></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HoursAndImpression() {
   return (
     <section className="hours-section">
@@ -238,6 +300,19 @@ function HoursAndImpression() {
         <div className="hours-text">
           <h2>Openingstijden</h2>
           <p>Loop gerust binnen. Een tafel reserveren is fijn, maar niet verplicht.</p>
+          <div className="visit">
+            <p className="visit-address">
+              <strong>{window.BRAND.address}</strong><br/>
+              {window.BRAND.postcode}<br/>
+              Tegenover het stadskantoor
+            </p>
+            <p className="visit-links">
+              <a href={window.BRAND.phoneHref}>{window.BRAND.phone}</a>
+              <a href={"https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Lunchcafé Zus & Zo, " + window.BRAND.address + ", " + window.BRAND.postcode)} target="_blank" rel="noopener">
+                Route plannen <IconArrow />
+              </a>
+            </p>
+          </div>
         </div>
         <div className="hours-table">
           {window.HOURS.map((h, i) => (
@@ -268,6 +343,8 @@ function PageHome({ go, openReserve }) {
       <Hero go={go} openReserve={openReserve} />
       <Intro />
       <Offerings go={go} />
+      <MenuTeaser go={go} />
+      <AlsoBand go={go} openReserve={openReserve} />
       <InstaFeed />
       <Vacature go={go} />
       <HoursAndImpression />

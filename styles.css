@@ -2151,3 +2151,47 @@ body { background: var(--cream); }
 .detail-strip { background: var(--aubergine-deep); color: #F6E8EF; border-bottom: 0; }
 .detail-strip .strip-track span { color: #F6E8EF; }
 .detail-strip .strip-heart { color: var(--aubergine-soft); }
+
+/* Wat we graag doen: oudroze vlak, foto's met een zacht roze kader erachter */
+.offerings { background: var(--cream-2); border-top: 0; }
+.o-media { position: relative; overflow: visible; }
+.o-media img { position: relative; z-index: 1; border-radius: 3px; }
+.o-media::before {
+  content: ""; position: absolute; inset: 18px -18px -18px 18px; z-index: 0;
+  background: var(--aubergine-soft); border-radius: 3px; opacity: 0.55;
+}
+.offer-row.reverse .o-media::before { inset: 18px 18px -18px -18px; }
+.o-kicker { display: inline-flex; color: var(--aubergine); margin-bottom: 10px; }
+.o-kicker svg { width: 16px; height: 16px; }
+@media (max-width: 599px) { .o-media::before { inset: 12px -10px -12px 10px; } .offer-row.reverse .o-media::before { inset: 12px 10px -12px -10px; } }
+
+/* Een greep uit de lunchkaart */
+.menu-teaser { background: var(--cream); }
+.menu-teaser-grid { display: grid; gap: 32px; }
+@media (min-width: 900px) { .menu-teaser-grid { grid-template-columns: 4fr 7fr; gap: 72px; align-items: start; } }
+.menu-teaser-text h2 { font-family: var(--serif); font-size: clamp(32px, 4.6vw, 48px); line-height: 1.04; letter-spacing: -0.02em; margin: 0 0 16px; }
+.menu-teaser-text h2 .em { color: var(--aubergine); }
+.menu-teaser-text p { color: var(--ink-soft); margin: 0 0 20px; max-width: 40ch; }
+.menu-teaser-list { background: var(--paper); border: 1px solid var(--line-soft); border-radius: 4px; padding: 8px 26px; min-width: 0; }
+.menu-teaser-list .dish:last-child { border-bottom: 0; }
+
+/* Diner en bezorgen: paarse band */
+.also-band { background: var(--aubergine-deep); color: #F6E8EF; padding: 64px 0; }
+@media (min-width: 900px) { .also-band { padding: 88px 0; } }
+.also-grid { display: grid; gap: 48px; }
+@media (min-width: 900px) { .also-grid { grid-template-columns: 1fr 1fr; gap: 0; } .also-item + .also-item { border-left: 1px solid rgba(246, 232, 239, 0.22); padding-left: 64px; } .also-item:first-child { padding-right: 64px; } }
+.also-kicker { display: block; font-size: 14px; font-weight: 600; color: var(--aubergine-soft); margin-bottom: 10px; }
+.also-item h2 { font-family: var(--serif); font-size: clamp(30px, 4vw, 42px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 14px; color: #FFFFFF; }
+.also-item p { margin: 0 0 22px; color: #E9D9E2; max-width: 46ch; line-height: 1.65; }
+.also-actions { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+.also-band .read-link { color: #FFFFFF; border-color: rgba(255, 255, 255, 0.45); }
+.also-band .nav-cta { background: #FFFFFF; color: var(--aubergine-deep); }
+.also-band .nav-cta:hover { background: var(--cream-2); }
+
+/* Bezoek: adres en route bij de openingstijden */
+.visit { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line-soft); }
+.visit-address { margin: 0 0 12px; color: var(--ink-soft); line-height: 1.6; }
+.visit-address strong { color: var(--ink); font-size: 18px; }
+.visit-links { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0; }
+.visit-links a { color: var(--aubergine); font-weight: 600; text-decoration: none; border-bottom: 1px solid var(--aubergine-soft); display: inline-flex; gap: 6px; align-items: center; }
+.visit-links a:hover { border-bottom-color: var(--aubergine); }
