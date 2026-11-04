@@ -42,7 +42,49 @@ function Logo({ onClick }) {
 // Welke kop krijgen de subpagina's? "photo" = foto over de hele breedte,
 // "split" / "arch" / "framed" = rustigere koppen. ?kop=... in de adresbalk
 // overschrijft het, om te vergelijken.
-const SUBHERO_DEFAULT = "photo";
+const SUBHERO_DEFAULT = "card";
+
+// Fotokeuze per pagina om te vergelijken: ?foto=1, 2 of 3 in de adresbalk.
+const HERO_S = "assets/Schermafbeelding 2026-05-22 ";
+const HERO_PHOTO_OPTIONS = {
+  "assets/gastvrouw-tray.png": [
+    ["assets/gastvrouw-tray.png", HERO_S + "162842.png", HERO_S + "162823.png"],
+    "assets/interieur.jpg",
+    [HERO_S + "162801.png", "assets/gastvrouw-tray.png", "assets/terras-proost.png"],
+  ],
+  [HERO_S + "162856.png"]: [
+    [HERO_S + "162856.png", "assets/terras-proost.png", HERO_S + "162801.png"],
+    "assets/terras-proost.png",
+    [HERO_S + "162801.png", HERO_S + "162856.png", HERO_S + "162905.png"],
+  ],
+  [HERO_S + "162916.png"]: [
+    [HERO_S + "162916.png", HERO_S + "162823.png", "assets/gastvrouw-tray.png"],
+    HERO_S + "162916.png",
+    [HERO_S + "162842.png", HERO_S + "162916.png", HERO_S + "162823.png"],
+  ],
+  "assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png": [
+    "assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png",
+    ["assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png", "assets/feest-dansvloer.png", "assets/interieur.jpg"],
+    "assets/interieur.jpg",
+  ],
+  [HERO_S + "162842.png"]: [
+    [HERO_S + "162823.png", HERO_S + "162842.png", HERO_S + "162916.png"],
+    "assets/interieur.jpg",
+    "assets/terras-proost.png",
+  ],
+};
+// Gekozen optie per pagina (1 = eerste uit de lijst hierboven).
+const HERO_PHOTO_CHOICE = { [HERO_S + "162856.png"]: 2 };
+function heroPhoto(image) {
+  const opts = HERO_PHOTO_OPTIONS[image];
+  if (!opts) return image;
+  let n = HERO_PHOTO_CHOICE[image] || 1;
+  try {
+    const q = Number(new URLSearchParams(window.location.search).get("foto"));
+    if (q >= 1 && q <= opts.length) n = q;
+  } catch (e) { /* oude browser */ }
+  return opts[n - 1];
+}
 function subHeroVariant() {
   try {
     const q = new URLSearchParams(window.location.search).get("kop");
@@ -68,7 +110,7 @@ function Nav({ page, go, openReserve }) {
 
   return (
     <React.Fragment>
-      <header className={"nav" + (scrolled || (page !== "home" && subHeroVariant() !== "photo") ? " scrolled" : "")}>
+      <header className={"nav" + (scrolled || (page !== "home" && !["photo", "card"].includes(subHeroVariant())) ? " scrolled" : "")}>
         <div className="nav-inner">
           <Logo onClick={(p) => { setOpen(false); go(p); }} />
           <nav className="nav-links" aria-label="Hoofdmenu">
@@ -223,6 +265,8 @@ function FloatingReserve({ onClick }) {
 function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children, full }) {
   const tintClass = tint ? ` tint-${tint}` : "";
   const variant = full ? "photo" : subHeroVariant();
+  if (!full) image = heroPhoto(image);
+  if (Array.isArray(image) && variant !== "card") image = image[0];
   if (variant !== "photo" && image && !placeholder) {
     const text = (
       <div className="sub-hero-text">
@@ -236,7 +280,9 @@ function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, l
     if (variant === "card") {
       return (
         <section className="sub-hero sub-hero-card">
-          <div className="sub-hero-card-photo"><img src={image} alt={alt || ""} /></div>
+          <div className={"sub-hero-card-photo" + (Array.isArray(image) ? " is-trio" : "")}>
+            {(Array.isArray(image) ? image : [image]).map((src, i) => <img key={src + i} src={src} alt={i === 0 ? alt || "" : ""} />)}
+          </div>
           <div className="container"><div className="sub-hero-card-box">{text}</div></div>
         </section>
       );
