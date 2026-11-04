@@ -341,7 +341,7 @@ body.beheer .bh-tablechip.on, body.beheer .bh-day.on { background: var(--aubergi
     padding: 48px 56px; color: #FFFFFF;
     background:
       linear-gradient(180deg, rgba(42, 28, 46, 0.55) 0%, rgba(42, 28, 46, 0.25) 40%, rgba(42, 28, 46, 0.85) 100%),
-      url("assets/interieur.jpg") center / cover no-repeat;
+      url("assets/interieur-1200.jpg") center / cover no-repeat;
   }
   .bh-auth-side-logo { width: 220px; height: auto; display: block; }
   .bh-auth-quote { font-family: var(--serif); font-size: 40px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin: 0 0 10px; max-width: 14ch; }

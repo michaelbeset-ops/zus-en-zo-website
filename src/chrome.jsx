@@ -47,7 +47,7 @@ const HERO_S = "assets/Schermafbeelding 2026-05-22 ";
 const HERO_PHOTO_OPTIONS = {
   "assets/gastvrouw-tray.png": [
     ["assets/gastvrouw-tray.png", HERO_S + "162842.png", HERO_S + "162823.png"],
-    "assets/interieur.jpg",
+    "assets/interieur-hd.jpg",
     [HERO_S + "162801.png", "assets/gastvrouw-tray.png", "assets/terras-proost.png"],
   ],
   [HERO_S + "162856.png"]: [
@@ -62,12 +62,12 @@ const HERO_PHOTO_OPTIONS = {
   ],
   "assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png": [
     "assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png",
-    ["assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png", "assets/feest-dansvloer.png", "assets/interieur.jpg"],
-    "assets/interieur.jpg",
+    ["assets/Gemini_Generated_Image_eij9mzeij9mzeij9.png", "assets/feest-dansvloer.png", "assets/interieur-hd.jpg"],
+    "assets/interieur-hd.jpg",
   ],
   [HERO_S + "162842.png"]: [
     [HERO_S + "162823.png", HERO_S + "162842.png", HERO_S + "162916.png"],
-    "assets/interieur.jpg",
+    "assets/interieur-hd.jpg",
     "assets/terras-proost.png",
   ],
 };
@@ -253,7 +253,7 @@ function FloatingReserve({ onClick }) {
 //   tag        , bottom-right caption (e.g. "PLACEHOLDER, etagère shot")
 //   children   , extra content in the aside column (CTAs)
 // ---------------------------------------------------------------
-function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children, full }) {
+function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children, full, srcSet }) {
   const tintClass = tint ? ` tint-${tint}` : "";
   if (!full && image && !placeholder) {
     const photos = heroPhoto(image);
@@ -277,7 +277,7 @@ function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, l
   return (
     <section className={"page-hero" + tintClass + (full ? "" : " page-hero-compact")}>
       {image && !placeholder && (
-        <img className="page-hero-img" src={image} alt={alt || ""} />
+        <img className="page-hero-img" src={image} srcSet={srcSet} sizes={srcSet ? "100vw" : undefined} alt={alt || ""} fetchpriority={full ? "high" : undefined} />
       )}
       {placeholder && (
         <div className={"page-hero-placeholder" + tintClass} aria-hidden="true"></div>
