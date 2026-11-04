@@ -2346,4 +2346,3 @@ body { background: var(--cream); }
 /* Reviews: ruimte voor de schaduw, langere teksten helemaal zichtbaar */
 .g-cards { padding: 6px 6px 40px; margin: -6px -6px -22px; }
 .g-quote { -webkit-line-clamp: 10; }
-@media (min-width: 760px) { .menu-acc { grid-auto-flow: row dense; } }

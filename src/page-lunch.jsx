@@ -32,16 +32,25 @@ function Dish({ item }) {
 // Kaart als reeks categorieën (Belegde broodjes, Salades, ...). Elke categorie
 // klapt open als je erop klikt, zodat de kaart overzichtelijk blijft.
 function MenuBlocks({ sections }) {
-  const [open, setOpen] = useStateM([]);
-  const toggle = (t) => setOpen(open.includes(t) ? open.filter((x) => x !== t) : [...open, t]);
+  // Er staat steeds één categorie open: een nieuwe openen sluit de vorige.
+  const [open, setOpen] = useStateM(null);
+  const toggle = (t, el) => {
+    const next = open === t ? null : t;
+    setOpen(next);
+    // Na het sluiten van een categorie erboven kan de geopende uit beeld schuiven.
+    if (next && el) setTimeout(() => {
+      const top = el.getBoundingClientRect().top;
+      if (top < 80 || top > window.innerHeight - 120) window.scrollTo({ top: window.scrollY + top - 100, behavior: "smooth" });
+    }, 30);
+  };
   return (
     <div className="menu-acc">
       {sections.map((sec, n) => {
-        const isOpen = open.includes(sec.title);
+        const isOpen = open === sec.title;
         const id = "cat-" + n + "-" + sec.title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
         return (
           <div className={"menu-acc-item" + (isOpen ? " open" : "")} key={sec.title}>
-            <button type="button" className="menu-acc-head" aria-expanded={isOpen} aria-controls={id} onClick={() => toggle(sec.title)}>
+            <button type="button" className="menu-acc-head" aria-expanded={isOpen} aria-controls={id} onClick={(e) => toggle(sec.title, e.currentTarget)}>
               <span className="menu-acc-text">
                 <span className="menu-acc-title">{sec.title}</span>
                 {!isOpen && (
