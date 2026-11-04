@@ -138,6 +138,7 @@ function Offerings({ go }) {
       <div className="container">
         <div className="offer-head">
           <div>
+            <p className="script-kicker" aria-hidden="true">Bij Zus &amp; Zo</p>
             <h2>Wat we <span className="em">graag doen.</span></h2>
           </div>
         </div>
@@ -178,6 +179,7 @@ function InstaFeed() {
       <div className="container">
         <div className="insta-head">
           <div>
+            <p className="script-kicker" aria-hidden="true">Kijk mee</p>
             <h2 className="mt-sm">Op <span className="em">Instagram.</span></h2>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -253,6 +255,7 @@ function MenuTeaser({ go }) {
     <section className="menu-teaser section">
       <div className="container menu-teaser-grid">
         <div className="menu-teaser-text">
+          <p className="script-kicker" aria-hidden="true">Uit onze keuken</p>
           <h2>Een greep uit <span className="em">de lunchkaart.</span></h2>
           <p>Belegde broodjes, sandwiches, salades en warme lunch. Ook met een lactosevrije en glutenvrije kaart.</p>
           <a className="read-link" href="#lunch" onClick={(e) => { e.preventDefault(); go("lunch"); }}>
@@ -313,27 +316,33 @@ function Stars({ value, size = 16 }) {
 }
 
 function GoogleReviews() {
-  const [g, setG] = React.useState(() => {
+  const [live, setLive] = React.useState(() => {
     try { const c = JSON.parse(sessionStorage.getItem("zz-reviews") || "null"); return c && c.ok ? c : null; } catch (e) { return null; }
   });
+  const scroller = React.useRef(null);
   React.useEffect(() => {
-    if (g || !window.ReserveApi || !window.ReserveApi.configured) return;
+    if (live || !window.ReserveApi || !window.ReserveApi.configured) return;
     window.ReserveApi.call("reviews", {}).then((r) => {
-      if (r && r.ok && typeof r.rating === "number") {
-        setG(r);
+      if (r && r.ok && typeof r.rating === "number" && (r.reviews || []).length) {
+        setLive(r);
         try { sessionStorage.setItem("zz-reviews", JSON.stringify(r)); } catch (e) { /* privévenster */ }
       }
     });
   }, []);
+  // Live van Google als dat er is, anders de overgenomen reviews uit data.jsx.
+  const g = live || window.GOOGLE_REVIEWS;
   if (!g) return null;
-  const shown = [...(g.reviews || [])]
-    .sort((a, b) => b.rating - a.rating)
-    .slice(0, 3);
+  const shown = live ? [...live.reviews].sort((a, b) => b.rating - a.rating).slice(0, 5) : g.reviews;
+  const slide = (dir) => {
+    const el = scroller.current;
+    if (el) el.scrollBy({ left: dir * Math.max(280, el.clientWidth * 0.8), behavior: "smooth" });
+  };
   const score = g.rating.toFixed(1).replace(".", ",");
   return (
     <section className="g-reviews section" aria-labelledby="g-reviews-title">
       <div className="container g-grid">
         <div className="g-summary">
+          <p className="script-kicker" aria-hidden="true">Lieve woorden</p>
           <h2 id="g-reviews-title">Dit zeggen <span className="em">onze gasten.</span></h2>
           <div className="g-score">
             <span className="g-score-num">{score}</span>
@@ -348,17 +357,25 @@ function GoogleReviews() {
           </div>
         </div>
         {shown.length > 0 && (
-          <div className="g-cards">
+          <div className="g-slider">
+          <div className="g-cards" ref={scroller}>
             {shown.map((r, i) => (
               <figure className="g-card" key={i}>
-                <Stars value={r.rating} size={15} />
+                {r.rating ? <Stars value={r.rating} size={15} /> : null}
                 <blockquote>{r.text}</blockquote>
                 <figcaption>
                   <strong>{r.author}</strong>
-                  <span>{r.when ? r.when + " · " : ""}Google</span>
+                  <span>{r.when ? r.when + " · " : ""}via Google</span>
                 </figcaption>
               </figure>
             ))}
+          </div>
+          {shown.length > 3 && (
+            <div className="g-nav">
+              <button type="button" onClick={() => slide(-1)} aria-label="Vorige reviews">‹</button>
+              <button type="button" onClick={() => slide(1)} aria-label="Volgende reviews">›</button>
+            </div>
+          )}
           </div>
         )}
       </div>
@@ -375,6 +392,7 @@ function HoursAndImpression() {
         </figure>
         <div className="hours-info">
         <div className="hours-text">
+          <p className="script-kicker" aria-hidden="true">Kom gezellig langs</p>
           <h2>Openingstijden</h2>
           <p>Loop gerust binnen. Een tafel reserveren is fijn, maar niet verplicht.</p>
           <div className="visit">

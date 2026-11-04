@@ -87,7 +87,25 @@ const INSTA_POSTS = [
   { image: "assets/Schermafbeelding 2026-05-22 162916.png", label: "Sfeer op het terras",          url: "https://www.instagram.com/p/DKebgUOt1bo/" },
 ];
 
+// Google-reviews, letterlijk overgenomen van het Google-profiel (november 2026).
+// Alleen reviews die daar volledig te lezen zijn. Met een Google Places-sleutel
+// komen score en reviews live van Google en wordt dit overschreven.
+const GOOGLE_REVIEWS = {
+  rating: 4.4,
+  count: 480,
+  url: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Lunchcafé Zus & Zo, Raadhuisplein 37, Etten-Leur"),
+  reviews: [
+    { author: "Adrie J.", text: "Kennismaking met deze eetgelegenheid was een prettige en positieve ervaring. Heerlijke broodjes en andere gerechten. De menukaart is overduidelijk met grote zorg en passie samengesteld." },
+    { author: "Fam. Maas", text: "Erg leuk om te lunchen. Prettige medewerkers. Prijs/kwaliteitsniveau is erg goed" },
+    { author: "Sonny F.", text: "Het eten was wederom heerlijk. De bediening was goed en vriendelijk. Een goede aanrader." },
+    { author: "Joost B.", text: "Heerlijk buiten gegeten, zeer vriendelijke bediening. Topper." },
+    { author: "Thijs v.d. H.", text: "Prima kunnen lunchen, vriendelijk personeel en heerlijk eten!" },
+    { author: "Tobias K.", text: "Lunchcafé Zus & Zo is een gezellige, gemoedelijk eetcafé. Voor een intieme lunch met z'n tweeën of grote groepen." },
+  ],
+};
+
 Object.assign(window, {
+  GOOGLE_REVIEWS,
   BRAND, NAV_PAGES, HOURS,
   OFFERINGS, INSTA_POSTS,
 });
