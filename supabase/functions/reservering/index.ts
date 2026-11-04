@@ -9,6 +9,7 @@
 //   cancel-info   bezoeker   gegevens voor de annuleerpagina (id uit de mail)
 //   cancel        bezoeker   annuleren via de link in de mail
 //   unsubscribe   bezoeker   afmelden voor nieuws via de link in de mail
+//   reviews       bezoeker   Google-score en reviews (12 uur bewaard)
 //   confirm       personeel  bevestigen, mail naar gast
 //   staff-cancel  personeel  annuleren door het café, mail naar gast (optioneel)
 //   staff-save    personeel  reservering invoeren of wijzigen, mail optioneel
@@ -21,6 +22,8 @@
 //                     welke als ze er allebei staan
 //   FROM_EMAIL        afzender, standaard reserveren@lunchcafezusenzo.nl
 //   SITE_URL          adres van de website
+//   GOOGLE_PLACES_KEY Google Places API key voor de reviews (niet verplicht);
+//   GOOGLE_PLACE_ID   welk Google-bedrijfsprofiel (anders zelf gezocht)
 // Het adres voor meldingen aan het café staat in het beheer (Instellingen).
 // Door Supabase zelf gezet: SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 
@@ -657,6 +660,8 @@ async function handle(req: Request): Promise<Response> {
     return json({ ok: true })
   }
 
+  if (action === 'reviews') return json(await googleReviews())
+
   // ── Personeel ──
 
   const staffActions = ['confirm', 'staff-cancel', 'staff-save', 'team-list', 'team-add', 'team-remove']
@@ -773,6 +778,76 @@ async function handle(req: Request): Promise<Response> {
   }
 
   return json({ ok: false, code: 'onbekende_actie' }, 400)
+}
+
+// ─── Google-reviews ───────────────────────────────────────────────────────────
+// Rechtstreeks van Google (Places API), zodat er nooit iets verzonnen op de
+// site staat. Bewaard in google_reviews, zodat Google hooguit twee keer per
+// dag gevraagd wordt; mislukt het, dan blijft de vorige versie staan.
+
+type GReview = { author: string; rating: number; text: string; when: string }
+type GReviews = { ok: true; rating: number; count: number; url: string; writeUrl: string; reviews: GReview[] } | { ok: false; code: string }
+
+const REVIEWS_FRESH_MS = 12 * 3600 * 1000
+const REVIEWS_RETRY_MS = 3600 * 1000
+
+async function googleReviews(): Promise<GReviews> {
+  const key = env('GOOGLE_PLACES_KEY')
+  const cached = await rest<{ data: GReviews | null; fetched_at: string; tried_at: string | null }[]>(
+    'GET', '/rest/v1/google_reviews?id=eq.1&select=data,fetched_at,tried_at')
+  const row = cached.data?.[0]
+  const age = row ? Date.now() - new Date(row.fetched_at).getTime() : Infinity
+  const triedAgo = row?.tried_at ? Date.now() - new Date(row.tried_at).getTime() : Infinity
+  const have = row?.data && row.data.ok ? row.data : null
+  if (!key || (have && age < REVIEWS_FRESH_MS) || triedAgo < REVIEWS_RETRY_MS) return have ?? { ok: false, code: 'geen_reviews' }
+
+  await rest('POST', '/rest/v1/google_reviews?on_conflict=id', { id: 1, tried_at: new Date().toISOString() },
+    { Prefer: 'resolution=merge-duplicates' })
+  const fresh = await fetchGoogle(key)
+  if (!fresh) return have ?? { ok: false, code: 'geen_reviews' }
+  await rest('POST', '/rest/v1/google_reviews?on_conflict=id', { id: 1, data: fresh, fetched_at: new Date().toISOString() },
+    { Prefer: 'resolution=merge-duplicates' })
+  return fresh
+}
+
+async function fetchGoogle(key: string): Promise<GReviews | null> {
+  const base = env('GOOGLE_PLACES_URL', 'https://places.googleapis.com/v1').replace(/\/+$/, '')
+  const headers = { 'X-Goog-Api-Key': key, 'Content-Type': 'application/json' }
+  try {
+    let placeId = env('GOOGLE_PLACE_ID')
+    if (!placeId) {
+      const s = await fetch(`${base}/places:searchText`, {
+        method: 'POST',
+        headers: { ...headers, 'X-Goog-FieldMask': 'places.id' },
+        body: JSON.stringify({ textQuery: `${CAFE.name}, ${CAFE.street}, ${CAFE.city}`, languageCode: 'nl', regionCode: 'NL' }),
+      })
+      if (!s.ok) { console.error('[reservering] Google zoeken mislukt', s.status, await s.text()); return null }
+      placeId = (await s.json())?.places?.[0]?.id ?? ''
+      if (!placeId) return null
+    }
+    const d = await fetch(`${base}/places/${encodeURIComponent(placeId)}?languageCode=nl&regionCode=NL`, {
+      headers: { ...headers, 'X-Goog-FieldMask': 'id,rating,userRatingCount,googleMapsUri,reviews' },
+    })
+    if (!d.ok) { console.error('[reservering] Google reviews mislukt', d.status, await d.text()); return null }
+    const p = await d.json()
+    if (typeof p.rating !== 'number') return null
+    const reviews: GReview[] = (p.reviews ?? [])
+      .map((r: Record<string, any>) => ({
+        author: String(r.authorAttribution?.displayName ?? '').slice(0, 80),
+        rating: Number(r.rating) || 0,
+        text: String(r.text?.text ?? r.originalText?.text ?? '').slice(0, 1200),
+        when: String(r.relativePublishTimeDescription ?? '').slice(0, 40),
+      }))
+      .filter((r: GReview) => r.author && r.text)
+    const id = String(p.id ?? placeId)
+    return {
+      ok: true, rating: p.rating, count: Number(p.userRatingCount) || 0, url: String(p.googleMapsUri ?? ''),
+      writeUrl: `https://search.google.com/local/writereview?placeid=${encodeURIComponent(id)}`, reviews,
+    }
+  } catch (e) {
+    console.error('[reservering] Google reviews fout', String(e))
+    return null
+  }
 }
 
 Deno.serve(handle)

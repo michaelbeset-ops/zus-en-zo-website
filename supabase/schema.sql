@@ -154,6 +154,14 @@ create table if not exists public.dining_tables (
   active     boolean not null default true
 );
 
+-- Google-score en reviews, opgehaald door de Edge Function (alleen service role).
+create table if not exists public.google_reviews (
+  id         integer primary key check (id = 1),
+  data       jsonb,
+  fetched_at timestamptz not null default 'epoch',
+  tried_at   timestamptz
+);
+
 create table if not exists public.reservation_tables (
   reservation_id uuid not null references public.reservations (id) on delete cascade,
   table_id       uuid not null references public.dining_tables (id) on delete cascade,
@@ -699,6 +707,7 @@ alter table public.subscribers       enable row level security;
 alter table public.staff             enable row level security;
 alter table public.dining_tables     enable row level security;
 alter table public.reservation_tables enable row level security;
+alter table public.google_reviews    enable row level security;
 
 -- Personeel mag alles in de beheertabellen. Status wijzigen en nieuwe
 -- reserveringen lopen via de Edge Function (die ook de mails stuurt).
@@ -728,10 +737,12 @@ create policy staff_read on public.staff
 -- Supabase geeft anon en authenticated standaard alle rechten op nieuwe
 -- tabellen. Eerst alles intrekken, dan alleen teruggeven wat nodig is.
 revoke all on public.reservations, public.reservation_types, public.opening_hours, public.blocked_slots,
-              public.settings, public.subscribers, public.staff, public.dining_tables, public.reservation_tables
+              public.settings, public.subscribers, public.staff, public.dining_tables, public.reservation_tables,
+              public.google_reviews
   from anon, authenticated;
 grant all on public.reservations, public.reservation_types, public.opening_hours, public.blocked_slots,
-             public.settings, public.subscribers, public.staff, public.dining_tables, public.reservation_tables
+             public.settings, public.subscribers, public.staff, public.dining_tables, public.reservation_tables,
+             public.google_reviews
   to service_role;
 grant select, insert, update, delete on public.dining_tables, public.reservation_tables to authenticated;
 grant select, update on public.reservations to authenticated;

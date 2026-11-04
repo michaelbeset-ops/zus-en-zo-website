@@ -135,6 +135,8 @@ async function main() {
   const keepMail = !mailKey && provider === state.mailProvider && !!(provider === 'brevo' ? state.brevoSet : state.resendSet)
   const site = (await ask('Adres van de website', state.site || DEFAULTS.site, 'ZZ_SITE_URL')).replace(/\/+$/, '')
   const cafeEmail = (await ask('Inlog en meldingen voor het café (e-mail)', state.cafeEmail || DEFAULTS.cafeEmail, 'ZZ_CAFE_EMAIL')).toLowerCase()
+  info('Google-reviews op de site (niet verplicht): een Google Places API key, zie RESERVERINGEN.md.')
+  const googleKey = await ask(state.googleSet ? 'Google Places API key (Enter = de huidige houden)' : 'Google Places API key (Enter = overslaan)', '', 'GOOGLE_PLACES_KEY')
   Object.assign(state, { site, cafeEmail })
 
   // ── 1. Project ──
@@ -260,10 +262,12 @@ async function main() {
   ]
   if (useResend) secrets.push({ name: 'RESEND_API_KEY', value: useResend })
   if (brevoKey) secrets.push({ name: 'BREVO_API_KEY', value: brevoKey })
+  if (googleKey) secrets.push({ name: 'GOOGLE_PLACES_KEY', value: googleKey })
   const sec = await http('POST', `${MGMT}/v1/projects/${ref}/secrets`, { token: sbToken, body: secrets })
   if (!sec.ok) fail(`Secrets opslaan lukte niet (${sec.status}): ${errText(sec)}`)
   if (useResend) state.resendSet = true
   if (brevoKey) state.brevoSet = true
+  if (googleKey) state.googleSet = true
   state.mailProvider = provider
   ok(`Secrets: ${secrets.map((s) => s.name).join(', ')}${keepMail ? ` (${provider === 'brevo' ? 'BREVO' : 'RESEND'}_API_KEY ongewijzigd)` : ''}`)
 

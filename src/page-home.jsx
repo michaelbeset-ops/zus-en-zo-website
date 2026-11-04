@@ -293,10 +293,87 @@ function AlsoBand({ go, openReserve }) {
   );
 }
 
+// Google-reviews: score en reviews komen live van Google via de Edge Function.
+// Is er (nog) niets, dan staat dit blok er gewoon niet.
+function Stars({ value, size = 16 }) {
+  return (
+    <span className="g-stars" role="img" aria-label={`${String(value).replace(".", ",")} van 5 sterren`}>
+      {[0, 1, 2, 3, 4].map((i) => {
+        const fill = Math.max(0, Math.min(1, value - i));
+        return (
+          <svg key={i} viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
+            <defs><clipPath id={`st-${size}-${i}-${Math.round(fill * 100)}`}><rect x="0" y="0" width={24 * fill} height="24" /></clipPath></defs>
+            <path className="g-star-bg" d="M12 2.5l2.9 6.2 6.6.7-5 4.5 1.4 6.6L12 17.2l-5.9 3.3 1.4-6.6-5-4.5 6.6-.7z" />
+            <path className="g-star-fg" clipPath={`url(#st-${size}-${i}-${Math.round(fill * 100)})`} d="M12 2.5l2.9 6.2 6.6.7-5 4.5 1.4 6.6L12 17.2l-5.9 3.3 1.4-6.6-5-4.5 6.6-.7z" />
+          </svg>
+        );
+      })}
+    </span>
+  );
+}
+
+function GoogleReviews() {
+  const [g, setG] = React.useState(() => {
+    try { const c = JSON.parse(sessionStorage.getItem("zz-reviews") || "null"); return c && c.ok ? c : null; } catch (e) { return null; }
+  });
+  React.useEffect(() => {
+    if (g || !window.ReserveApi || !window.ReserveApi.configured) return;
+    window.ReserveApi.call("reviews", {}).then((r) => {
+      if (r && r.ok && typeof r.rating === "number") {
+        setG(r);
+        try { sessionStorage.setItem("zz-reviews", JSON.stringify(r)); } catch (e) { /* privévenster */ }
+      }
+    });
+  }, []);
+  if (!g) return null;
+  const shown = [...(g.reviews || [])]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 3);
+  const score = g.rating.toFixed(1).replace(".", ",");
+  return (
+    <section className="g-reviews section" aria-labelledby="g-reviews-title">
+      <div className="container g-grid">
+        <div className="g-summary">
+          <h2 id="g-reviews-title">Dit zeggen <span className="em">onze gasten.</span></h2>
+          <div className="g-score">
+            <span className="g-score-num">{score}</span>
+            <span className="g-score-meta">
+              <Stars value={g.rating} size={22} />
+              <span>op Google, {g.count.toLocaleString("nl-NL")} reviews</span>
+            </span>
+          </div>
+          <div className="g-actions">
+            {g.url && <a className="read-link" href={g.url} target="_blank" rel="noopener">Alle reviews op Google <IconArrow /></a>}
+            {g.writeUrl && <a className="read-link" href={g.writeUrl} target="_blank" rel="noopener">Schrijf een review <IconArrow /></a>}
+          </div>
+        </div>
+        {shown.length > 0 && (
+          <div className="g-cards">
+            {shown.map((r, i) => (
+              <figure className="g-card" key={i}>
+                <Stars value={r.rating} size={15} />
+                <blockquote>{r.text}</blockquote>
+                <figcaption>
+                  <strong>{r.author}</strong>
+                  <span>{r.when ? r.when + " · " : ""}Google</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function HoursAndImpression() {
   return (
     <section className="hours-section">
-      <div className="container hours-grid">
+      <div className="container hours-grid hours-grid-photo">
+        <figure className="hours-photo">
+          <img src="assets/Schermafbeelding 2026-05-22 162823.png" alt="Het team van Zus & Zo voor de zaak aan het Raadhuisplein" loading="lazy" />
+        </figure>
+        <div className="hours-info">
         <div className="hours-text">
           <h2>Openingstijden</h2>
           <p>Loop gerust binnen. Een tafel reserveren is fijn, maar niet verplicht.</p>
@@ -332,6 +409,7 @@ function HoursAndImpression() {
             </div>
           ))}
         </div>
+        </div>
       </div>
     </section>
   );
@@ -342,12 +420,13 @@ function PageHome({ go, openReserve }) {
     <main>
       <Hero go={go} openReserve={openReserve} />
       <Intro />
-      <Offerings go={go} />
       <MenuTeaser go={go} />
+      <Offerings go={go} />
       <AlsoBand go={go} openReserve={openReserve} />
+      <GoogleReviews />
+      <HoursAndImpression />
       <InstaFeed />
       <Vacature go={go} />
-      <HoursAndImpression />
     </main>
   );
 }

@@ -61,6 +61,24 @@ reserveringen, instellingen en wachtwoorden blijven staan.
 | **Mailinglijst** | Gasten die zelf toestemming gaven. Zoeken, exporteren (CSV voor bijvoorbeeld MailChimp of Brevo), verwijderen. |
 | **Instellingen** | Capaciteit (gasten tegelijk, hoe lang een tafel bezet is), maximaal per online reservering, termijnen, adres voor meldingen, nieuwsbriefvraag aan/uit en de tekst ervan, en **collega's toegang geven of intrekken**. |
 
+## Google-reviews op de homepage (niet verplicht)
+
+De homepage toont de Google-score en de nieuwste reviews, rechtstreeks van
+Google. De Edge Function haalt ze hooguit twee keer per dag op en bewaart ze
+in de tabel `google_reviews`. Zonder sleutel staat het blok er niet.
+
+1. https://console.cloud.google.com, nieuw project (bijv. "zus-en-zo").
+2. Koppel een betaalaccount (Google geeft maandelijks gratis tegoed; twee
+   aanvragen per dag blijft daar ruim binnen).
+3. *APIs & Services*, *Library*: zet **Places API (New)** aan.
+4. *Credentials*, *Create credentials*, *API key*. Beperk de sleutel tot
+   Places API (New).
+5. Draai `node installeer/installeer.mjs` en plak de sleutel bij
+   *Google Places API key*.
+
+Het script zoekt het bedrijfsprofiel zelf op naam en adres. Pakt het het
+verkeerde profiel, zet dan het Place ID als secret `GOOGLE_PLACE_ID`.
+
 ## Mailadressen en toestemming (AVG)
 
 - Bij het reserveren staat een vinkje *"Ja, stuur me af en toe nieuws..."*.
