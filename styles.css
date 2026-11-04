@@ -2284,3 +2284,66 @@ body { background: var(--cream); }
 .hours-section .hours-row.special .time { color: #FFFFFF; }
 .g-card blockquote { -webkit-line-clamp: 10; }
 .g-card { padding-top: 30px; }
+
+/* Review-kaartjes: klikbaar naar Google, met initiaal en zachte schaduw */
+.g-reviews .g-card {
+  text-decoration: none; color: inherit; background: #FFFFFF; border: 0; border-radius: 18px;
+  padding: 26px 26px 22px; gap: 16px;
+  box-shadow: 0 1px 2px rgba(43, 29, 41, 0.05), 0 14px 30px -18px rgba(77, 56, 83, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.g-reviews .g-card::before {
+  content: "\201C"; top: auto; bottom: 8px; right: 18px; font-size: 110px; line-height: 0.6;
+  color: var(--cream-2); pointer-events: none;
+}
+.g-reviews .g-card:hover, .g-reviews .g-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 2px 4px rgba(43, 29, 41, 0.06), 0 22px 40px -18px rgba(77, 56, 83, 0.45);
+}
+.g-reviews .g-card:focus-visible { outline: 2px solid var(--aubergine); outline-offset: 3px; }
+.g-card-head { display: flex; align-items: center; gap: 12px; position: relative; z-index: 1; }
+.g-avatar {
+  flex: none; width: 42px; height: 42px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--aubergine); color: #FFFFFF; font-family: var(--serif); font-weight: 700; font-size: 18px;
+}
+.g-card:nth-child(3n+2) .g-avatar { background: var(--aubergine-deep); }
+.g-card:nth-child(3n) .g-avatar { background: #8E6A94; }
+.g-who { display: grid; gap: 1px; min-width: 0; }
+.g-who strong { font-size: 15px; color: var(--ink); }
+.g-who span { font-size: 12.5px; color: var(--ink-mute); }
+.g-quote {
+  position: relative; z-index: 1; font-size: 15.5px; line-height: 1.65; color: var(--ink);
+  display: -webkit-box; -webkit-line-clamp: 8; -webkit-box-orient: vertical; overflow: hidden;
+}
+.g-more {
+  margin-top: auto; position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13.5px; font-weight: 600; color: var(--aubergine);
+}
+.g-card:hover .g-more { text-decoration: underline; text-underline-offset: 3px; }
+.g-cards { padding: 6px 4px 18px; margin: -6px -4px 0; }
+@media (prefers-reduced-motion: reduce) { .g-reviews .g-card { transition: none; } .g-reviews .g-card:hover { transform: none; } }
+
+/* Menukaart als tegels: twee naast elkaar, een geopende categorie over de hele breedte */
+.menu-acc { display: grid; grid-template-columns: 1fr; gap: 12px; border-top: 0; }
+@media (min-width: 760px) { .menu-acc { grid-template-columns: 1fr 1fr; gap: 14px; } }
+.menu-acc-item {
+  border: 0; border-radius: 16px; background: var(--cream);
+  box-shadow: inset 0 0 0 1px var(--line-soft);
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+.menu-acc-item:hover { box-shadow: inset 0 0 0 1px var(--aubergine-soft); }
+.menu-acc-item.open { grid-column: 1 / -1; background: #FFFFFF; box-shadow: inset 0 0 0 1px var(--aubergine-soft), 0 14px 30px -22px rgba(77, 56, 83, 0.4); }
+.menu-acc-head { padding: 20px 20px; align-items: center; }
+.menu-acc-text { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.menu-acc-title { font-size: 21px; flex: none; }
+.menu-acc-preview { font-size: 13.5px; color: var(--ink-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu-acc-count { font-size: 12.5px; }
+.menu-acc-body { padding: 0 22px 22px; }
+@media (min-width: 760px) { .menu-acc-item:not(.open) .menu-acc-count { display: none; } }
+@media (max-width: 400px) { .menu-acc-head { padding: 16px; } .menu-acc-title { font-size: 18px; } .menu-acc-body { padding: 0 16px 16px; } }
+
+/* Reviews: ruimte voor de schaduw, langere teksten helemaal zichtbaar */
+.g-cards { padding: 6px 6px 40px; margin: -6px -6px -22px; }
+.g-quote { -webkit-line-clamp: 10; }
+@media (min-width: 760px) { .menu-acc { grid-auto-flow: row dense; } }

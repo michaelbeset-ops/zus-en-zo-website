@@ -360,14 +360,18 @@ function GoogleReviews() {
           <div className="g-slider">
           <div className="g-cards" ref={scroller}>
             {shown.map((r, i) => (
-              <figure className="g-card" key={i}>
+              <a className="g-card" key={i} href={g.url} target="_blank" rel="noopener" aria-label={`Review van ${r.author} op Google lezen`}>
+                <span className="g-card-head">
+                  <span className="g-avatar" aria-hidden="true">{r.author.charAt(0).toUpperCase()}</span>
+                  <span className="g-who">
+                    <strong>{r.author}</strong>
+                    <span>{r.when ? r.when + " · " : ""}Review op Google</span>
+                  </span>
+                </span>
                 {r.rating ? <Stars value={r.rating} size={15} /> : null}
-                <blockquote>{r.text}</blockquote>
-                <figcaption>
-                  <strong>{r.author}</strong>
-                  <span>{r.when ? r.when + " · " : ""}via Google</span>
-                </figcaption>
-              </figure>
+                <span className="g-quote">{r.text}</span>
+                <span className="g-more">Lees op Google <IconArrow /></span>
+              </a>
             ))}
           </div>
           {shown.length > 3 && (

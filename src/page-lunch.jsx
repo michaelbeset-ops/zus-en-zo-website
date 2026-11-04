@@ -42,7 +42,14 @@ function MenuBlocks({ sections }) {
         return (
           <div className={"menu-acc-item" + (isOpen ? " open" : "")} key={sec.title}>
             <button type="button" className="menu-acc-head" aria-expanded={isOpen} aria-controls={id} onClick={() => toggle(sec.title)}>
-              <span className="menu-acc-title">{sec.title}</span>
+              <span className="menu-acc-text">
+                <span className="menu-acc-title">{sec.title}</span>
+                {!isOpen && (
+                  <span className="menu-acc-preview">
+                    {sec.items.slice(0, 3).map((it) => it.name).join(", ")}{sec.items.length > 3 ? " en meer" : ""}
+                  </span>
+                )}
+              </span>
               <span className="menu-acc-count">{sec.items.length} {sec.items.length === 1 ? "gerecht" : "gerechten"}</span>
               <span className="menu-acc-icon" aria-hidden="true">{isOpen ? "−" : "+"}</span>
             </button>
