@@ -9,26 +9,26 @@ function MapPlaceholder() {
   return (
     <div className="map-ph">
       <svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        <rect width="500" height="400" fill="#EEE7DC" />
+        <rect width="500" height="400" fill="#F7F3F8" />
         {/* parcels */}
-        <rect x="40" y="40" width="120" height="80" fill="#E4D9C6" />
-        <rect x="40" y="140" width="80" height="100" fill="#E4D9C6" />
-        <rect x="140" y="140" width="100" height="60" fill="#E4D9C6" />
-        <rect x="260" y="40" width="200" height="100" fill="#E4D9C6" />
-        <rect x="40" y="280" width="200" height="80" fill="#E4D9C6" />
-        <rect x="320" y="180" width="140" height="100" fill="#E4D9C6" />
-        <rect x="280" y="300" width="180" height="60" fill="#E4D9C6" />
+        <rect x="40" y="40" width="120" height="80" fill="#ECE6EE" />
+        <rect x="40" y="140" width="80" height="100" fill="#ECE6EE" />
+        <rect x="140" y="140" width="100" height="60" fill="#ECE6EE" />
+        <rect x="260" y="40" width="200" height="100" fill="#ECE6EE" />
+        <rect x="40" y="280" width="200" height="80" fill="#ECE6EE" />
+        <rect x="320" y="180" width="140" height="100" fill="#ECE6EE" />
+        <rect x="280" y="300" width="180" height="60" fill="#ECE6EE" />
         {/* streets */}
-        <line x1="0" y1="130" x2="500" y2="130" stroke="#FBF8F3" strokeWidth="14" />
-        <line x1="0" y1="270" x2="500" y2="270" stroke="#FBF8F3" strokeWidth="14" />
-        <line x1="170" y1="0" x2="170" y2="400" stroke="#FBF8F3" strokeWidth="14" />
-        <line x1="260" y1="0" x2="260" y2="400" stroke="#FBF8F3" strokeWidth="14" />
+        <line x1="0" y1="130" x2="500" y2="130" stroke="#FFFFFF" strokeWidth="14" />
+        <line x1="0" y1="270" x2="500" y2="270" stroke="#FFFFFF" strokeWidth="14" />
+        <line x1="170" y1="0" x2="170" y2="400" stroke="#FFFFFF" strokeWidth="14" />
+        <line x1="260" y1="0" x2="260" y2="400" stroke="#FFFFFF" strokeWidth="14" />
         {/* plein */}
-        <rect x="170" y="210" width="90" height="60" fill="#D8CFC0" />
-        <text x="180" y="247" fontSize="12" fontFamily="Hanken Grotesk, sans-serif" fill="#8B7355">Raadhuisplein</text>
+        <rect x="170" y="210" width="90" height="60" fill="#DCD3DE" />
+        <text x="180" y="247" fontSize="12" fontFamily="Hanken Grotesk, sans-serif" fill="#776D7A">Raadhuisplein</text>
         {/* small details */}
-        <line x1="0" y1="200" x2="170" y2="200" stroke="#E4D9C6" strokeWidth="2" />
-        <line x1="260" y1="200" x2="500" y2="200" stroke="#E4D9C6" strokeWidth="2" />
+        <line x1="0" y1="200" x2="170" y2="200" stroke="#ECE6EE" strokeWidth="2" />
+        <line x1="260" y1="200" x2="500" y2="200" stroke="#ECE6EE" strokeWidth="2" />
       </svg>
       <div className="map-pin">
         <div className="label"><span className="a">37</span> Zus &amp; Zo</div>

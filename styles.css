@@ -3,7 +3,7 @@
    ============================================================ */
 
 :root {
-  /* Warm sand-taupe palette — picks up the wood + plaster tones in the room */
+  /* Basiskleuren; onderaan dit bestand wit gemaakt in plaats van zand */
   --cream: #E3D6C0;          /* page background */
   --cream-2: #D9CAB0;        /* alternate section bg */
   --cream-3: #CCBC9F;        /* deeper accent on sand */
@@ -2127,3 +2127,23 @@ html, body { overflow-x: clip; }
 .option-grid .option-btn:hover { border-color: var(--aubergine); color: var(--aubergine); }
 .option-grid .option-btn.selected { background: var(--aubergine); color: #fff; border-color: var(--aubergine); }
 .menu-acc-note { font-size: 13px; font-style: italic; color: var(--ink-mute); margin: 10px 0 0; }
+
+/* ============================================================
+   Wit in plaats van beige: rustige witte basis, lichte lila
+   voor afwisselende blokken, paars blijft de accentkleur.
+   ============================================================ */
+:root {
+  --cream: #FFFFFF;
+  --cream-2: #F7F3F8;
+  --cream-3: #ECE4EE;
+  --paper: #FFFFFF;
+  --paper-2: #FFFFFF;
+  --ink: #241A27;
+  --ink-soft: #4E4551;
+  --ink-mute: #776D7A;
+  --line: #D8D0DA;
+  --line-soft: #E9E4EB;
+}
+body { background: #FFFFFF; }
+.nav.scrolled, .nav.solid { background: rgba(255, 255, 255, 0.96); }
+.choice:hover { background: var(--cream-2); }

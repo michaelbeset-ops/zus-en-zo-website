@@ -118,14 +118,14 @@ const beheerUrl = () => `${SITE_URL}/beheer.html`
 
 // Kleuren uit styles.css: aubergine, zand, warm bruin.
 const C = {
-  bg: '#E3D6C0',
-  card: '#F4EAD6',
-  ink: '#2A1F1A',
-  text: '#5E4A3C',
-  muted: '#8B7355',
-  line: '#D2C2A2',
+  bg: '#F7F3F8',
+  card: '#FFFFFF',
+  ink: '#241A27',
+  text: '#4E4551',
+  muted: '#776D7A',
+  line: '#E9E4EB',
   accent: '#6B4E71',
-  wash: '#EFE3CD',
+  wash: '#F7F3F8',
 }
 const SANS = "'Helvetica Neue', Helvetica, Arial, sans-serif"
 
@@ -147,7 +147,7 @@ const wrapper = (ctx: MailContext, preheader: string, content: string, footerNot
         <tr>
           <td style="background-color:${C.accent};padding:28px 40px;">
             <p style="margin:0 0 4px 0;font-family:${SANS};font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#E6D6E0;">Lunchcafé &middot; Etten-Leur</p>
-            <p style="margin:0;font-family:${SANS};font-size:28px;font-weight:700;color:#F4EAD6;letter-spacing:-0.5px;">Zus <span style="font-style:italic;font-weight:400;color:#C9A875;">&amp;</span> Zo</p>
+            <p style="margin:0;font-family:${SANS};font-size:28px;font-weight:700;color:#FFFFFF;letter-spacing:-0.5px;">Zus <span style="font-style:italic;font-weight:400;color:#C9A875;">&amp;</span> Zo</p>
           </td>
         </tr>
         <tr><td style="padding:36px 40px 8px 40px;">${content}</td></tr>
@@ -189,7 +189,7 @@ const para = (html: string) =>
 
 const button = (href: string, label: string) => `
     <div style="margin:0 0 26px 0;">
-      <a href="${href}" style="display:inline-block;background:${C.accent};color:#F4EAD6;font-family:${SANS};font-size:14px;font-weight:600;text-decoration:none;padding:13px 24px;border-radius:2px;">${label}</a>
+      <a href="${href}" style="display:inline-block;background:${C.accent};color:#FFFFFF;font-family:${SANS};font-size:14px;font-weight:600;text-decoration:none;padding:13px 24px;border-radius:2px;">${label}</a>
     </div>`
 
 const signOff = () => para(`Tot zo,<br><strong style="color:${C.ink};">${escape(CAFE.name)}</strong>`)
