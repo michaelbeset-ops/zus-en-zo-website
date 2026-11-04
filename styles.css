@@ -2129,21 +2129,25 @@ html, body { overflow-x: clip; }
 .menu-acc-note { font-size: 13px; font-style: italic; color: var(--ink-mute); margin: 10px 0 0; }
 
 /* ============================================================
-   Wit in plaats van beige: rustige witte basis, lichte lila
-   voor afwisselende blokken, paars blijft de accentkleur.
+   Warme rozetinten in plaats van zand: zacht roze-crème als basis,
+   oudroze voor afwisselende blokken, paars als accent en voor de balk.
    ============================================================ */
 :root {
-  --cream: #FFFFFF;
-  --cream-2: #F7F3F8;
-  --cream-3: #ECE4EE;
-  --paper: #FFFFFF;
-  --paper-2: #FFFFFF;
-  --ink: #241A27;
-  --ink-soft: #4E4551;
-  --ink-mute: #776D7A;
-  --line: #D8D0DA;
-  --line-soft: #E9E4EB;
+  --cream: #F7EDED;
+  --cream-2: #EFDEE4;
+  --cream-3: #E3CBD6;
+  --paper: #FDF8F7;
+  --paper-2: #FFFBFA;
+  --ink: #2B1D29;
+  --ink-soft: #574752;
+  --ink-mute: #85717E;
+  --line: #DBC6CF;
+  --line-soft: #EADAE0;
 }
-body { background: #FFFFFF; }
-.nav.scrolled, .nav.solid { background: rgba(255, 255, 255, 0.96); }
+body { background: var(--cream); }
+.nav.scrolled, .nav.solid { background: rgba(247, 237, 237, 0.96); }
 .choice:hover { background: var(--cream-2); }
+/* Bewegende balk in paars met roze hartjes */
+.detail-strip { background: var(--aubergine-deep); color: #F6E8EF; border-bottom: 0; }
+.detail-strip .strip-track span { color: #F6E8EF; }
+.detail-strip .strip-heart { color: var(--aubergine-soft); }
