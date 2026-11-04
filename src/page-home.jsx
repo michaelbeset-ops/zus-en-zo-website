@@ -438,7 +438,6 @@ function PageHome({ go, openReserve }) {
     <main>
       <Hero go={go} openReserve={openReserve} />
       <Intro />
-      <MenuTeaser go={go} />
       <Offerings go={go} />
       <AlsoBand go={go} openReserve={openReserve} />
       <GoogleReviews />
