@@ -52,6 +52,7 @@ function MenuBlocks({ sections }) {
                 <div className="menu-acc-dishes">
                   {sec.items.map((it, i) => <Dish key={it.name + i} item={it} />)}
                 </div>
+                {sec.note && <p className="menu-acc-note">{sec.note}</p>}
               </div>
             )}
           </div>
@@ -117,8 +118,8 @@ function CardComingSoon({ what }) {
 function PageLunch({ openReserve }) {
   const cards = [
     { id: "lunch", title: "Lunchkaart", sub: "Broodjes, sandwiches, salades, warme lunch en desserts", sections: window.LUNCHKAART },
-    { id: "lactosevrij", title: "Lactosevrije kaart", body: <CardComingSoon what="lactosevrije kaart" /> },
-    { id: "glutenvrij", title: "Glutenvrije kaart", body: <CardComingSoon what="glutenvrije kaart" /> },
+    { id: "lactosevrij", title: "Lactosevrije kaart", sub: "Alles op lactosevrij brood, ook lactosevrij gebak", sections: window.LACTOSEVRIJE_KAART },
+    { id: "glutenvrij", title: "Glutenvrije kaart", sub: "Alles op glutenvrij brood, ook gluten- en lactosevrij gebak", sections: window.GLUTENVRIJE_KAART },
     { id: "borrel", title: "Borrelkaart", body: <CardComingSoon what="borrelkaart" /> },
   ];
   return (

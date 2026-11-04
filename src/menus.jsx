@@ -1,7 +1,8 @@
 /* global window */
 // =============================================================
 // Menukaarten, overgenomen uit de pdf's van het café:
-//   Zomerkaart 2026 (lunch), Bezorgkaart winter 25/26, Dinerkaart zomer 2026.
+//   Zomerkaart 2026 (lunch), Bezorgkaart winter 25/26, Dinerkaart zomer 2026,
+//   lactosevrije en glutenvrije kaart (foto's van de kaarten in het café).
 // Nieuwe kaart? Pas alleen dit bestand aan.
 // veg: true = vegetarisch (groene V op de kaart).
 // =============================================================
@@ -285,4 +286,143 @@ const DINERKAART = [
   },
 ];
 
-Object.assign(window, { LUNCHKAART, BEZORGKAART, VERGADERPAKKETTEN, DINERKAART });
+// Lactosevrije en glutenvrije kaart: overgetypt van de kaarten in het café.
+const FRIET_NOTE = "*Onze friet bevat geen lactose of gluten, maar wordt gebakken in gedeelde olie met producten die dit wel bevatten.";
+
+const LACTOSEVRIJE_KAART = [
+  {
+    title: "Belegde broodjes",
+    intro: "Waldkorn of een focaccia. Belegd met dagverse rauwkost.",
+    items: [
+      { name: "Carpaccio", desc: "met zontomaat, pitjes, rucola en truffelmayonaise", price: "12,50" },
+      { name: "Gezond", desc: "met ham, ei, sla, tomaat, komkommer en cocktailsaus", price: "11,25" },
+      { name: "Gerookte zalm", desc: "met citroen-dillesaus, gefrituurde kappertjes, bosui en wasabikroepoek", price: "13,95" },
+      { name: "Eiersalade", veg: true, extra: "(met rauwe ham + €1,95)", desc: "met truffelmayonaise en bosui", price: "9,95" },
+    ],
+  },
+  {
+    title: "Warme lunch specialiteiten",
+    intro: "Op een waldkorn of een focaccia.",
+    items: [
+      { name: "Wrap crispy chicken", desc: "krokante kip, paprika, rode ui en kimchimayonaise", price: "12,50" },
+      { name: "Hete kip", desc: "met pittige kip volgens Zus & Zo recept, maïs, cocktailsaus en tomatensalsa", price: "13,95" },
+      { name: "Big Zus & Zo", desc: "tijgerbol met een runderhamburger, spek en burgersaus. Geserveerd met een mandje friet*", price: "18,95" },
+      { name: "Broodje steak", desc: "met biefstuk, gebakken ui, champignons, cherrytomaat en chimichurrimayonaise", price: "18,95" },
+    ],
+  },
+  {
+    title: "Sandwiches (3-laags)",
+    intro: "Lactosevrij brood.",
+    items: [
+      { name: "Sandwich Zus", desc: "met kip, spek, ei en remouladesaus", price: "14,95" },
+      { name: "Sandwich Zo", desc: "met kip, gerookte zalm, ei, cocktailsaus en remouladesaus", price: "16,50" },
+      { name: "Healthy sandwich", veg: true, extra: "(met rosbief + €2,00)", desc: "met hoemoes, zongedroogde tomaat, gegrilde groenten en pittenmelange, geserveerd met groentechips", price: "14,95" },
+    ],
+  },
+  {
+    title: "Soepen en specials",
+    items: [
+      { name: "Tomatensoep", veg: true, desc: "met lactosevrij brood en basilicumolie", price: "7,25" },
+    ],
+  },
+  {
+    title: "Eiergerechten (omelet of uitsmijter)",
+    intro: "Lactosevrij brood.",
+    items: [
+      { name: "Naturel", price: "9,50" },
+      { name: "Extra ingrediënt", desc: "keuze uit ham of spek", price: "+ 1,50" },
+      { name: "Uitsmijter de luxe", desc: "rosbief, rucola, truffelmayonaise en pitjes", price: "15,95" },
+      { name: "Uitsmijter zalm", desc: "gerookte zalm, rode ui, rucola en mierikswortelmayonaise", price: "16,75" },
+    ],
+  },
+  {
+    title: "Salades",
+    intro: "Geserveerd met lactosevrij brood en olijfolie.",
+    items: [
+      { name: "Carpaccio", desc: "met zontomaat, pittenmelange, rucola, truffelkroepoek en truffelmayonaise", price: "16,95" },
+      { name: "Mexicaanse kip", desc: "met pittige kip volgens Zus & Zo recept, maïs, paprika en tomatensalsa", price: "15,95" },
+      { name: "Salade zalm", desc: "met gerookte zalm, rode ui, gefrituurde kappertjes, ei, rode curry kroepoek en citroen-dilledressing", price: "18,50" },
+      { name: "Mandje friet*", desc: "met mayonaise", price: "3,95" },
+    ],
+    note: FRIET_NOTE,
+  },
+  {
+    title: "Lactosevrij gebak",
+    intro: "Ons lactosevrije gebak wordt met liefde en zorg bereid, waardoor het soms langer kan duren dan je van ons gewend bent.",
+    items: [
+      { name: "Lactosevrije appeltaart", price: "3,95" },
+      { name: "Lactosevrije brownie met noten", price: "5,25" },
+    ],
+  },
+];
+
+const GLUTENVRIJE_KAART = [
+  {
+    title: "Belegde broodjes",
+    intro: "Op een glutenvrij broodje.",
+    items: [
+      { name: "Carpaccio", desc: "met zontomaat, pittenmelange, Parmezaanse kaas, rucola en truffelmayonaise", price: "12,50" },
+      { name: "Gezond", desc: "met ham, kaas, ei, paprika, tomaat, komkommer, zoetzure ui en cocktailsaus", price: "11,25" },
+      { name: "Gerookte zalm", desc: "met roomkaas, citroen-dilledressing, zontomaat en ui", price: "13,95" },
+      { name: "Brie", extra: "(met rauwe ham + €1,95)", desc: "met vijgencompote, rode ui, zontomaat, gesuikerde walnoten en balsamicostroop", price: "13,95" },
+    ],
+  },
+  {
+    title: "Warme lunch specialiteiten",
+    intro: "Glutenvrij broodje.",
+    items: [
+      { name: "Geitenkaas", veg: true, extra: "(met spek + €0,95)", desc: "met walnoten, rode biet, frambozendressing en balsamico", price: "13,95" },
+      { name: "Hete kip", desc: "met pittige kip volgens Zus & Zo recept, maïs, cocktailsaus, nacho's en kaas", price: "13,95" },
+      { name: "Broodje steak", desc: "met biefstuk, gebakken ui, champignons, cherrytomaat, cheddar en chimichurrimayonaise", price: "18,95" },
+    ],
+  },
+  {
+    title: "Sandwiches (3-laags)",
+    intro: "Op glutenvrij brood. Belegd met dagverse rauwkost.",
+    items: [
+      { name: "Sandwich Zus", desc: "met kip, spek, ei en remouladesaus", price: "14,95" },
+      { name: "Sandwich Zo", desc: "met kip, gerookte zalm, ei, cocktailsaus en remouladesaus", price: "16,50" },
+      { name: "Texmex sandwich", desc: "met roomkaas, guacamole, kip, ui, paprika, nacho's en cheddar", price: "14,95" },
+      { name: "Healthy sandwich", veg: true, extra: "(met rosbief + €2,00)", desc: "met hoemoes, zongedroogde tomaat, gegrilde groenten en pittenmelange, geserveerd met groentechips", price: "14,95" },
+    ],
+  },
+  {
+    title: "Soepen",
+    items: [
+      { name: "Tomatensoep", veg: true, desc: "met glutenvrije boterham en basilicumolie", price: "7,25" },
+    ],
+  },
+  {
+    title: "Eiergerechten (omelet of uitsmijter)",
+    intro: "Glutenvrij brood.",
+    items: [
+      { name: "Naturel", price: "9,50" },
+      { name: "Extra ingrediënt", desc: "keuze uit ham of spek", price: "+ 1,25" },
+      { name: "Uitsmijter de luxe", desc: "carpaccio, rucola en truffelmayonaise", price: "15,95" },
+      { name: "Uitsmijter zalm", desc: "gerookte zalm, rode ui, rucola en mierikswortelmayonaise", price: "16,75" },
+    ],
+  },
+  {
+    title: "Salades",
+    intro: "Met glutenvrij brood en kruidenboter.",
+    items: [
+      { name: "Carpaccio", desc: "met zontomaat, pitjes, Parmezaanse kaas, rucola en truffelmayonaise", price: "16,95" },
+      { name: "Geitenkaas", veg: true, extra: "(met spek + €1,25)", desc: "met warme geitenkaas, rode biet, walnoten, frambozendressing en balsamico", price: "15,95" },
+      { name: "Mexicaanse kip", desc: "met pittige kip volgens Zus & Zo recept, maïs, paprika, nacho's, kaas en cocktailsaus", price: "15,95" },
+      { name: "Salade zalm", desc: "met gerookte zalm, rode ui, citroen-dilledressing, zontomaat, ei, komkommer en kappertjes", price: "18,50" },
+      { name: "Mandje friet*", desc: "met mayonaise", price: "3,95" },
+    ],
+    note: FRIET_NOTE,
+  },
+  {
+    title: "Gluten- en lactosevrij gebak",
+    intro: "Ons gluten- en lactosevrije gebak wordt met liefde en zorg bereid, waardoor het soms langer kan duren dan je van ons gewend bent.",
+    items: [
+      { name: "Gluten- en lactosevrije appeltaart", price: "5,25" },
+      { name: "Gluten- en lactosevrije brownie met noten", price: "5,25" },
+      { name: "Glutenvrije passie-frambozenmeringue", price: "5,95" },
+    ],
+  },
+];
+
+Object.assign(window, { LUNCHKAART, BEZORGKAART, VERGADERPAKKETTEN, DINERKAART, LACTOSEVRIJE_KAART, GLUTENVRIJE_KAART });

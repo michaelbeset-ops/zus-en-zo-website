@@ -2126,3 +2126,4 @@ html, body { overflow-x: clip; }
 }
 .option-grid .option-btn:hover { border-color: var(--aubergine); color: var(--aubergine); }
 .option-grid .option-btn.selected { background: var(--aubergine); color: #fff; border-color: var(--aubergine); }
+.menu-acc-note { font-size: 13px; font-style: italic; color: var(--ink-mute); margin: 10px 0 0; }
