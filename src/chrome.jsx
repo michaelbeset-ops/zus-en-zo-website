@@ -208,10 +208,10 @@ function FloatingReserve({ onClick }) {
 //   tag        , bottom-right caption (e.g. "PLACEHOLDER, etagère shot")
 //   children   , extra content in the aside column (CTAs)
 // ---------------------------------------------------------------
-function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children }) {
+function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children, full }) {
   const tintClass = tint ? ` tint-${tint}` : "";
   return (
-    <section className={"page-hero" + tintClass}>
+    <section className={"page-hero" + tintClass + (full ? "" : " page-hero-compact")}>
       {image && !placeholder && (
         <img className="page-hero-img" src={image} alt={alt || ""} />
       )}

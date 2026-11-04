@@ -4,6 +4,44 @@
 // =============================================================
 const { useState: useStateC } = React;
 
+// Echte kaart van Google Maps. Google plaatst cookies, dus de kaart laadt pas
+// na toestemming voor "Marketing & social" of als de bezoeker zelf op de knop drukt.
+const MAP_QUERY = "Lunchcafé Zus & Zo, Raadhuisplein 37, 4873 BH Etten-Leur";
+const MAP_EMBED = "https://www.google.com/maps?q=" + encodeURIComponent(MAP_QUERY) + "&z=15&output=embed";
+const MAP_LINK = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(MAP_QUERY);
+
+function marketingConsent() {
+  try { return !!(JSON.parse(window.localStorage.getItem("zusenzo.cookieconsent.v1") || "{}").marketing); } catch (e) { return false; }
+}
+
+function ContactMap() {
+  const [show, setShow] = useStateC(marketingConsent);
+  React.useEffect(() => {
+    const on = () => { if (marketingConsent()) setShow(true); };
+    window.addEventListener("zz-consent", on);
+    return () => window.removeEventListener("zz-consent", on);
+  }, []);
+  if (show) {
+    return (
+      <div className="map-ph map-live">
+        <iframe title="Kaart: Lunchcafé Zus & Zo aan het Raadhuisplein in Etten-Leur" src={MAP_EMBED} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
+      </div>
+    );
+  }
+  return (
+    <div className="map-gate">
+      <MapPlaceholder />
+      <div className="map-gate-box">
+        <p>De kaart komt van Google Maps. Google plaatst daarbij cookies.</p>
+        <div className="map-gate-actions">
+          <button type="button" className="btn btn-primary" onClick={() => setShow(true)}>Kaart laden</button>
+          <a className="read-link" href={MAP_LINK} target="_blank" rel="noopener">Open in Google Maps <IconArrow /></a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MapPlaceholder() {
   // Hand-drawn stylized map: a few crossing lines suggesting a plein, with a pin
   return (
@@ -150,7 +188,7 @@ function PageContact({ openReserve }) {
         </div>
 
         <div>
-          <MapPlaceholder />
+          <ContactMap />
           <ContactForm />
         </div>
       </div>

@@ -29,6 +29,7 @@ function Hero({ go, openReserve }) {
   return (
     <React.Fragment>
       <window.PageHero
+        full
         image="assets/interieur.jpg"
         alt="Interieur Zus & Zo met paarse luchter, houten bar en bloemen"
         titleNode={

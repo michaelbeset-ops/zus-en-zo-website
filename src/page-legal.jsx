@@ -33,6 +33,7 @@ function CookieBanner({ go }) {
     } catch (e) { /* ignore */ }
     setState("hidden");
     setShowPrefs(false);
+    try { window.dispatchEvent(new Event("zz-consent")); } catch (e) { /* oude browser */ }
   };
 
   if (state !== "shown") return null;
@@ -110,7 +111,7 @@ function CookieBanner({ go }) {
                 />
                 <div>
                   <strong>Marketing & social</strong>
-                  <p>Voor ingebedde Instagram-content en eventuele advertenties (we gebruiken dit nu niet, maar in de toekomst misschien wel).</p>
+                  <p>Voor de kaart van Google Maps op de contactpagina en eventuele ingebedde content van bijvoorbeeld Instagram.</p>
                 </div>
               </label>
             </div>
@@ -302,7 +303,7 @@ function PageCookiebeleid() {
         <React.Fragment>
           <p>
             Wanneer je akkoord gaat met marketing-cookies kunnen externe partijen
-            (bijvoorbeeld Instagram of Facebook) cookies plaatsen via ingebedde content
+            (bijvoorbeeld Google via de kaart op de contactpagina, of Instagram en Facebook) cookies plaatsen via ingebedde content
             of knoppen. Wij hebben geen invloed op wat die partijen vervolgens met die
             gegevens doen. Lees daarom ook hun eigen privacybeleid voor de details.
           </p>
