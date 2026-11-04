@@ -2442,3 +2442,46 @@ body { background: var(--cream); }
 .sub-hero-frame .sub-hero-lede { color: rgba(255, 255, 255, 0.88); }
 .sub-hero-frame .page-hero-arrow-link { color: #FFFFFF; border-bottom-color: rgba(255, 255, 255, 0.5); }
 @media (min-width: 900px) { .sub-hero-frame { min-height: 520px; padding: 56px 56px; } .sub-hero-framed { padding-top: 104px; } }
+
+/* D. Kaart: lage foto over de breedte, paarse tekstkaart er half overheen (zoals Rosi) */
+.sub-hero-card { background: var(--cream); padding-bottom: 56px; }
+.sub-hero-card-photo { height: clamp(300px, 46svh, 460px); overflow: hidden; }
+.sub-hero-card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sub-hero-card-box {
+  position: relative; z-index: 2; margin-top: -150px; max-width: 640px; margin-left: auto;
+  background: var(--aubergine-deep); color: #FFFFFF; border-radius: 22px; padding: 36px 36px 32px;
+  box-shadow: 0 24px 50px -28px rgba(36, 22, 38, 0.6);
+}
+.sub-hero-card h1 { color: #FFFFFF; font-size: clamp(38px, 4.6vw, 60px); }
+.sub-hero-card h1 .it { color: #E8C7E1; }
+.sub-hero-card .sub-hero-lede { color: #E9D9E2; }
+.sub-hero-card .page-hero-arrow-link { color: #FFFFFF; border-bottom-color: rgba(255, 255, 255, 0.5); }
+.sub-hero-card .nav-cta { background: #FFFFFF; color: var(--aubergine-deep); }
+@media (max-width: 699px) { .sub-hero-card-box { margin-top: -70px; padding: 26px 22px; } .sub-hero-card-photo { height: 300px; margin-top: 64px; } }
+@media (min-width: 700px) { .sub-hero-card-photo { margin-top: 0; } }
+
+/* E. Collage: losse foto's schuin over elkaar, als polaroids op tafel */
+.sub-hero-collage { background: var(--cream-2); padding: 128px 0 80px; overflow: hidden; }
+.sub-hero-pile { position: relative; height: 420px; }
+.sub-hero-pile img {
+  position: absolute; object-fit: cover; border-radius: 6px; background: #fff;
+  border: 10px solid #FFFFFF; border-bottom-width: 34px; box-shadow: 0 18px 36px -18px rgba(36, 22, 38, 0.45);
+}
+.sub-hero-pile .pile-1 { width: 58%; aspect-ratio: 4 / 5; left: 18%; top: 10px; transform: rotate(-3deg); z-index: 2; }
+.sub-hero-pile .pile-2 { width: 44%; aspect-ratio: 1 / 1; left: 0; top: 150px; transform: rotate(-9deg); z-index: 1; }
+.sub-hero-pile .pile-3 { width: 42%; aspect-ratio: 1 / 1; right: 0; top: 190px; transform: rotate(7deg); z-index: 3; }
+@media (min-width: 900px) { .sub-hero-collage .sub-hero-grid { grid-template-columns: 6fr 6fr; gap: 64px; } .sub-hero-collage { padding: 150px 0 100px; } .sub-hero-pile { height: 500px; } }
+@media (max-width: 699px) { .sub-hero-pile { height: 360px; } }
+
+/* F. Fotostrook: titel op een rustige achtergrond, daaronder drie foto's naast elkaar */
+.sub-hero-strip { background: var(--cream); padding: 128px 0 56px; }
+.sub-hero-strip .sub-hero-text { display: grid; gap: 0 64px; }
+@media (min-width: 900px) {
+  .sub-hero-strip .sub-hero-text { grid-template-columns: 7fr 5fr; align-items: end; }
+  .sub-hero-strip h1 { grid-row: span 2; margin: 0; }
+  .sub-hero-strip { padding: 150px 0 72px; }
+}
+.sub-hero-photos { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-top: 44px; height: clamp(220px, 30vw, 340px); }
+.sub-hero-photos img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; display: block; min-width: 0; }
+@media (max-width: 699px) { .sub-hero-photos { grid-template-columns: 1fr 1fr; height: auto; } .sub-hero-photos img { aspect-ratio: 1 / 1; height: auto; } .sub-hero-photos img:first-child { grid-column: 1 / -1; aspect-ratio: 16 / 10; } }
+.sub-hero-photos { grid-template-rows: 100%; overflow: hidden; } @media (max-width: 699px) { .sub-hero-photos { grid-template-rows: none; overflow: visible; } }

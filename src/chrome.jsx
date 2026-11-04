@@ -46,7 +46,7 @@ const SUBHERO_DEFAULT = "photo";
 function subHeroVariant() {
   try {
     const q = new URLSearchParams(window.location.search).get("kop");
-    if (["photo", "split", "arch", "framed"].includes(q)) return q;
+    if (["photo", "split", "arch", "framed", "card", "collage", "strip"].includes(q)) return q;
   } catch (e) { /* oude browser */ }
   return SUBHERO_DEFAULT;
 }
@@ -231,6 +231,43 @@ function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, l
         {children && <div className="sub-hero-actions">{children}</div>}
       </div>
     );
+    // Extra sfeerfoto's voor collage en strook: echte foto's van de zaak (Instagram).
+    const extras = (window.INSTA_POSTS || []).map((x) => x.image).filter((x) => x && x !== image);
+    if (variant === "card") {
+      return (
+        <section className="sub-hero sub-hero-card">
+          <div className="sub-hero-card-photo"><img src={image} alt={alt || ""} /></div>
+          <div className="container"><div className="sub-hero-card-box">{text}</div></div>
+        </section>
+      );
+    }
+    if (variant === "collage") {
+      return (
+        <section className="sub-hero sub-hero-collage">
+          <div className="container sub-hero-grid">
+            {text}
+            <div className="sub-hero-pile" aria-hidden={false}>
+              <img className="pile-1" src={image} alt={alt || ""} />
+              {extras[0] && <img className="pile-2" src={extras[0]} alt="" />}
+              {extras[1] && <img className="pile-3" src={extras[1]} alt="" />}
+            </div>
+          </div>
+        </section>
+      );
+    }
+    if (variant === "strip") {
+      return (
+        <section className="sub-hero sub-hero-strip">
+          <div className="container">
+            {text}
+            <div className="sub-hero-photos">
+              <img src={image} alt={alt || ""} />
+              {extras.slice(0, 2).map((x) => <img key={x} src={x} alt="" />)}
+            </div>
+          </div>
+        </section>
+      );
+    }
     if (variant === "framed") {
       return (
         <section className="sub-hero sub-hero-framed">
