@@ -2497,3 +2497,12 @@ body { background: var(--cream); }
   .sub-hero-card-photo.is-trio img:nth-child(3) { display: none; }
   .sub-hero-card-box { margin-top: -90px; }
 }
+
+/* Kaart-kop: minder ingezoomd, compactere kaart zodat de foto's meer zichtbaar zijn */
+.sub-hero-card-photo { height: clamp(360px, 50svh, 480px); }
+.sub-hero-card-photo img { object-position: center 25%; }
+.sub-hero-card-box { margin-top: -96px; max-width: 560px; padding: 30px 32px 28px; }
+.sub-hero-card h1 { font-size: clamp(34px, 3.8vw, 50px); margin-bottom: 14px; }
+.sub-hero-card .sub-hero-lede { font-size: 16.5px; margin-bottom: 20px; }
+@media (max-width: 699px) { .sub-hero-card-photo { height: 340px; } .sub-hero-card-box { margin-top: -60px; padding: 24px 20px; } }
+.sub-hero-card { padding-bottom: 40px; }
