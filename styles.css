@@ -2346,3 +2346,8 @@ body { background: var(--cream); }
 /* Reviews: ruimte voor de schaduw, langere teksten helemaal zichtbaar */
 .g-cards { padding: 6px 6px 40px; margin: -6px -6px -22px; }
 .g-quote { -webkit-line-clamp: 10; }
+/* Review-kaartjes compacter: maximaal vijf regels, rest via Google */
+.g-reviews .g-card { padding: 22px 22px 18px; gap: 12px; }
+.g-quote { -webkit-line-clamp: 5; }
+.g-reviews .g-card::before { font-size: 84px; }
+@media (min-width: 900px) { .g-reviews.section { padding: 88px 0; } }
