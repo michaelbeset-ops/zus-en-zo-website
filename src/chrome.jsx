@@ -39,6 +39,18 @@ function Logo({ onClick }) {
   );
 }
 
+// Welke kop krijgen de subpagina's? "photo" = foto over de hele breedte,
+// "split" / "arch" / "framed" = rustigere koppen. ?kop=... in de adresbalk
+// overschrijft het, om te vergelijken.
+const SUBHERO_DEFAULT = "photo";
+function subHeroVariant() {
+  try {
+    const q = new URLSearchParams(window.location.search).get("kop");
+    if (["photo", "split", "arch", "framed"].includes(q)) return q;
+  } catch (e) { /* oude browser */ }
+  return SUBHERO_DEFAULT;
+}
+
 function Nav({ page, go, openReserve }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -56,7 +68,7 @@ function Nav({ page, go, openReserve }) {
 
   return (
     <React.Fragment>
-      <header className={"nav" + (scrolled ? " scrolled" : "")}>
+      <header className={"nav" + (scrolled || (page !== "home" && subHeroVariant() !== "photo") ? " scrolled" : "")}>
         <div className="nav-inner">
           <Logo onClick={(p) => { setOpen(false); go(p); }} />
           <nav className="nav-links" aria-label="Hoofdmenu">
@@ -210,6 +222,36 @@ function FloatingReserve({ onClick }) {
 // ---------------------------------------------------------------
 function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children, full }) {
   const tintClass = tint ? ` tint-${tint}` : "";
+  const variant = full ? "photo" : subHeroVariant();
+  if (variant !== "photo" && image && !placeholder) {
+    const text = (
+      <div className="sub-hero-text">
+        <h1>{titleNode}</h1>
+        {lede && <p className="sub-hero-lede">{lede}</p>}
+        {children && <div className="sub-hero-actions">{children}</div>}
+      </div>
+    );
+    if (variant === "framed") {
+      return (
+        <section className="sub-hero sub-hero-framed">
+          <div className="container">
+            <div className="sub-hero-frame">
+              <img src={image} alt={alt || ""} />
+              {text}
+            </div>
+          </div>
+        </section>
+      );
+    }
+    return (
+      <section className={"sub-hero sub-hero-" + variant}>
+        <div className="container sub-hero-grid">
+          {text}
+          <figure className="sub-hero-media"><img src={image} alt={alt || ""} /></figure>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className={"page-hero" + tintClass + (full ? "" : " page-hero-compact")}>
       {image && !placeholder && (
