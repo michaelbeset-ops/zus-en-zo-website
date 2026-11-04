@@ -2506,3 +2506,11 @@ body { background: var(--cream); }
 .sub-hero-card .sub-hero-lede { font-size: 16.5px; margin-bottom: 20px; }
 @media (max-width: 699px) { .sub-hero-card-photo { height: 340px; } .sub-hero-card-box { margin-top: -60px; padding: 24px 20px; } }
 .sub-hero-card { padding-bottom: 40px; }
+
+/* Kaart over de onderkant van de foto, zodat er geen lege band onder ontstaat */
+@media (min-width: 700px) {
+  .sub-hero-card { position: relative; padding-bottom: 44px; }
+  .sub-hero-card > .container { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; }
+  .sub-hero-card-box { margin-top: 0; }
+  .sub-hero-card-photo { height: clamp(440px, 58svh, 560px); }
+}
