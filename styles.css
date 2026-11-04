@@ -2247,12 +2247,6 @@ body { background: var(--cream); }
 .menu-teaser-list, .g-card { border-radius: 14px; }
 .insta-cell { overflow: hidden; }
 
-/* Instagram als mozaïek: één grote foto en vier kleine */
-@media (min-width: 1000px) {
-  .insta-grid { grid-template-columns: repeat(4, 1fr); grid-auto-rows: 1fr; gap: 14px; }
-  .insta-cell:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: 1 / 1; }
-  .insta-cell:nth-child(n+6) { display: none; }
-}
 
 /* Openingstijden en adres in de huiskleur, net als het diner-blok */
 .hours-section { background: var(--aubergine-deep); color: #F6E8EF; }
