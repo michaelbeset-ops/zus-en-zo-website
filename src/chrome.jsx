@@ -39,12 +39,10 @@ function Logo({ onClick }) {
   );
 }
 
-// Welke kop krijgen de subpagina's? "photo" = foto over de hele breedte,
-// "split" / "arch" / "framed" = rustigere koppen. ?kop=... in de adresbalk
-// overschrijft het, om te vergelijken.
-const SUBHERO_DEFAULT = "card";
-
-// Fotokeuze per pagina om te vergelijken: ?foto=1, 2 of 3 in de adresbalk.
+// Subpagina's krijgen een fotostrook met een paarse kaart erover; alleen de
+// homepage heeft de grote foto over het hele scherm.
+// Foto's per pagina: een lijst = drie naast elkaar, een los pad = één brede foto.
+// ?foto=1, 2 of 3 in de adresbalk toont een andere optie, om te vergelijken.
 const HERO_S = "assets/Schermafbeelding 2026-05-22 ";
 const HERO_PHOTO_OPTIONS = {
   "assets/gastvrouw-tray.png": [
@@ -85,13 +83,6 @@ function heroPhoto(image) {
   } catch (e) { /* oude browser */ }
   return opts[n - 1];
 }
-function subHeroVariant() {
-  try {
-    const q = new URLSearchParams(window.location.search).get("kop");
-    if (["photo", "split", "arch", "framed", "card", "collage", "strip"].includes(q)) return q;
-  } catch (e) { /* oude browser */ }
-  return SUBHERO_DEFAULT;
-}
 
 function Nav({ page, go, openReserve }) {
   const [open, setOpen] = useState(false);
@@ -110,7 +101,7 @@ function Nav({ page, go, openReserve }) {
 
   return (
     <React.Fragment>
-      <header className={"nav" + (scrolled || (page !== "home" && !["photo", "card"].includes(subHeroVariant())) ? " scrolled" : "")}>
+      <header className={"nav" + (scrolled ? " scrolled" : "")}>
         <div className="nav-inner">
           <Logo onClick={(p) => { setOpen(false); go(p); }} />
           <nav className="nav-links" aria-label="Hoofdmenu">
@@ -264,73 +255,21 @@ function FloatingReserve({ onClick }) {
 // ---------------------------------------------------------------
 function PageHero({ image, alt, tint, placeholder, eyebrow, number, titleNode, lede, tag, children, full }) {
   const tintClass = tint ? ` tint-${tint}` : "";
-  const variant = full ? "photo" : subHeroVariant();
-  if (!full) image = heroPhoto(image);
-  if (Array.isArray(image) && variant !== "card") image = image[0];
-  if (variant !== "photo" && image && !placeholder) {
-    const text = (
-      <div className="sub-hero-text">
-        <h1>{titleNode}</h1>
-        {lede && <p className="sub-hero-lede">{lede}</p>}
-        {children && <div className="sub-hero-actions">{children}</div>}
-      </div>
-    );
-    // Extra sfeerfoto's voor collage en strook: echte foto's van de zaak (Instagram).
-    const extras = (window.INSTA_POSTS || []).map((x) => x.image).filter((x) => x && x !== image);
-    if (variant === "card") {
-      return (
-        <section className="sub-hero sub-hero-card">
-          <div className={"sub-hero-card-photo" + (Array.isArray(image) ? " is-trio" : "")}>
-            {(Array.isArray(image) ? image : [image]).map((src, i) => <img key={src + i} src={src} alt={i === 0 ? alt || "" : ""} />)}
-          </div>
-          <div className="container"><div className="sub-hero-card-box">{text}</div></div>
-        </section>
-      );
-    }
-    if (variant === "collage") {
-      return (
-        <section className="sub-hero sub-hero-collage">
-          <div className="container sub-hero-grid">
-            {text}
-            <div className="sub-hero-pile" aria-hidden={false}>
-              <img className="pile-1" src={image} alt={alt || ""} />
-              {extras[0] && <img className="pile-2" src={extras[0]} alt="" />}
-              {extras[1] && <img className="pile-3" src={extras[1]} alt="" />}
-            </div>
-          </div>
-        </section>
-      );
-    }
-    if (variant === "strip") {
-      return (
-        <section className="sub-hero sub-hero-strip">
-          <div className="container">
-            {text}
-            <div className="sub-hero-photos">
-              <img src={image} alt={alt || ""} />
-              {extras.slice(0, 2).map((x) => <img key={x} src={x} alt="" />)}
-            </div>
-          </div>
-        </section>
-      );
-    }
-    if (variant === "framed") {
-      return (
-        <section className="sub-hero sub-hero-framed">
-          <div className="container">
-            <div className="sub-hero-frame">
-              <img src={image} alt={alt || ""} />
-              {text}
-            </div>
-          </div>
-        </section>
-      );
-    }
+  if (!full && image && !placeholder) {
+    const photos = heroPhoto(image);
     return (
-      <section className={"sub-hero sub-hero-" + variant}>
-        <div className="container sub-hero-grid">
-          {text}
-          <figure className="sub-hero-media"><img src={image} alt={alt || ""} /></figure>
+      <section className="sub-hero sub-hero-card">
+        <div className={"sub-hero-card-photo" + (Array.isArray(photos) ? " is-trio" : "")}>
+          {(Array.isArray(photos) ? photos : [photos]).map((src, i) => <img key={src + i} src={src} alt={i === 0 ? alt || "" : ""} />)}
+        </div>
+        <div className="container">
+          <div className="sub-hero-card-box">
+            <div className="sub-hero-text">
+              <h1>{titleNode}</h1>
+              {lede && <p className="sub-hero-lede">{lede}</p>}
+              {children && <div className="sub-hero-actions">{children}</div>}
+            </div>
+          </div>
         </div>
       </section>
     );

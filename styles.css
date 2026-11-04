@@ -2387,7 +2387,7 @@ body { background: var(--cream); }
 .map-ph .map-pin { display: none; }
 
 /* ============================================================
-   Koppen voor subpagina's (varianten: split, arch, framed)
+   Koppen voor subpagina's: fotostrook met een paarse kaart erover
    ============================================================ */
 .sub-hero { position: relative; }
 .sub-hero h1 {
@@ -2399,49 +2399,7 @@ body { background: var(--cream); }
 .sub-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; }
 .sub-hero-actions .page-hero-cta-row { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; margin: 0; }
 .sub-hero .page-hero-arrow-link { color: var(--aubergine); border-bottom-color: var(--aubergine-soft); }
-.sub-hero-grid { display: grid; gap: 36px; align-items: center; }
-.sub-hero-media { margin: 0; position: relative; min-width: 0; }
-.sub-hero-media img { display: block; width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 1; }
 .sub-hero-text { min-width: 0; }
-
-/* A. Gesplitst: tekst links, foto rechts met roze kader (zoals de homepage) */
-.sub-hero-split { background: var(--cream); padding: 128px 0 72px; }
-.sub-hero-split .sub-hero-media { aspect-ratio: 4 / 3; }
-.sub-hero-split .sub-hero-media img { border-radius: 18px; }
-.sub-hero-split .sub-hero-media::before {
-  content: ""; position: absolute; inset: 20px -20px -20px 20px; border-radius: 18px;
-  background: var(--aubergine-soft); opacity: 0.55;
-}
-@media (min-width: 900px) { .sub-hero-split .sub-hero-grid { grid-template-columns: 5fr 6fr; gap: 72px; } .sub-hero-split { padding: 150px 0 96px; } }
-
-/* B. Boog: oudroze vlak, foto in boogvorm, handgeschreven accent */
-.sub-hero-arch { background: var(--cream-2); padding: 128px 0 72px; overflow: hidden; }
-.sub-hero-arch .sub-hero-media { aspect-ratio: 4 / 5; max-height: 560px; width: min(100%, 440px); justify-self: center; }
-.sub-hero-arch .sub-hero-media img { border-radius: 999px 999px 22px 22px; }
-.sub-hero-arch .sub-hero-media::before {
-  content: ""; position: absolute; inset: -14px; border-radius: 999px 999px 30px 30px;
-  border: 2px solid var(--aubergine-soft);
-}
-.sub-hero-arch .sub-hero-media::after {
-  content: "\2665"; position: absolute; left: -28px; bottom: 60px; z-index: 2;
-  font-size: 34px; color: var(--aubergine); transform: rotate(-12deg);
-}
-@media (min-width: 900px) { .sub-hero-arch .sub-hero-grid { grid-template-columns: 7fr 5fr; gap: 72px; } .sub-hero-arch { padding: 150px 0 88px; } }
-
-/* C. Ingelijst: de foto blijft groot, maar binnen de pagina met ronde hoeken */
-.sub-hero-framed { background: var(--cream); padding: 96px 0 40px; }
-.sub-hero-frame {
-  position: relative; border-radius: 24px; overflow: hidden; min-height: 440px;
-  display: flex; align-items: flex-end; padding: 40px 32px;
-}
-.sub-hero-frame > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.sub-hero-frame::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(36, 22, 38, 0.15) 0%, rgba(36, 22, 38, 0.72) 100%); }
-.sub-hero-frame .sub-hero-text { position: relative; z-index: 1; color: #fff; max-width: 760px; }
-.sub-hero-frame h1 { color: #FFFFFF; }
-.sub-hero-frame h1 .it { color: #E8C7E1; }
-.sub-hero-frame .sub-hero-lede { color: rgba(255, 255, 255, 0.88); }
-.sub-hero-frame .page-hero-arrow-link { color: #FFFFFF; border-bottom-color: rgba(255, 255, 255, 0.5); }
-@media (min-width: 900px) { .sub-hero-frame { min-height: 520px; padding: 56px 56px; } .sub-hero-framed { padding-top: 104px; } }
 
 /* D. Kaart: lage foto over de breedte, paarse tekstkaart er half overheen (zoals Rosi) */
 .sub-hero-card { background: var(--cream); padding-bottom: 56px; }
@@ -2459,33 +2417,6 @@ body { background: var(--cream); }
 .sub-hero-card .nav-cta { background: #FFFFFF; color: var(--aubergine-deep); }
 @media (max-width: 699px) { .sub-hero-card-box { margin-top: -70px; padding: 26px 22px; } .sub-hero-card-photo { height: 300px; margin-top: 64px; } }
 @media (min-width: 700px) { .sub-hero-card-photo { margin-top: 0; } }
-
-/* E. Collage: losse foto's schuin over elkaar, als polaroids op tafel */
-.sub-hero-collage { background: var(--cream-2); padding: 128px 0 80px; overflow: hidden; }
-.sub-hero-pile { position: relative; height: 420px; }
-.sub-hero-pile img {
-  position: absolute; object-fit: cover; border-radius: 6px; background: #fff;
-  border: 10px solid #FFFFFF; border-bottom-width: 34px; box-shadow: 0 18px 36px -18px rgba(36, 22, 38, 0.45);
-}
-.sub-hero-pile .pile-1 { width: 58%; aspect-ratio: 4 / 5; left: 18%; top: 10px; transform: rotate(-3deg); z-index: 2; }
-.sub-hero-pile .pile-2 { width: 44%; aspect-ratio: 1 / 1; left: 0; top: 150px; transform: rotate(-9deg); z-index: 1; }
-.sub-hero-pile .pile-3 { width: 42%; aspect-ratio: 1 / 1; right: 0; top: 190px; transform: rotate(7deg); z-index: 3; }
-@media (min-width: 900px) { .sub-hero-collage .sub-hero-grid { grid-template-columns: 6fr 6fr; gap: 64px; } .sub-hero-collage { padding: 150px 0 100px; } .sub-hero-pile { height: 500px; } }
-@media (max-width: 699px) { .sub-hero-pile { height: 360px; } }
-
-/* F. Fotostrook: titel op een rustige achtergrond, daaronder drie foto's naast elkaar */
-.sub-hero-strip { background: var(--cream); padding: 128px 0 56px; }
-.sub-hero-strip .sub-hero-text { display: grid; gap: 0 64px; }
-@media (min-width: 900px) {
-  .sub-hero-strip .sub-hero-text { grid-template-columns: 7fr 5fr; align-items: end; }
-  .sub-hero-strip h1 { grid-row: span 2; margin: 0; }
-  .sub-hero-strip { padding: 150px 0 72px; }
-}
-.sub-hero-photos { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-top: 44px; height: clamp(220px, 30vw, 340px); }
-.sub-hero-photos img { width: 100%; height: 100%; object-fit: cover; border-radius: 16px; display: block; min-width: 0; }
-@media (max-width: 699px) { .sub-hero-photos { grid-template-columns: 1fr 1fr; height: auto; } .sub-hero-photos img { aspect-ratio: 1 / 1; height: auto; } .sub-hero-photos img:first-child { grid-column: 1 / -1; aspect-ratio: 16 / 10; } }
-.sub-hero-photos { grid-template-rows: 100%; overflow: hidden; } @media (max-width: 699px) { .sub-hero-photos { grid-template-rows: none; overflow: visible; } }
-.sub-hero-card-photo img { object-position: center 42%; }
 
 /* Kaart-kop: hogere fotostrook tot achter het menu, eventueel drie foto's naast elkaar */
 .sub-hero-card-photo { position: relative; height: clamp(400px, 62svh, 600px); display: flex; gap: 6px; background: var(--aubergine-deep); }
@@ -2514,3 +2445,10 @@ body { background: var(--cream); }
   .sub-hero-card-box { margin-top: 0; }
   .sub-hero-card-photo { height: clamp(440px, 58svh, 560px); }
 }
+/* Bezorgingen: "Particulier bestellen?" in de kaart als compact blokje i.p.v. rondje */
+.sub-hero-card .pickup-badge {
+  width: auto; height: auto; border-radius: 14px; padding: 16px 18px; margin-top: 18px;
+  align-items: flex-start; text-align: left; gap: 4px; box-shadow: none;
+}
+.sub-hero-card .pickup-badge strong { font-size: 17px; }
+.sub-hero-card .pickup-badge span { font-size: 13.5px; }
